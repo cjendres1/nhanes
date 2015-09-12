@@ -1,0 +1,17 @@
+Functions:
+=========
+
+nhanes                        Download an nhanes table
+nhanesDisplayTableNames       Display names of nhanes tables in a given survey
+nhanesDisplayTableVariables   Display names of Variables in a given nhanes table
+nhanesAttributes              Display attributes of an nhanes table
+nhanesTranslate				  Translate coded values to their interpreted values
+
+Datasets:
+========
+
+DEMOGRAPHICS    nhanes Demographics
+DIETARY         nhanes Dietary Info
+EXAMINATION     nhanes Examination
+LABORATORY      nhanes Laboratory
+QUESTIONNAIRE   nhanes Questionnaire
