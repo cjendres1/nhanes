@@ -1,6 +1,6 @@
 Package: nhanesA
-Version: 0.5
-Date: 2015-08-29
+Version: 0.5.1
+Date: 2015-09-12
 Title: NHANES Data Retrieval
 Author: Christopher Endres
 Maintainer: Christopher Endres <cjendres1@gmail.com>

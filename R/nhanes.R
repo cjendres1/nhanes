@@ -4,8 +4,8 @@ nhanesURL <- 'http://wwwn.cdc.gov/Nchs/Nhanes/'
 # Create a list of nhanes groups
 # Include convenient aliases
 nhanes_group <- list()
-nhanes_group['DEMO']          <- "DEMO"
-nhanes_group['DEMOGRAPHICS']  <- "DEMO"
+nhanes_group['DEMO']          <- "DEMOGRAPHICS"
+nhanes_group['DEMOGRAPHICS']  <- "DEMOGRAPHICS"
 nhanes_group['DIETARY']       <- "DIETARY"
 nhanes_group['DIET']          <- "DIETARY"
 nhanes_group['EXAMINATION']   <- "EXAMINATION"
@@ -33,8 +33,8 @@ nh_years['2009'] <- "2009-2010"
 nh_years['2010'] <- "2009-2010"
 nh_years['2011'] <- "2011-2012"
 nh_years['2012'] <- "2011-2012"
-#nh_years['2013'] <- "2013-2014"
-#nh_years['2014'] <- "2013-2014"
+nh_years['2013'] <- "2013-2014"
+nh_years['2014'] <- "2013-2014"
 
 # Continuous NHANES table names have a letter suffix that indicates the collection interval
 data_idx <- list()
@@ -45,7 +45,7 @@ data_idx['2005-2006'] <- "D"
 data_idx['2007-2008'] <- "E"
 data_idx['2009-2010'] <- "F"
 data_idx['2011-2012'] <- "G"
-#data_idx['2013-2014'] <- "H"
+data_idx['2013-2014'] <- "H"
 
 
 # An internal function that converts a year into the nhanes interval.
@@ -61,6 +61,7 @@ nhloc <- data.frame(stringr::str_locate_all(nh_table, '_'))
 if(nrow(nhloc)!=0){
   if((nhloc$start[nrow(nhloc)]+1) == nchar(nh_table)) {
     idx <- str_sub(nh_table, -1, -1) 
+    if(idx == 'A') {return(nh_year <- "1999-2000")}
     nh_year <- names(data_idx[grep(idx, data_idx)])
   } else { ## It appears a mistake was made in the table name
     message('Invalid column name')
@@ -124,13 +125,15 @@ nhanesTables <- function(nh_surveygroup, year, details = FALSE) {
   
   if(details == TRUE) {
     df <- unique(df[,3:length(df)])
-    df <- df[!is.na(str_match(df[['Data.File.Name']], idx)),]
+    if(nchar(idx) > 0) {
+    df <- df[!is.na(str_match(df[['Data.File.Name']], idx)),]}
     row.names(df) <- c(1:nrow(df))
     return(df)
   }
   else {
     tablenames <- as.character(unique(df[['Data.File.Name']]))
-    tablenames <- tablenames[!is.na(str_match(tablenames, idx))]
+    if(nchar(idx) > 0) {
+    tablenames <- tablenames[!is.na(str_match(tablenames, idx))]}
     desc  <- character(length(tablenames))
     for(i in 1:length(tablenames)) {
       desc[i] <- as.character(df[df[['Data.File.Name']]==tablenames[i],][['Data.File.Description']][[1]])
@@ -220,7 +223,6 @@ nhanesTableVars <- function(nh_surveygroup, nh_table, truncated = FALSE, nchar=1
 nhanes <- function(nh_table) {
   nht <- tryCatch({    
     nh_year <- get_year_from_nh_table(nh_table)
-#    nh_year <- names(data_idx[1])
     url <- str_c(nhanesURL, nh_year, '/', nh_table, '.XPT', collapse='')
     return(sasxport.get(url))
   },
