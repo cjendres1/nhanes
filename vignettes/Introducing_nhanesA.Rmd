@@ -1,0 +1,82 @@
+---
+title: "Introducing_nhanesA"
+author: "Christopher Endres"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introducing_nhanesA}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Background
+nhanesA was developed to enable fully customizable retrieval of data from the National Health and Nutrition Examination Survey (NHANES). The survey is conducted by the National Center for Health Statistics (NCHS), and data are made publicly available via their website: http://www.cdc.gov/nchs/nhanes.htm. Approximately 5,000 people are included in the survey each year, and the results are grouped in two-year intervals. NHANES data are reported in well over one thousand peer-reviewed journal publications every year. 
+
+## NHANES Data
+Since 1999, the NHANES survey has been conducted continuously. The surveys during that period are referred to as "continous NHANES" to distinguish from several prior surveys that were performed intermittently. Continuous NHANES surveys are grouped in two-year intervals, where the first interval corresponds to 1999-2000.
+
+Most NHANES data are in the form of tables stored in SAS 'XPT' format.
+The data are grouped into five data categories that are publicly available, as well as an additional category (Limited access data) that requires written justification and prior approval before access. Package nhanesA is intended mostly for use with the publicly available data, but some information pertaining to the limited access data can also be retrieved.
+
+The five publicly available data categories are:
+- Demographics  (DEMO)
+- Dietary       (DIET)
+- Examination   (EXAM)
+- Laboratory    (LAB)
+- Questionnaire (Q)
+Abbreviated forms are in parentheses
+
+### List NHANES Tables
+Use nhanesTables to get information on tables that are available for a given category for a given year.
+```{r}
+suppressWarnings(library(nhanesA))
+nhanesTables('EXAM', 2005)
+```
+
+Note that the survey is grouped in two-year intervals beginning with the odd year. For convenience, only a single 4-digit year is entered such that ``` nhanesTables('EXAM', 2005) ``` and ``` nhanesTables('EXAM', 2006)``` yield identical output. In the preceding example we see that the Examination data for the 2005-2006 survey consists of thirteen tables.
+
+After viewing the output, we decide we are interested in table 'BPX_D' that contains blood pressure data.
+To better determine if that table is of interest, we can display detailed information on the table contents using nhanesTableVars.
+```{r}
+nhanesTableVars('EXAM', 'BPX_D', nchar = 62)
+```
+We see that there are 28 columns in table BPX_D. The first column (SEQN) is the respondent sequence number and is included in every NHANES table. Effectively, SEQN is a subject identifier that is used to join information across tables.
+We now import BPX\_D along with the demographics table DEMO\_D.
+```{r}
+bpx_d  <- nhanes('BPX_D')
+demo_d <- nhanes('DEMO_D')
+```
+We can then merge the tables: 
+```{r}
+bpx <- merge(demo_d, bpx_d)
+```
+We can compute mean blood pressure by gender.
+NHANES uses coded values for many fields. As an example, gender is recorded as 1 or 2. To determine what the values mean, we can list the code translations for the gender field RIAGENDR in table DEMO_D
+```{r}
+nhanesTranslate('DEMO_D', 'RIAGENDR')
+```
+If desired, we can use nhanesTranslate to apply the code translation to demo\_b directly by assigning data=demo\_b. 
+```{r, eval=FALSE}
+levels(demo_b$RIAGENDR)
+demo_b <- nhanesTranslate('DEMO_D', 'RIAGENDR', data=demo_b)
+levels(demo_b$RIAGENDR)
+```
+
+## Batch processing
+The goal of nhanesA is to enable fully customizable selection of NHANES tables. However, it may be desired to download entire sets or apply all possible code translations.  Here are some examples showing the use of nhanesA for rapid processing.
+
+Say we want to download every questionnaire in the 2007-2008 survey.  We first get a list of the table names by using nhanesTables with namesonly = TRUE. The tables can then be downloaded using nhanes with lapply.
+```{r,eval=FALSE}
+q2007names  <- nhanesTables('Q', 2007, namesonly=TRUE)
+q2007tables <- lapply(q2007names, nhanes)
+names(q2007tables) <- q2007names
+```
+Similarly, to quickly apply all possible code translations to a given table, we need to first get a list of all the table columns then use nhanesTranslate to apply the translation one column at a time.
+```{r,eval=FALSE}
+bpx_d <- nhanes('BPX_D')
+head(bpx_d)
+bpx_d_vars  <- nhanesTableVars('EXAM', 'BPX_D', namesonly=TRUE)
+bpx_d <- nhanesTranslate('BPX_D', bpx_d_vars, data=bpx_d)
+head(bpx_d)
+```
+Some discretion is applied by nhanesTranslate such that not all of the coded columns will be translated. In general, columns that have at least two categories (e.g. Male, Female) will be translated.  In some cases the code translations are quite long, thus to improve readability it may be desirable to limit the length by setting nchar.

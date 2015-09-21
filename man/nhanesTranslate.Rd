@@ -4,17 +4,24 @@
 \alias{nhanesTranslate}
 \title{Display code translation information for the specified table.}
 \usage{
-nhanesTranslate(nh_table, colname, details = FALSE)
+nhanesTranslate(nh_table, colnames, data = NULL, nchar = 32,
+  details = FALSE)
 }
 \arguments{
-\item{nh_table}{The name of the specific table to retrieve.}
+\item{nh_table}{The name of the NHANES table to retrieve.}
 
-\item{colname}{The name of the column to translate}
+\item{colnames}{The names of the columns to translate.}
+
+\item{data}{If a data frame is passed, then code translation will be applied directly to the data frame. \cr
+In that case the return argument is the code-translated data frame.}
+
+\item{nchar}{Applies only when data is defined. Code translations can be very long. \cr
+Truncate the length by setting nchar. Default is nchar = 32.}
 
 \item{details}{If TRUE. then all available table translation information is displayed.}
 }
 \value{
-The code translation
+The code translation table (or translated data frame when data is defined).
 }
 \description{
 Returns code translations which is especially useful for categorical tables,
@@ -23,7 +30,10 @@ which includes most NHANES tables.
 \details{
 Code translation tables are retrieved via webscraping using rvest.
 Many of the NHANES data tables have encoded values. E.g. 1 = 'Male', 2 = 'Female'.
-By default, the codes and the translated values are returned in a data frame.
+Thus it is often helpful to view the code translations and perhaps insert the translated values
+in a data frame. Note that Hmisc supports "labelled" fields. When a translation is applied directly
+to a column in a data frame, the column class is first converted to 'factor' and then the coded
+values are replaced with the code translations.
 }
 \examples{
 nhanesTranslate('DEMO_B', 'DMDBORN')

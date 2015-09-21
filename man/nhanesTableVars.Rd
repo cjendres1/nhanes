@@ -4,7 +4,8 @@
 \alias{nhanesTableVars}
 \title{Displays a list of variables in the specified NHANES table.}
 \usage{
-nhanesTableVars(nh_surveygroup, nh_table, truncated = FALSE, nchar = 100)
+nhanesTableVars(nh_surveygroup, nh_table, details = FALSE, nchar = 100,
+  namesonly = FALSE)
 }
 \arguments{
 \item{nh_surveygroup}{The type of survey (DEMOGRAPHIC, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
@@ -12,10 +13,12 @@ Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).}
 
 \item{nh_table}{The name of the specific table to retrieve.}
 
-\item{truncated}{If true then only the variable names and descriptions are returned, which is often sufficient.}
+\item{details}{If TRUE then only the variable names and descriptions are returned, which is often sufficient.}
 
 \item{nchar}{The number of characters in the Variable Description to print. Values are limited to 0<=nchar<=127.
 This is used to enhance readability, cause variable descriptions can be very long.}
+
+\item{namesonly}{If TRUE then only the variable names are returned.}
 }
 \value{
 The names of the tables in the specified survey group
@@ -30,6 +33,6 @@ descriptions to ascertain quickly if a data table is of interest.
 }
 \examples{
 nhanesTableVars('LAB', 'CBC_E')
-nhanesTableVars('EXAM', 'OHX_E', truncated=TRUE)
+nhanesTableVars('EXAM', 'OHX_E', details=TRUE)
 }
 
