@@ -98,6 +98,7 @@ xpath <- '//*[@id="ContentPlaceHolder1_GridView1"]'
 #' @param year The year in yyyy format where 1999 <= yyyy <= 2012.
 #' @param details If TRUE then a more detailed description of the tables is returned.
 #' @param namesonly If TRUE then only the table names are returned.
+#' @param includerdconly If TRUE then RDC only tables are included in list.
 #' @return The names of the tables in the specified survey group.
 #' @details Data are retrieved via web scraping using html wrappers from package rvest.
 #' It is often useful to display the table names in an NHANES survey. In effect this
@@ -107,7 +108,7 @@ xpath <- '//*[@id="ContentPlaceHolder1_GridView1"]'
 #' nhanesTables('LAB', 2009, details=TRUE)
 #' @export
 #' 
-nhanesTables <- function(nh_surveygroup, year, details = FALSE, namesonly=FALSE) {
+nhanesTables <- function(nh_surveygroup, year, details = FALSE, namesonly=FALSE, includerdconly=FALSE) {
   if( !(nh_surveygroup %in% names(nhanes_group)) ) {
     stop("Invalid survey group")
     return(NULL)
@@ -120,6 +121,9 @@ nhanesTables <- function(nh_surveygroup, year, details = FALSE, namesonly=FALSE)
                 '&CycleBeginYear=', unlist(strsplit(as.character(nh_year), '-'))[[1]] , sep='')
   df <- as.data.frame(turl %>% read_html() %>% html_nodes(xpath=xpath) %>% html_table())
   
+  if( includerdconly == FALSE) {
+    df <- df[(df$Use.Constraints != "RDC Only"),]
+  }
   
   idx <- str_c('_', data_idx[[nh_year]], sep='')
   if( idx == '_') {idx = '' }
@@ -143,7 +147,7 @@ nhanesTables <- function(nh_surveygroup, year, details = FALSE, namesonly=FALSE)
     names(df) <- c('FileName', 'Description')
   }
   if( namesonly == TRUE ) {
-    return(df[[1]])
+    return(as.character(df[[1]]))
   }
   return(df)  
 }
@@ -206,7 +210,7 @@ nhanesTableVars <- function(nh_surveygroup, nh_table, details = FALSE, nchar=100
   }
   row.names(df) <- c(1:nrow(df))
   if( namesonly == TRUE ) {
-    return(df[[1]])
+    return(as.character(df[[1]]))
   }
   return(df)
 }

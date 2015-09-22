@@ -4,7 +4,8 @@
 \alias{nhanesTables}
 \title{Returns a list of table names for the specified survey group.}
 \usage{
-nhanesTables(nh_surveygroup, year, details = FALSE, namesonly = FALSE)
+nhanesTables(nh_surveygroup, year, details = FALSE, namesonly = FALSE,
+  includerdconly = FALSE)
 }
 \arguments{
 \item{nh_surveygroup}{The type of survey (DEMOGRAPHIC, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
@@ -15,6 +16,8 @@ Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).}
 \item{details}{If TRUE then a more detailed description of the tables is returned.}
 
 \item{namesonly}{If TRUE then only the table names are returned.}
+
+\item{includerdconly}{If TRUE then RDC only tables are included in list.}
 }
 \value{
 The names of the tables in the specified survey group.
