@@ -164,7 +164,7 @@ nhanesTables <- function(nh_surveygroup, year, details = FALSE, namesonly=FALSE,
 #' Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).
 #' @param nh_table The name of the specific table to retrieve.
 #' @param details If TRUE then only the variable names and descriptions are returned, which is often sufficient.
-#' @param nchar The number of characters in the Variable Description to print. Values are limited to 0<=nchar<=127.
+#' @param nchar The number of characters in the Variable Description to print. Values are limited to 0<=nchar<=128.
 #' This is used to enhance readability, cause variable descriptions can be very long.
 #' @param namesonly If TRUE then only the variable names are returned.
 #' @return The names of the tables in the specified survey group
@@ -194,7 +194,7 @@ nhanesTableVars <- function(nh_surveygroup, nh_table, details = FALSE, nchar=100
     return(NULL)
   }
   
-  nchar_max <- 300
+  nchar_max <- 128
   if(nchar > nchar_max) {
     nchar <- nchar_max
   }
@@ -373,6 +373,12 @@ nhanesTranslate <- function(nh_table, colnames, data = NULL, nchar = 32, details
   url <- str_c(nhanesURL, nh_year, '/', nh_table, '.htm', sep='')
   translations <- lapply(colnames, get_translation_table)
   names(translations) <- colnames
+  
+  nchar_max <- 128
+  if(nchar > nchar_max) {
+    nchar <- nchar_max
+  }
+  
   
   if(is.null(data)) { ## If no data to translate then just return the translation table
     return(Filter(Negate(function(x) is.null(unlist(x))), translations))

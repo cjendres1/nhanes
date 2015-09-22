@@ -15,7 +15,7 @@ Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).}
 
 \item{details}{If TRUE then only the variable names and descriptions are returned, which is often sufficient.}
 
-\item{nchar}{The number of characters in the Variable Description to print. Values are limited to 0<=nchar<=127.
+\item{nchar}{The number of characters in the Variable Description to print. Values are limited to 0<=nchar<=128.
 This is used to enhance readability, cause variable descriptions can be very long.}
 
 \item{namesonly}{If TRUE then only the variable names are returned.}

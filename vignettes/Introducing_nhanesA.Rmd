@@ -42,46 +42,59 @@ To better determine if that table is of interest, we can display detailed inform
 ```{r}
 nhanesTableVars('EXAM', 'BMX_D')
 ```
-We see that there are 28 columns in table BPX_D. The first column (SEQN) is the respondent sequence number and is included in every NHANES table. Effectively, SEQN is a subject identifier that is used to join information across tables.
+We see that there are 27 columns in table BMX_D. The first column (SEQN) is the respondent sequence number and is included in every NHANES table. Effectively, SEQN is a subject identifier that is used to join information across tables.
 We now import BMX\_D along with the demographics table DEMO\_D.
 ```{r}
 bmx_d  <- nhanes('BMX_D')
 demo_d <- nhanes('DEMO_D')
 ```
-We can then merge the tables: 
+We then merge the tables and compute average values by gender for several variables: 
 ```{r}
-bmx <- merge(demo_d, bmx_d)
+bmx_demo <- merge(demo_d, bmx_d)
+aggregate(cbind(bmxht,bmxwt, bmxleg, bmxcalf, bmxthicr)~riagendr, bmx_demo, mean)
 ```
-We can compute mean blood pressure by gender.
 
 ### Translation of Coded Values
 
-NHANES uses coded values for many fields. As an example, gender is recorded as 1 or 2. To determine what the values mean, we can list the code translations for the gender field RIAGENDR in table DEMO_D
+NHANES uses coded values for many fields. In the preceding example, gender is coded as 1 or 2. To determine what the values mean, we can list the code translations for the gender field RIAGENDR in table DEMO_D
 ```{r}
 nhanesTranslate('DEMO_D', 'RIAGENDR')
 ```
-If desired, we can use nhanesTranslate to apply the code translation to demo\_b directly by assigning data=demo\_b. 
-```{r, eval=FALSE}
-levels(demo_b$RIAGENDR)
-demo_b <- nhanesTranslate('DEMO_D', 'RIAGENDR', data=demo_b)
-levels(demo_b$RIAGENDR)
+
+If desired, we can use nhanesTranslate to apply the code translation to demo\_d directly by assigning data=demo\_d. 
+```{r}
+levels(as.factor(demo_d$riagendr))
+demo_d <- nhanesTranslate('DEMO_D', 'RIAGENDR', data=demo_d)
+levels(demo_d$riagendr)
+bmx_demo <- merge(demo_d, bmx_d)
+aggregate(cbind(bmxht,bmxwt, bmxleg, bmxcalf, bmxthicr)~riagendr, bmx_demo, mean)
 ```
 
-### Batch Processing
-The goal of nhanesA is to enable fully customizable selection of NHANES tables. However, it may be desired to download entire sets or apply all possible code translations.  Here are some examples showing the use of nhanesA for rapid processing.
-
+### Downloading a Complete Survey
+The primary goal of nhanesA is to enable fully customizable processing of select NHANES tables. However, it is quite easy to download entire surveys using nhanesA functions.
 Say we want to download every questionnaire in the 2007-2008 survey.  We first get a list of the table names by using nhanesTables with namesonly = TRUE. The tables can then be downloaded using nhanes with lapply.
 ```{r,eval=FALSE}
 q2007names  <- nhanesTables('Q', 2007, namesonly=TRUE)
 q2007tables <- lapply(q2007names, nhanes)
 names(q2007tables) <- q2007names
 ```
-Similarly, to quickly apply all possible code translations to a given table, we need to first get a list of all the table columns then use nhanesTranslate to apply the translation one column at a time.
-```{r,eval=FALSE}
+
+### Apply All Possible Code Translations to a Table
+An NHANES table may have dozens of columns with coded values. Translating all possible columns is a three step process.
+1: Download the table
+2: Download the list of table variables using nhanesTableVars with namesonly=TRUE
+3: Pass the table and variable list to nhanesTranslate
+
+```{r}
 bpx_d <- nhanes('BPX_D')
-head(bpx_d)
+head(bpx_d[,6:11])
 bpx_d_vars  <- nhanesTableVars('EXAM', 'BPX_D', namesonly=TRUE)
-bpx_d <- nhanesTranslate('BPX_D', bpx_d_vars, data=bpx_d)
-head(bpx_d)
+bpx_d <- suppressWarnings(nhanesTranslate('BPX_D', bpx_d_vars, data=bpx_d))
+head(bpx_d[,6:11])
 ```
-Some discretion is applied by nhanesTranslate such that not all of the coded columns will be translated. In general, columns that have at least two categories (e.g. Male, Female) will be translated.  In some cases the code translations are quite long, thus to improve readability it may be desirable to limit the length by setting nchar.
+
+Some discretion is applied by nhanesTranslate such that not all of the coded columns will be translated. In general, columns that have at least two categories (e.g. Male, Female) will be translated.  In some cases the code translations are quite long, thus to improve readability the maximum translation string should be limited. The default translation string length is 32 but can be set as high as 128.  
+
+#### Please send any feedback or requests to cjendres1@gmail.com. Hope you enjoy your experience with nhanesA!
+Sincerely,  
+Christopher Endres
