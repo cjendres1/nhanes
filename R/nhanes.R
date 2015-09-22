@@ -47,14 +47,11 @@ data_idx['2009-2010'] <- "F"
 data_idx['2011-2012'] <- "G"
 data_idx['2013-2014'] <- "H"
 
-
 # An internal function that converts a year into the nhanes interval.
-# 
 # E.g. 2003 is converted to '2003-2004'
 # @param year where year is numeric in yyyy format
 # @return The 2-year interval that includes the year, e.g. 2001-2002
 # 
-
 #------------------------------------------------------------------------------
 get_year_from_nh_table <- function(nh_table) {
 nhloc <- data.frame(stringr::str_locate_all(nh_table, '_'))
@@ -93,22 +90,23 @@ xpath <- '//*[@id="ContentPlaceHolder1_GridView1"]'
 #' @importFrom rvest html_nodes html_table
 #' @importFrom xml2 read_html
 #' @importFrom magrittr %>%
-#' @param nh_surveygroup The type of survey (DEMOGRAPHIC, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
+#' @param nh_surveygroup The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
 #' Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).
 #' @param year The year in yyyy format where 1999 <= yyyy <= 2012.
 #' @param details If TRUE then a more detailed description of the tables is returned.
 #' @param namesonly If TRUE then only the table names are returned.
-#' @param includerdconly If TRUE then RDC only tables are included in list.
+#' @param includerdc If TRUE then RDC only tables are included in list.
 #' @return The names of the tables in the specified survey group.
 #' @details Data are retrieved via web scraping using html wrappers from package rvest.
 #' It is often useful to display the table names in an NHANES survey. In effect this
 #' is a convenient way to browse the available NHANES tables.
 #' @examples
 #' nhanesTables('EXAM', 2007)
-#' nhanesTables('LAB', 2009, details=TRUE)
+#' nhanesTables('LAB', 2009, details=TRUE, includerdc=TRUE)
+#' nhanesTables('Q', 2005, namesonly=TRUE)
 #' @export
 #' 
-nhanesTables <- function(nh_surveygroup, year, details = FALSE, namesonly=FALSE, includerdconly=FALSE) {
+nhanesTables <- function(nh_surveygroup, year, details = FALSE, namesonly=FALSE, includerdc=FALSE) {
   if( !(nh_surveygroup %in% names(nhanes_group)) ) {
     stop("Invalid survey group")
     return(NULL)
@@ -121,7 +119,7 @@ nhanesTables <- function(nh_surveygroup, year, details = FALSE, namesonly=FALSE,
                 '&CycleBeginYear=', unlist(strsplit(as.character(nh_year), '-'))[[1]] , sep='')
   df <- as.data.frame(turl %>% read_html() %>% html_nodes(xpath=xpath) %>% html_table())
   
-  if( includerdconly == FALSE) {
+  if( includerdc == FALSE) {
     df <- df[(df$Use.Constraints != "RDC Only"),]
   }
   
@@ -162,7 +160,7 @@ nhanesTables <- function(nh_surveygroup, year, details = FALSE, namesonly=FALSE,
 #' @importFrom rvest html_nodes html_table
 #' @importFrom xml2 read_html
 #' @importFrom magrittr %>%
-#' @param nh_surveygroup The type of survey (DEMOGRAPHIC, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
+#' @param nh_surveygroup The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
 #' Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).
 #' @param nh_table The name of the specific table to retrieve.
 #' @param details If TRUE then only the variable names and descriptions are returned, which is often sufficient.
@@ -175,7 +173,8 @@ nhanesTables <- function(nh_surveygroup, year, details = FALSE, namesonly=FALSE,
 #' descriptions to ascertain quickly if a data table is of interest.
 #' @examples
 #' nhanesTableVars('LAB', 'CBC_E')
-#' nhanesTableVars('EXAM', 'OHX_E', details=TRUE)
+#' nhanesTableVars('EXAM', 'OHX_E', details=TRUE, nchar=50)
+#' nhanesTableVars('DEMO', 'DEMO_F', namesonly = TRUE)
 #' @export
 #' 
 nhanesTableVars <- function(nh_surveygroup, nh_table, details = FALSE, nchar=100, namesonly = FALSE) {
@@ -331,7 +330,7 @@ nhanesAttr <- function(nh_table) {
 #' to a column in a data frame, the column class is first converted to 'factor' and then the coded
 #' values are replaced with the code translations.
 #' @examples
-#' nhanesTranslate('DEMO_B', 'DMDBORN')
+#' nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN'))
 #' nhanesTranslate('BPX_F', 'BPACSZ', details=TRUE)
 #' @export
 #' 

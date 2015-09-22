@@ -5,10 +5,10 @@
 \title{Returns a list of table names for the specified survey group.}
 \usage{
 nhanesTables(nh_surveygroup, year, details = FALSE, namesonly = FALSE,
-  includerdconly = FALSE)
+  includerdc = FALSE)
 }
 \arguments{
-\item{nh_surveygroup}{The type of survey (DEMOGRAPHIC, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
+\item{nh_surveygroup}{The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
 Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).}
 
 \item{year}{The year in yyyy format where 1999 <= yyyy <= 2012.}
@@ -17,7 +17,7 @@ Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).}
 
 \item{namesonly}{If TRUE then only the table names are returned.}
 
-\item{includerdconly}{If TRUE then RDC only tables are included in list.}
+\item{includerdc}{If TRUE then RDC only tables are included in list.}
 }
 \value{
 The names of the tables in the specified survey group.
@@ -32,6 +32,7 @@ is a convenient way to browse the available NHANES tables.
 }
 \examples{
 nhanesTables('EXAM', 2007)
-nhanesTables('LAB', 2009, details=TRUE)
+nhanesTables('LAB', 2009, details=TRUE, includerdc=TRUE)
+nhanesTables('Q', 2005, namesonly=TRUE)
 }
 

@@ -8,7 +8,7 @@ nhanesTableVars(nh_surveygroup, nh_table, details = FALSE, nchar = 100,
   namesonly = FALSE)
 }
 \arguments{
-\item{nh_surveygroup}{The type of survey (DEMOGRAPHIC, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
+\item{nh_surveygroup}{The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
 Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).}
 
 \item{nh_table}{The name of the specific table to retrieve.}
@@ -33,6 +33,7 @@ descriptions to ascertain quickly if a data table is of interest.
 }
 \examples{
 nhanesTableVars('LAB', 'CBC_E')
-nhanesTableVars('EXAM', 'OHX_E', details=TRUE)
+nhanesTableVars('EXAM', 'OHX_E', details=TRUE, nchar=50)
+nhanesTableVars('DEMO', 'DEMO_F', namesonly = TRUE)
 }
 

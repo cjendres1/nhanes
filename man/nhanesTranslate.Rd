@@ -36,7 +36,7 @@ to a column in a data frame, the column class is first converted to 'factor' and
 values are replaced with the code translations.
 }
 \examples{
-nhanesTranslate('DEMO_B', 'DMDBORN')
+nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN'))
 nhanesTranslate('BPX_F', 'BPACSZ', details=TRUE)
 }
 
