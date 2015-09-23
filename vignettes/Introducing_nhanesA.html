@@ -120,43 +120,76 @@ code > span.er { color: #ff0000; font-weight: bold; }
 ## 25        BMITRI            Triceps Skinfold Comment
 ## 26        BMXSUB           Subscapular Skinfold (mm)
 ## 27        BMISUB        Subscapular Skinfold Comment</code></pre>
-<p>We see that there are 28 columns in table BPX_D. The first column (SEQN) is the respondent sequence number and is included in every NHANES table. Effectively, SEQN is a subject identifier that is used to join information across tables. We now import BMX_D along with the demographics table DEMO_D.</p>
+<p>We see that there are 27 columns in table BMX_D. The first column (SEQN) is the respondent sequence number and is included in every NHANES table. Effectively, SEQN is a subject identifier that is used to join information across tables. We now import BMX_D along with the demographics table DEMO_D.</p>
 <pre class="sourceCode r"><code class="sourceCode r">bmx_d  &lt;-<span class="st"> </span><span class="kw">nhanes</span>(<span class="st">'BMX_D'</span>)</code></pre>
 <pre><code>## Processing SAS dataset BMX_D      ..</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">demo_d &lt;-<span class="st"> </span><span class="kw">nhanes</span>(<span class="st">'DEMO_D'</span>)</code></pre>
 <pre><code>## Processing SAS dataset DEMO_D     ..</code></pre>
-<p>We can then merge the tables:</p>
-<pre class="sourceCode r"><code class="sourceCode r">bmx &lt;-<span class="st"> </span><span class="kw">merge</span>(demo_d, bmx_d)</code></pre>
-<p>We can compute mean blood pressure by gender.</p>
+<p>We then merge the tables and compute average values by gender for several variables:</p>
+<pre class="sourceCode r"><code class="sourceCode r">bmx_demo &lt;-<span class="st"> </span><span class="kw">merge</span>(demo_d, bmx_d)
+<span class="kw">aggregate</span>(<span class="kw">cbind</span>(bmxht,bmxwt, bmxleg, bmxcalf, bmxthicr)~riagendr, bmx_demo, mean)</code></pre>
+<pre><code>##   riagendr    bmxht    bmxwt   bmxleg  bmxcalf bmxthicr
+## 1        1 170.0105 76.90659 40.49696 37.47678 51.45514
+## 2        2 158.9209 68.17988 37.19337 36.88751 51.09288</code></pre>
 </div>
 <div id="translation-of-coded-values" class="section level3">
 <h3>Translation of Coded Values</h3>
-<p>NHANES uses coded values for many fields. As an example, gender is recorded as 1 or 2. To determine what the values mean, we can list the code translations for the gender field RIAGENDR in table DEMO_D</p>
+<p>NHANES uses coded values for many fields. In the preceding example, gender is coded as 1 or 2. To determine what the values mean, we can list the code translations for the gender field RIAGENDR in table DEMO_D</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">nhanesTranslate</span>(<span class="st">'DEMO_D'</span>, <span class="st">'RIAGENDR'</span>)</code></pre>
 <pre><code>## $RIAGENDR
 ##   Code.or.Value Value.Description
 ## 1             1              Male
 ## 2             2            Female
 ## 3             .           Missing</code></pre>
-<p>If desired, we can use nhanesTranslate to apply the code translation to demo_b directly by assigning data=demo_b.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">levels</span>(demo_b$RIAGENDR)
-demo_b &lt;-<span class="st"> </span><span class="kw">nhanesTranslate</span>(<span class="st">'DEMO_D'</span>, <span class="st">'RIAGENDR'</span>, <span class="dt">data=</span>demo_b)
-<span class="kw">levels</span>(demo_b$RIAGENDR)</code></pre>
+<p>If desired, we can use nhanesTranslate to apply the code translation to demo_d directly by assigning data=demo_d.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">levels</span>(<span class="kw">as.factor</span>(demo_d$riagendr))</code></pre>
+<pre><code>## [1] &quot;1&quot; &quot;2&quot;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">demo_d &lt;-<span class="st"> </span><span class="kw">nhanesTranslate</span>(<span class="st">'DEMO_D'</span>, <span class="st">'RIAGENDR'</span>, <span class="dt">data=</span>demo_d)</code></pre>
+<pre><code>## Translated columns: RIAGENDR</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">levels</span>(demo_d$riagendr)</code></pre>
+<pre><code>## [1] &quot;Male&quot;   &quot;Female&quot;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">bmx_demo &lt;-<span class="st"> </span><span class="kw">merge</span>(demo_d, bmx_d)
+<span class="kw">aggregate</span>(<span class="kw">cbind</span>(bmxht,bmxwt, bmxleg, bmxcalf, bmxthicr)~riagendr, bmx_demo, mean)</code></pre>
+<pre><code>##   riagendr    bmxht    bmxwt   bmxleg  bmxcalf bmxthicr
+## 1     Male 170.0105 76.90659 40.49696 37.47678 51.45514
+## 2   Female 158.9209 68.17988 37.19337 36.88751 51.09288</code></pre>
 </div>
-<div id="batch-processing" class="section level3">
-<h3>Batch Processing</h3>
-<p>The goal of nhanesA is to enable fully customizable selection of NHANES tables. However, it may be desired to download entire sets or apply all possible code translations. Here are some examples showing the use of nhanesA for rapid processing.</p>
-<p>Say we want to download every questionnaire in the 2007-2008 survey. We first get a list of the table names by using nhanesTables with namesonly = TRUE. The tables can then be downloaded using nhanes with lapply.</p>
+<div id="downloading-a-complete-survey" class="section level3">
+<h3>Downloading a Complete Survey</h3>
+<p>The primary goal of nhanesA is to enable fully customizable processing of select NHANES tables. However, it is quite easy to download entire surveys using nhanesA functions. Say we want to download every questionnaire in the 2007-2008 survey. We first get a list of the table names by using nhanesTables with namesonly = TRUE. The tables can then be downloaded using nhanes with lapply.</p>
 <pre class="sourceCode r"><code class="sourceCode r">q2007names  &lt;-<span class="st"> </span><span class="kw">nhanesTables</span>(<span class="st">'Q'</span>, <span class="dv">2007</span>, <span class="dt">namesonly=</span><span class="ot">TRUE</span>)
 q2007tables &lt;-<span class="st"> </span><span class="kw">lapply</span>(q2007names, nhanes)
 <span class="kw">names</span>(q2007tables) &lt;-<span class="st"> </span>q2007names</code></pre>
-<p>Similarly, to quickly apply all possible code translations to a given table, we need to first get a list of all the table columns then use nhanesTranslate to apply the translation one column at a time.</p>
-<pre class="sourceCode r"><code class="sourceCode r">bpx_d &lt;-<span class="st"> </span><span class="kw">nhanes</span>(<span class="st">'BPX_D'</span>)
-<span class="kw">head</span>(bpx_d)
-bpx_d_vars  &lt;-<span class="st"> </span><span class="kw">nhanesTableVars</span>(<span class="st">'EXAM'</span>, <span class="st">'BPX_D'</span>, <span class="dt">namesonly=</span><span class="ot">TRUE</span>)
-bpx_d &lt;-<span class="st"> </span><span class="kw">nhanesTranslate</span>(<span class="st">'BPX_D'</span>, bpx_d_vars, <span class="dt">data=</span>bpx_d)
-<span class="kw">head</span>(bpx_d)</code></pre>
-<p>Some discretion is applied by nhanesTranslate such that not all of the coded columns will be translated. In general, columns that have at least two categories (e.g. Male, Female) will be translated. In some cases the code translations are quite long, thus to improve readability it may be desirable to limit the length by setting nchar.</p>
+</div>
+<div id="apply-all-possible-code-translations-to-a-table" class="section level3">
+<h3>Apply All Possible Code Translations to a Table</h3>
+<p>An NHANES table may have dozens of columns with coded values. Translating all possible columns is a three step process. 1: Download the table 2: Download the list of table variables using nhanesTableVars with namesonly=TRUE 3: Pass the table and variable list to nhanesTranslate</p>
+<pre class="sourceCode r"><code class="sourceCode r">bpx_d &lt;-<span class="st"> </span><span class="kw">nhanes</span>(<span class="st">'BPX_D'</span>)</code></pre>
+<pre><code>## Processing SAS dataset BPX_D      ..</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(bpx_d[,<span class="dv">6</span>:<span class="dv">11</span>])</code></pre>
+<pre><code>##   bpq150a bpq150b bpq150c bpq150d bpaarm bpacsz
+## 1      NA      NA      NA      NA     NA     NA
+## 2       2       2       2       2      1      3
+## 3       1       2       2       2      1      4
+## 4       2       2       2       2      1      3
+## 5       2       2       2       2      1      4
+## 6       2       2       2       2      1      4</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">bpx_d_vars  &lt;-<span class="st"> </span><span class="kw">nhanesTableVars</span>(<span class="st">'EXAM'</span>, <span class="st">'BPX_D'</span>, <span class="dt">namesonly=</span><span class="ot">TRUE</span>)
+bpx_d &lt;-<span class="st"> </span><span class="kw">suppressWarnings</span>(<span class="kw">nhanesTranslate</span>(<span class="st">'BPX_D'</span>, bpx_d_vars, <span class="dt">data=</span>bpx_d))</code></pre>
+<pre><code>## Translated columns: PEASCST1 PEASCCT1 BPQ150A BPQ150B BPQ150C BPQ150D BPAARM BPACSZ BPXPULS BPXPTY BPAEN2 BPAEN3 BPAEN4</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(bpx_d[,<span class="dv">6</span>:<span class="dv">11</span>])</code></pre>
+<pre><code>##   bpq150a bpq150b bpq150c bpq150d bpaarm        bpacsz
+## 1    &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;   &lt;NA&gt;          &lt;NA&gt;
+## 2      No      No      No      No  Right Adult (12X22)
+## 3     Yes      No      No      No  Right Large (15X32)
+## 4      No      No      No      No  Right Adult (12X22)
+## 5      No      No      No      No  Right Large (15X32)
+## 6      No      No      No      No  Right Large (15X32)</code></pre>
+<p>Some discretion is applied by nhanesTranslate such that not all of the coded columns will be translated. In general, columns that have at least two categories (e.g. Male, Female) will be translated. In some cases the code translations are quite long, thus to improve readability the maximum translation string should be limited. The default translation string length is 32 but can be set as high as 128.</p>
+<div id="please-send-any-feedback-or-requests-to-cjendres1gmail.com.-hope-you-enjoy-your-experience-with-nhanesa" class="section level4">
+<h4>Please send any feedback or requests to <a href="mailto:cjendres1@gmail.com">cjendres1@gmail.com</a>. Hope you enjoy your experience with nhanesA!</h4>
+<p>Sincerely,<br />Christopher Endres</p>
+</div>
 </div>
 </div>
 

@@ -87,7 +87,7 @@ xpath <- '//*[@id="ContentPlaceHolder1_GridView1"]'
 #' Enables quick display of all available tables in the survey group.
 #' 
 #' @importFrom stringr str_replace str_c str_match str_to_title
-#' @importFrom rvest html_nodes html_table
+#' @importFrom rvest xml_nodes html_table
 #' @importFrom xml2 read_html
 #' @importFrom magrittr %>%
 #' @param nh_surveygroup The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
@@ -117,7 +117,7 @@ nhanesTables <- function(nh_surveygroup, year, details = FALSE, namesonly=FALSE,
   turl <- str_c(nhanesURL, 'search/variablelist.aspx?Component=', 
                 str_to_title(as.character(nhanes_group[nh_surveygroup])), 
                 '&CycleBeginYear=', unlist(strsplit(as.character(nh_year), '-'))[[1]] , sep='')
-  df <- as.data.frame(turl %>% read_html() %>% html_nodes(xpath=xpath) %>% html_table())
+  df <- as.data.frame(turl %>% read_html() %>% xml_nodes(xpath=xpath) %>% html_table())
   
   if( includerdc == FALSE) {
     df <- df[(df$Use.Constraints != "RDC Only"),]
@@ -157,7 +157,7 @@ nhanesTables <- function(nh_surveygroup, year, details = FALSE, namesonly=FALSE,
 #' Enables quick display of table variables and their definitions.
 #' 
 #' @importFrom stringr str_replace str_c str_sub
-#' @importFrom rvest html_nodes html_table
+#' @importFrom rvest xml_nodes html_table
 #' @importFrom xml2 read_html
 #' @importFrom magrittr %>%
 #' @param nh_surveygroup The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
@@ -187,8 +187,8 @@ nhanesTableVars <- function(nh_surveygroup, nh_table, details = FALSE, nchar=100
   turl <- str_c(nhanesURL, 'search/variablelist.aspx?Component=', 
                 str_to_title(as.character(nhanes_group[nh_surveygroup])), 
                 '&CycleBeginYear=', unlist(strsplit(as.character(nh_year), '-'))[[1]] , sep='')
-  df <- as.data.frame(turl %>% read_html() %>% html_nodes(xpath=xpath) %>% html_table())
-  
+  df <- as.data.frame(turl %>% read_html() %>% xml_nodes(xpath=xpath) %>% html_table())
+
   if(!(nh_table %in% df$Data.File.Name)) {
     stop('Table ', nh_table, ' not present in the ', nh_surveygroup, ' survey' )
     return(NULL)
@@ -312,7 +312,7 @@ nhanesAttr <- function(nh_table) {
 #' which includes most NHANES tables. 
 #' 
 #' @importFrom stringr str_c str_locate str_sub 
-#' @importFrom rvest html_nodes html_table
+#' @importFrom rvest xml_nodes html_table
 #' @importFrom xml2 read_html
 #' @importFrom plyr mapvalues
 #' @param nh_table The name of the NHANES table to retrieve.
@@ -351,9 +351,9 @@ nhanesTranslate <- function(nh_table, colnames, data = NULL, nchar = 32, details
   
   get_translation_table <- function(colname) {
     xpt <- str_c('//*[h3[a[@name="', colname, '"]]]', sep='')
-    tabletree <- url %>% read_html() %>% html_nodes(xpath=xpt)
+    tabletree <- url %>% read_html() %>% xml_nodes(xpath=xpt)
     if(length(tabletree)>0) {
-      tabletrans <- as.data.frame(html_nodes(tabletree, 'table') %>% html_table())
+      tabletrans <- as.data.frame(xml_nodes(tabletree, 'table') %>% html_table())
     } else {
       warning(c('Column "', colname, '" not found'), collapse='')
       return(NULL)
@@ -378,7 +378,6 @@ nhanesTranslate <- function(nh_table, colnames, data = NULL, nchar = 32, details
   if(nchar > nchar_max) {
     nchar <- nchar_max
   }
-  
   
   if(is.null(data)) { ## If no data to translate then just return the translation table
     return(Filter(Negate(function(x) is.null(unlist(x))), translations))
