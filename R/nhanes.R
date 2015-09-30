@@ -53,7 +53,8 @@ data_idx["G"] <- '2011-2012'
 data_idx["H"] <- '2013-2014'
 data_idx["I"] <- '2015-2016'
 
-  
+anomalytables2005 <- c('CHLMD_DR', 'SSUECD_R', 'HSV_DR')
+
 # An internal function that converts a year into the nhanes interval.
 # E.g. 2003 is converted to '2003-2004'
 # @param year where year is numeric in yyyy format
@@ -61,8 +62,7 @@ data_idx["I"] <- '2015-2016'
 # 
 #------------------------------------------------------------------------------
 get_year_from_nh_table <- function(nh_table) {
-list2005 <- c('CHLMD_DR', 'SSUECD_R', 'HSV_DR')
-if(nh_table %in% list2005) {return('2005-2006')}
+if(nh_table %in% anomalytables2005) {return('2005-2006')}
 nhloc <- data.frame(stringr::str_locate_all(nh_table, '_'))
 nn <- nrow(nhloc)
 if(nn!=0){
@@ -115,7 +115,7 @@ xpath <- '//*[@id="ContentPlaceHolder1_GridView1"]'
 #' It is often useful to display the table names in an NHANES survey. In effect this
 #' is a convenient way to browse the available NHANES tables.
 #' @examples
-#' nhanesTables('EXAM', 2007)
+#' \donttest{nhanesTables('EXAM', 2007)}
 #' nhanesTables('LAB', 2009, details=TRUE, includerdc=TRUE)
 #' nhanesTables('Q', 2005, namesonly=TRUE)
 #' @export
@@ -144,12 +144,7 @@ nhanesTables <- function(nh_surveygroup, year, nchar=100, details = FALSE, names
     colnames(df)[colnames(df)=="Data.File.Description"] <- "Description"
   }
   else {
-    tablenames <- as.character(unique(df[['Data.File.Name']]))
-    desc  <- character(length(tablenames))
-    for(i in 1:length(tablenames)) {
-      desc[i] <- as.character(df[df[['Data.File.Name']]==tablenames[i],][['Data.File.Description']][[1]])
-    }
-    df <- data.frame(cbind(tablenames,desc))
+    df <- unique(df[,c('Data.File.Name', 'Data.File.Description')])
     names(df) <- c('FileName', 'Description')
   }
   
@@ -158,6 +153,7 @@ nhanesTables <- function(nh_surveygroup, year, nchar=100, details = FALSE, names
   if( nh_year != "1999-2000") { ## No exclusion needed for first survey
     suffix <- names(data_idx[which(data_idx == nh_year)])
     suffix <- unlist(lapply(suffix, function(x) {str_c('_', x, sep='')}))
+    if(nh_year == '2005-2006') {suffix <- c(suffix, anomalytables2005)}
     matches <- unique(grep(paste(suffix,collapse="|"), df[['FileName']], value=TRUE))  
     df <- df[(df$FileName %in% matches),]
   }
@@ -218,14 +214,11 @@ nhanesTableVars <- function(nh_surveygroup, nh_table, details = FALSE, nchar=100
     nchar <- nchar_max
   }
   if( details == FALSE ) { # If TRUE then only return the variable name and description
-
     df <- df[df$Data.File.Name == nh_table,1:2]
-    df[[2]] <- str_sub(df[[2]],1,nchar)
-  }
-  else {
+  } else {
     df <- df[df$Data.File.Name == nh_table,]
-    df[[2]] <- str_sub(df[[2]],1,nchar)
   }
+  df[[2]] <- str_sub(df[[2]],1,nchar)
   row.names(df) <- NULL
   if( namesonly == TRUE ) {
     return(as.character(unique(df[[1]])))
