@@ -35,18 +35,25 @@ nh_years['2011'] <- "2011-2012"
 nh_years['2012'] <- "2011-2012"
 nh_years['2013'] <- "2013-2014"
 nh_years['2014'] <- "2013-2014"
+nh_years['2015'] <- "2015-2016"
+nh_years['2016'] <- "2015-2016"
 
 # Continuous NHANES table names have a letter suffix that indicates the collection interval
 data_idx <- list()
-data_idx['1999-2000'] <- ""
-data_idx['2001-2002'] <- "B"
-data_idx['2003-2004'] <- "C"
-data_idx['2005-2006'] <- "D"
-data_idx['2007-2008'] <- "E"
-data_idx['2009-2010'] <- "F"
-data_idx['2011-2012'] <- "G"
-data_idx['2013-2014'] <- "H"
+data_idx["A"] <- '1999-2000'
+data_idx["a"] <- '1999-2000'
+data_idx["B"] <- '2001-2002'
+data_idx["b"] <- '2001-2002'
+data_idx["C"] <- '2003-2004'
+data_idx["c"] <- '2003-2004'
+data_idx["D"] <- '2005-2006'
+data_idx["E"] <- '2007-2008'
+data_idx["F"] <- '2009-2010'
+data_idx["G"] <- '2011-2012'
+data_idx["H"] <- '2013-2014'
+data_idx["I"] <- '2015-2016'
 
+  
 # An internal function that converts a year into the nhanes interval.
 # E.g. 2003 is converted to '2003-2004'
 # @param year where year is numeric in yyyy format
@@ -54,15 +61,21 @@ data_idx['2013-2014'] <- "H"
 # 
 #------------------------------------------------------------------------------
 get_year_from_nh_table <- function(nh_table) {
+list2005 <- c('CHLMD_DR', 'SSUECD_R', 'HSV_DR')
+if(nh_table %in% list2005) {return('2005-2006')}
 nhloc <- data.frame(stringr::str_locate_all(nh_table, '_'))
-if(nrow(nhloc)!=0){
-  if((nhloc$start[nrow(nhloc)]+1) == nchar(nh_table)) {
-    idx <- str_sub(nh_table, -1, -1) 
-    if(idx == 'A') {return(nh_year <- "1999-2000")}
-    nh_year <- names(data_idx[grep(idx, data_idx)])
-  } else { ## It appears a mistake was made in the table name
-    message('Invalid column name')
-    return(NULL) }
+nn <- nrow(nhloc)
+if(nn!=0){
+  if((nhloc$start[nn]+1) == nchar(nh_table)) {
+    idx <- str_sub(nh_table, -1, -1)
+    if(idx=='r'||idx=='R') {
+      if(nn > 1) {
+        idx <- str_sub(nh_table, nhloc$start[nn-1]+1, nhloc$start[nn-1]+1)
+      } else {stop('Invalid table name')}
+    }
+    return(nh_year <- data_idx[idx])
+  } else { ## Assume it's from the first set
+    return("1999-2000")}
 } else 
   nh_year <- "1999-2000"
 }
@@ -73,7 +86,7 @@ get_nh_survey_years <- function(year) {
     return( as.character(nh_years[as.character(year)]) )
   }
   else {
-    stop('Data for year ', year, ' is not available')
+    stop('Data for year ', year, ' are not available')
     return(NULL)
   }
 }
@@ -93,6 +106,7 @@ xpath <- '//*[@id="ContentPlaceHolder1_GridView1"]'
 #' @param nh_surveygroup The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
 #' Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).
 #' @param year The year in yyyy format where 1999 <= yyyy <= 2012.
+#' @param nchar Truncates the table description to a max length of nchar.
 #' @param details If TRUE then a more detailed description of the tables is returned.
 #' @param namesonly If TRUE then only the table names are returned.
 #' @param includerdc If TRUE then RDC only tables are included in list.
@@ -106,7 +120,7 @@ xpath <- '//*[@id="ContentPlaceHolder1_GridView1"]'
 #' nhanesTables('Q', 2005, namesonly=TRUE)
 #' @export
 #' 
-nhanesTables <- function(nh_surveygroup, year, details = FALSE, namesonly=FALSE, includerdc=FALSE) {
+nhanesTables <- function(nh_surveygroup, year, nchar=100, details = FALSE, namesonly=FALSE, includerdc=FALSE) {
   if( !(nh_surveygroup %in% names(nhanes_group)) ) {
     stop("Invalid survey group")
     return(NULL)
@@ -117,26 +131,20 @@ nhanesTables <- function(nh_surveygroup, year, details = FALSE, namesonly=FALSE,
   turl <- str_c(nhanesURL, 'search/variablelist.aspx?Component=', 
                 str_to_title(as.character(nhanes_group[nh_surveygroup])), 
                 '&CycleBeginYear=', unlist(strsplit(as.character(nh_year), '-'))[[1]] , sep='')
+  # At this point df contains every table
   df <- as.data.frame(turl %>% read_html() %>% xml_nodes(xpath=xpath) %>% html_table())
-  
+  # By default we exclude RDC Only tables as those cannot be downloaded
   if( includerdc == FALSE) {
     df <- df[(df$Use.Constraints != "RDC Only"),]
   }
   
-  idx <- str_c('_', data_idx[[nh_year]], sep='')
-  if( idx == '_') {idx = '' }
-  
   if(details == TRUE) {
     df <- unique(df[,3:length(df)])
-    if(nchar(idx) > 0) {
-    df <- df[!is.na(str_match(df[['Data.File.Name']], idx)),]}
-    row.names(df) <- c(1:nrow(df))
-    return(df)
+    colnames(df)[colnames(df)=="Data.File.Name"] <- "FileName"
+    colnames(df)[colnames(df)=="Data.File.Description"] <- "Description"
   }
   else {
     tablenames <- as.character(unique(df[['Data.File.Name']]))
-    if(nchar(idx) > 0) {
-    tablenames <- tablenames[!is.na(str_match(tablenames, idx))]}
     desc  <- character(length(tablenames))
     for(i in 1:length(tablenames)) {
       desc[i] <- as.character(df[df[['Data.File.Name']]==tablenames[i],][['Data.File.Description']][[1]])
@@ -144,9 +152,20 @@ nhanesTables <- function(nh_surveygroup, year, details = FALSE, namesonly=FALSE,
     df <- data.frame(cbind(tablenames,desc))
     names(df) <- c('FileName', 'Description')
   }
+  
+  #Here we exclude tables that overlap from earlier surveys
+  # Get possible table suffixes for the specified year
+  if( nh_year != "1999-2000") { ## No exclusion needed for first survey
+    suffix <- names(data_idx[which(data_idx == nh_year)])
+    suffix <- unlist(lapply(suffix, function(x) {str_c('_', x, sep='')}))
+    matches <- unique(grep(paste(suffix,collapse="|"), df[['FileName']], value=TRUE))  
+    df <- df[(df$FileName %in% matches),]
+  }
+  row.names(df) <- c(1:nrow(df))
   if( namesonly == TRUE ) {
     return(as.character(df[[1]]))
   }
+  df$Description <- strtrim(df$Description, nchar)
   return(df)  
 }
 
@@ -207,11 +226,11 @@ nhanesTableVars <- function(nh_surveygroup, nh_table, details = FALSE, nchar=100
     df <- df[df$Data.File.Name == nh_table,]
     df[[2]] <- str_sub(df[[2]],1,nchar)
   }
-  row.names(df) <- c(1:nrow(df))
+  row.names(df) <- NULL
   if( namesonly == TRUE ) {
-    return(as.character(df[[1]]))
+    return(as.character(unique(df[[1]])))
   }
-  return(df)
+  return(unique(df))
 }
 
 #------------------------------------------------------------------------------
@@ -342,8 +361,7 @@ nhanesTranslate <- function(nh_table, colnames, data = NULL, nchar = 32, details
   
   # Parse nh_table to find the suffix, e.g. for table 'BPX_E', the suffix is '_E'
   # If there is no suffix, then we are likely dealing with data from 1999-2000
-  # Will use data_idx to perform an inverse match
-  
+
   nh_year <- get_year_from_nh_table(nh_table)
   if(is.null(nh_year)) {
     return(NULL)

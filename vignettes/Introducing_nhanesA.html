@@ -10,7 +10,7 @@
 
 <meta name="author" content="Christopher Endres" />
 
-<meta name="date" content="2015-09-22" />
+<meta name="date" content="2015-09-29" />
 
 <title>Introducing_nhanesA</title>
 
@@ -54,13 +54,13 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="header">
 <h1 class="title">Introducing_nhanesA</h1>
 <h4 class="author"><em>Christopher Endres</em></h4>
-<h4 class="date"><em>2015-09-22</em></h4>
+<h4 class="date"><em>2015-09-29</em></h4>
 </div>
 
 
 <div id="background" class="section level2">
 <h2>Background</h2>
-<p>nhanesA was developed to enable fully customizable retrieval of data from the National Health and Nutrition Examination Survey (NHANES). The survey is conducted by the National Center for Health Statistics (NCHS), and data are publicly available at: <a href="http://www.cdc.gov/nchs/nhanes.htm" class="uri">http://www.cdc.gov/nchs/nhanes.htm</a>. Approximately 5,000 people are surveyed annually, and the results are grouped in two-year intervals. NHANES data are reported in well over one thousand peer-reviewed journal publications every year.</p>
+<p>nhanesA was developed to enable fully customizable retrieval of data from the National Health and Nutrition Examination Survey (NHANES). The survey is conducted by the National Center for Health Statistics (NCHS), and data are publicly available at: <a href="http://www.cdc.gov/nchs/nhanes.htm" class="uri">http://www.cdc.gov/nchs/nhanes.htm</a>. NHANES data are reported in well over one thousand peer-reviewed journal publications every year.</p>
 </div>
 <div id="nhanes-data" class="section level2">
 <h2>NHANES Data</h2>
@@ -80,13 +80,11 @@ code > span.er { color: #ff0000; font-weight: bold; }
 ## 5     BMX_D                                     Body Measures
 ## 6   DXXAG_D Dual Energy X-ray Absorptiometry - Android/Gynoid
 ## 7  DXXFEM_D          Dual Energy X-ray Absorptiometry - Femur
-## 8  DXXSPN_D          Dual Energy X-ray Absorptiometry - Spine
-## 9  OPXFDT_D     Ophthalmology - Frequency Doubling Technology
-## 10 OPXRET_D                   Ophthalmology - Retinal Imaging
-## 11    OHX_D                                       Oral Health
-## 12 PAXRAW_D                         Physical Activity Monitor
-## 13    VIX_D                                            Vision</code></pre>
-<p>Note that the survey is grouped in two-year intervals beginning with the odd year. For convenience, only a single 4-digit year is entered such that <code>nhanesTables('EXAM', 2005)</code> and <code>nhanesTables('EXAM', 2006)</code> yield identical output. In the preceding example we see that the Examination data for the 2005-2006 survey consists of thirteen tables.</p>
+## 8  OPXFDT_D     Ophthalmology - Frequency Doubling Technology
+## 9     OHX_D                                       Oral Health
+## 10 PAXRAW_D                         Physical Activity Monitor
+## 11    VIX_D                                            Vision</code></pre>
+<p>Note that the two-year survey intervals begin with the odd year. For convenience, only a single 4-digit year is entered such that <code>nhanesTables('EXAM', 2005)</code> and <code>nhanesTables('EXAM', 2006)</code> yield identical output. In the preceding example we see that the Examination data for the 2005-2006 survey consists of thirteen tables.</p>
 </div>
 <div id="list-variables-in-an-nhanes-table" class="section level3">
 <h3>List Variables in an NHANES Table</h3>
@@ -127,10 +125,11 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <pre><code>## Processing SAS dataset DEMO_D     ..</code></pre>
 <p>We then merge the tables and compute average values by gender for several variables:</p>
 <pre class="sourceCode r"><code class="sourceCode r">bmx_demo &lt;-<span class="st"> </span><span class="kw">merge</span>(demo_d, bmx_d)
+<span class="kw">options</span>(<span class="dt">digits=</span><span class="dv">4</span>)
 <span class="kw">aggregate</span>(<span class="kw">cbind</span>(bmxht,bmxwt, bmxleg, bmxcalf, bmxthicr)~riagendr, bmx_demo, mean)</code></pre>
-<pre><code>##   riagendr    bmxht    bmxwt   bmxleg  bmxcalf bmxthicr
-## 1        1 170.0105 76.90659 40.49696 37.47678 51.45514
-## 2        2 158.9209 68.17988 37.19337 36.88751 51.09288</code></pre>
+<pre><code>##   riagendr bmxht bmxwt bmxleg bmxcalf bmxthicr
+## 1        1 170.0 76.91  40.50   37.48    51.46
+## 2        2 158.9 68.18  37.19   36.89    51.09</code></pre>
 </div>
 <div id="translation-of-coded-values" class="section level3">
 <h3>Translation of Coded Values</h3>
@@ -150,9 +149,9 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <pre><code>## [1] &quot;Male&quot;   &quot;Female&quot;</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">bmx_demo &lt;-<span class="st"> </span><span class="kw">merge</span>(demo_d, bmx_d)
 <span class="kw">aggregate</span>(<span class="kw">cbind</span>(bmxht,bmxwt, bmxleg, bmxcalf, bmxthicr)~riagendr, bmx_demo, mean)</code></pre>
-<pre><code>##   riagendr    bmxht    bmxwt   bmxleg  bmxcalf bmxthicr
-## 1     Male 170.0105 76.90659 40.49696 37.47678 51.45514
-## 2   Female 158.9209 68.17988 37.19337 36.88751 51.09288</code></pre>
+<pre><code>##   riagendr bmxht bmxwt bmxleg bmxcalf bmxthicr
+## 1     Male 170.0 76.91  40.50   37.48    51.46
+## 2   Female 158.9 68.18  37.19   36.89    51.09</code></pre>
 </div>
 <div id="downloading-a-complete-survey" class="section level3">
 <h3>Downloading a Complete Survey</h3>

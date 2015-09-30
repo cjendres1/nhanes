@@ -10,7 +10,7 @@ vignette: >
 ---
 
 ## Background
-nhanesA was developed to enable fully customizable retrieval of data from the National Health and Nutrition Examination Survey (NHANES). The survey is conducted by the National Center for Health Statistics (NCHS), and data are publicly available at: http://www.cdc.gov/nchs/nhanes.htm. Approximately 5,000 people are surveyed annually, and the results are grouped in two-year intervals. NHANES data are reported in well over one thousand peer-reviewed journal publications every year. 
+nhanesA was developed to enable fully customizable retrieval of data from the National Health and Nutrition Examination Survey (NHANES). The survey is conducted by the National Center for Health Statistics (NCHS), and data are publicly available at: http://www.cdc.gov/nchs/nhanes.htm. NHANES data are reported in well over one thousand peer-reviewed journal publications every year. 
 
 ## NHANES Data
 Since 1999, the NHANES survey has been conducted continuously, and the surveys during that period are referred to as "continous NHANES" to distinguish from several prior surveys. Continuous NHANES surveys are grouped in two-year intervals, with the first interval being 1999-2000.
@@ -33,7 +33,7 @@ suppressWarnings(library(nhanesA))
 nhanesTables('EXAM', 2005)
 ```
 
-Note that the survey is grouped in two-year intervals beginning with the odd year. For convenience, only a single 4-digit year is entered such that ``` nhanesTables('EXAM', 2005) ``` and ``` nhanesTables('EXAM', 2006)``` yield identical output. In the preceding example we see that the Examination data for the 2005-2006 survey consists of thirteen tables.
+Note that the two-year survey intervals begin with the odd year. For convenience, only a single 4-digit year is entered such that ``` nhanesTables('EXAM', 2005) ``` and ``` nhanesTables('EXAM', 2006)``` yield identical output. In the preceding example we see that the Examination data for the 2005-2006 survey consists of thirteen tables.
 
 ### List Variables in an NHANES Table
 
@@ -51,6 +51,7 @@ demo_d <- nhanes('DEMO_D')
 We then merge the tables and compute average values by gender for several variables: 
 ```{r}
 bmx_demo <- merge(demo_d, bmx_d)
+options(digits=4)
 aggregate(cbind(bmxht,bmxwt, bmxleg, bmxcalf, bmxthicr)~riagendr, bmx_demo, mean)
 ```
 

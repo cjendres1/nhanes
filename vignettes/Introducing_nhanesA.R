@@ -11,6 +11,7 @@ demo_d <- nhanes('DEMO_D')
 
 ## ------------------------------------------------------------------------
 bmx_demo <- merge(demo_d, bmx_d)
+options(digits=4)
 aggregate(cbind(bmxht,bmxwt, bmxleg, bmxcalf, bmxthicr)~riagendr, bmx_demo, mean)
 
 ## ------------------------------------------------------------------------
