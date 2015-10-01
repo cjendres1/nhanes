@@ -65,18 +65,19 @@ get_year_from_nh_table <- function(nh_table) {
 if(nh_table %in% anomalytables2005) {return('2005-2006')}
 nhloc <- data.frame(stringr::str_locate_all(nh_table, '_'))
 nn <- nrow(nhloc)
-if(nn!=0){
+if(nn!=0){ #Underscores were found
   if((nhloc$start[nn]+1) == nchar(nh_table)) {
     idx <- str_sub(nh_table, -1, -1)
     if(idx=='r'||idx=='R') {
       if(nn > 1) {
-        idx <- str_sub(nh_table, nhloc$start[nn-1]+1, nhloc$start[nn-1]+1)
+        newloc <- nhloc$start[nn-1]+1
+        idx <- str_sub(nh_table, newloc, newloc)
       } else {stop('Invalid table name')}
     }
-    return(nh_year <- data_idx[idx])
-  } else { ## Assume it's from the first set
+    return(data_idx[idx])
+  } else { ## Undersore not 2nd to last. Assume table is from the first set.
     return("1999-2000")}
-} else 
+} else #If there are no underscores then table must be from first survey
   nh_year <- "1999-2000"
 }
 #------------------------------------------------------------------------------
@@ -99,10 +100,11 @@ xpath <- '//*[@id="ContentPlaceHolder1_GridView1"]'
 #' 
 #' Enables quick display of all available tables in the survey group.
 #' 
-#' @importFrom stringr str_replace str_c str_match str_to_title
+#' @importFrom stringr str_replace str_c str_match str_to_title str_sub str_split
 #' @importFrom rvest xml_nodes html_table
 #' @importFrom xml2 read_html
 #' @importFrom magrittr %>%
+#' @importFrom plyr rename
 #' @param nh_surveygroup The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
 #' Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).
 #' @param year The year in yyyy format where 1999 <= yyyy <= 2012.
@@ -119,7 +121,8 @@ xpath <- '//*[@id="ContentPlaceHolder1_GridView1"]'
 #' nhanesTables('LAB', 2009, details=TRUE, includerdc=TRUE)
 #' nhanesTables('Q', 2005, namesonly=TRUE)
 #' @export
-#' 
+#'
+
 nhanesTables <- function(nh_surveygroup, year, nchar=100, details = FALSE, namesonly=FALSE, includerdc=FALSE) {
   if( !(nh_surveygroup %in% names(nhanes_group)) ) {
     stop("Invalid survey group")
@@ -130,7 +133,7 @@ nhanesTables <- function(nh_surveygroup, year, nchar=100, details = FALSE, names
   
   turl <- str_c(nhanesURL, 'search/variablelist.aspx?Component=', 
                 str_to_title(as.character(nhanes_group[nh_surveygroup])), 
-                '&CycleBeginYear=', unlist(strsplit(as.character(nh_year), '-'))[[1]] , sep='')
+                '&CycleBeginYear=', unlist(str_split(as.character(nh_year), '-'))[[1]] , sep='')
   # At this point df contains every table
   df <- as.data.frame(turl %>% read_html() %>% xml_nodes(xpath=xpath) %>% html_table())
   # By default we exclude RDC Only tables as those cannot be downloaded
@@ -140,28 +143,25 @@ nhanesTables <- function(nh_surveygroup, year, nchar=100, details = FALSE, names
   
   if(details == TRUE) {
     df <- unique(df[,3:length(df)])
-    colnames(df)[colnames(df)=="Data.File.Name"] <- "FileName"
-    colnames(df)[colnames(df)=="Data.File.Description"] <- "Description"
-  }
-  else {
+  } else {
     df <- unique(df[,c('Data.File.Name', 'Data.File.Description')])
-    names(df) <- c('FileName', 'Description')
   }
+  df <- rename(df, c("Data.File.Name"="FileName","Data.File.Description"="Description"))
   
   #Here we exclude tables that overlap from earlier surveys
   # Get possible table suffixes for the specified year
-  if( nh_year != "1999-2000") { ## No exclusion needed for first survey
+  if(nh_year != "1999-2000") { ## No exclusion needed for first survey
     suffix <- names(data_idx[which(data_idx == nh_year)])
     suffix <- unlist(lapply(suffix, function(x) {str_c('_', x, sep='')}))
     if(nh_year == '2005-2006') {suffix <- c(suffix, anomalytables2005)}
     matches <- unique(grep(paste(suffix,collapse="|"), df[['FileName']], value=TRUE))  
     df <- df[(df$FileName %in% matches),]
   }
-  row.names(df) <- c(1:nrow(df))
   if( namesonly == TRUE ) {
     return(as.character(df[[1]]))
   }
-  df$Description <- strtrim(df$Description, nchar)
+  df$Description <- str_sub(df$Description, 1, nchar)
+  row.names(df) <- NULL
   return(df)  
 }
 
@@ -171,7 +171,7 @@ nhanesTables <- function(nh_surveygroup, year, nchar=100, details = FALSE, names
 #' 
 #' Enables quick display of table variables and their definitions.
 #' 
-#' @importFrom stringr str_replace str_c str_sub
+#' @importFrom stringr str_replace str_c str_sub str_split
 #' @importFrom rvest xml_nodes html_table
 #' @importFrom xml2 read_html
 #' @importFrom magrittr %>%
@@ -201,7 +201,7 @@ nhanesTableVars <- function(nh_surveygroup, nh_table, details = FALSE, nchar=100
   nh_year <- get_year_from_nh_table(nh_table)
   turl <- str_c(nhanesURL, 'search/variablelist.aspx?Component=', 
                 str_to_title(as.character(nhanes_group[nh_surveygroup])), 
-                '&CycleBeginYear=', unlist(strsplit(as.character(nh_year), '-'))[[1]] , sep='')
+                '&CycleBeginYear=', unlist(str_split(as.character(nh_year), '-'))[[1]] , sep='')
   df <- as.data.frame(turl %>% read_html() %>% xml_nodes(xpath=xpath) %>% html_table())
 
   if(!(nh_table %in% df$Data.File.Name)) {
@@ -219,10 +219,10 @@ nhanesTableVars <- function(nh_surveygroup, nh_table, details = FALSE, nchar=100
     df <- df[df$Data.File.Name == nh_table,]
   }
   df[[2]] <- str_sub(df[[2]],1,nchar)
-  row.names(df) <- NULL
   if( namesonly == TRUE ) {
     return(as.character(unique(df[[1]])))
   }
+  row.names(df) <- NULL
   return(unique(df))
 }
 
@@ -263,7 +263,6 @@ nhanes <- function(nh_table) {
 }
 
 #------------------------------------------------------------------------------
-
 #' Returns the attributes of an NHANES data table.
 #' 
 #' Returns attributes such as number of rows, columns, and memory size,
@@ -399,7 +398,7 @@ nhanesTranslate <- function(nh_table, colnames, data = NULL, nchar = 32, details
     
     translated <- c() ## Let's keep track of columns that were translated
     notfound   <- c() ## Keep track of columns that were not found
-    nskip <- grep('Range', translations)
+    nskip <- grep('Range', translations) ## 'Range' of values indicates the column is not coded
     for( i in 1:length(colnames) ) {
       if(!(i %in% nskip)) {
         cname <- unlist(colnames[i])
@@ -409,7 +408,7 @@ nhanesTranslate <- function(nh_table, colnames, data = NULL, nchar = 32, details
           if(length(levels(as.factor(data[[idx]]))) > 1) {
             data[[idx]] <- as.factor(data[[idx]])
             data[[idx]] <- suppressMessages(mapvalues(data[[idx]], from = translations[[cname]][['Code.or.Value']], 
-                                                      to = strtrim(translations[[cname]][['Value.Description']], nchar)))
+                                            to = str_sub(translations[[cname]][['Value.Description']], 1, nchar)))
             translated <- c(translated, cname) }
         } else {
           notfound <- c(notfound, cname)

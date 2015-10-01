@@ -33,7 +33,7 @@ suppressWarnings(library(nhanesA))
 nhanesTables('EXAM', 2005)
 ```
 
-Note that the two-year survey intervals begin with the odd year. For convenience, only a single 4-digit year is entered such that ``` nhanesTables('EXAM', 2005) ``` and ``` nhanesTables('EXAM', 2006)``` yield identical output. In the preceding example we see that the Examination data for the 2005-2006 survey consists of thirteen tables.
+Note that the two-year survey intervals begin with the odd year. For convenience, only a single 4-digit year is entered such that ``` nhanesTables('EXAM', 2005) ``` and ``` nhanesTables('EXAM', 2006)``` yield identical output.
 
 ### List Variables in an NHANES Table
 
@@ -42,12 +42,14 @@ To better determine if that table is of interest, we can display detailed inform
 ```{r}
 nhanesTableVars('EXAM', 'BMX_D')
 ```
+
 We see that there are 27 columns in table BMX_D. The first column (SEQN) is the respondent sequence number and is included in every NHANES table. Effectively, SEQN is a subject identifier that is used to join information across tables.
 We now import BMX\_D along with the demographics table DEMO\_D.
 ```{r}
 bmx_d  <- nhanes('BMX_D')
 demo_d <- nhanes('DEMO_D')
 ```
+
 We then merge the tables and compute average values by gender for several variables: 
 ```{r}
 bmx_demo <- merge(demo_d, bmx_d)
