@@ -33,7 +33,6 @@ It is often useful to display the table names in an NHANES survey. In effect thi
 is a convenient way to browse the available NHANES tables.
 }
 \examples{
-\donttest{nhanesTables('EXAM', 2007)}
 nhanesTables('LAB', 2009, details=TRUE, includerdc=TRUE)
 nhanesTables('Q', 2005, namesonly=TRUE)
 }

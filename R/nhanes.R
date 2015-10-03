@@ -117,7 +117,7 @@ xpath <- '//*[@id="ContentPlaceHolder1_GridView1"]'
 #' It is often useful to display the table names in an NHANES survey. In effect this
 #' is a convenient way to browse the available NHANES tables.
 #' @examples
-#' \donttest{nhanesTables('EXAM', 2007)}
+# \donttest{nhanesTables('EXAM', 2007)}
 #' nhanesTables('LAB', 2009, details=TRUE, includerdc=TRUE)
 #' nhanesTables('Q', 2005, namesonly=TRUE)
 #' @export
@@ -137,11 +137,11 @@ nhanesTables <- function(nh_surveygroup, year, nchar=100, details = FALSE, names
   # At this point df contains every table
   df <- as.data.frame(turl %>% read_html() %>% xml_nodes(xpath=xpath) %>% html_table())
   # By default we exclude RDC Only tables as those cannot be downloaded
-  if( includerdc == FALSE) {
+  if(!includerdc) {
     df <- df[(df$Use.Constraints != "RDC Only"),]
   }
   
-  if(details == TRUE) {
+  if(details) {
     df <- unique(df[,3:length(df)])
   } else {
     df <- unique(df[,c('Data.File.Name', 'Data.File.Description')])
@@ -157,7 +157,7 @@ nhanesTables <- function(nh_surveygroup, year, nchar=100, details = FALSE, names
     matches <- unique(grep(paste(suffix,collapse="|"), df[['FileName']], value=TRUE))  
     df <- df[(df$FileName %in% matches),]
   }
-  if( namesonly == TRUE ) {
+  if(namesonly) {
     return(as.character(df[[1]]))
   }
   df$Description <- str_sub(df$Description, 1, nchar)
@@ -233,7 +233,7 @@ nhanesTableVars <- function(nh_surveygroup, nh_table, details = FALSE, nchar=100
 #' Use to download NHANES data tables that are in SAS format.
 #' 
 #' @importFrom Hmisc sasxport.get
-#' @importFrom stringr str_c
+#' @importFrom stringr str_c str_to_upper
 #' @param nh_table The name of the specific table to retrieve.
 #' @return The table is returned as a data frame.
 #' @details Downloads a table from the NHANES website in its entirety. NHANES tables 
@@ -248,7 +248,10 @@ nhanes <- function(nh_table) {
   nht <- tryCatch({    
     nh_year <- get_year_from_nh_table(nh_table)
     url <- str_c(nhanesURL, nh_year, '/', nh_table, '.XPT', collapse='')
-    return(sasxport.get(url))
+    nhanes_table <- sasxport.get(url)
+    names(nhanes_table) <- str_to_upper(names(nhanes_table))
+    return(nhanes_table)
+#    return(sasxport.get(url))
   },
   error = function(cond) {
     message(paste("Data set ", nh_table,  " is not available"), collapse='')

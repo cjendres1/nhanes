@@ -12,17 +12,17 @@ demo_d <- nhanes('DEMO_D')
 ## ------------------------------------------------------------------------
 bmx_demo <- merge(demo_d, bmx_d)
 options(digits=4)
-aggregate(cbind(bmxht,bmxwt, bmxleg, bmxcalf, bmxthicr)~riagendr, bmx_demo, mean)
+aggregate(cbind(BMXHT,BMXWT, BMXLEG, BMXCALF, BMXTHICR)~RIAGENDR, bmx_demo, mean)
 
 ## ------------------------------------------------------------------------
 nhanesTranslate('DEMO_D', 'RIAGENDR')
 
 ## ------------------------------------------------------------------------
-levels(as.factor(demo_d$riagendr))
+levels(as.factor(demo_d$RIAGENDR))
 demo_d <- nhanesTranslate('DEMO_D', 'RIAGENDR', data=demo_d)
-levels(demo_d$riagendr)
+levels(demo_d$RIAGENDR)
 bmx_demo <- merge(demo_d, bmx_d)
-aggregate(cbind(bmxht,bmxwt, bmxleg, bmxcalf, bmxthicr)~riagendr, bmx_demo, mean)
+aggregate(cbind(BMXHT,BMXWT, BMXLEG, BMXCALF, BMXTHICR)~RIAGENDR, bmx_demo, mean)
 
 ## ----eval=FALSE----------------------------------------------------------
 #  q2007names  <- nhanesTables('Q', 2007, namesonly=TRUE)

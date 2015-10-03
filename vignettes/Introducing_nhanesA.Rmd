@@ -54,7 +54,7 @@ We then merge the tables and compute average values by gender for several variab
 ```{r}
 bmx_demo <- merge(demo_d, bmx_d)
 options(digits=4)
-aggregate(cbind(bmxht,bmxwt, bmxleg, bmxcalf, bmxthicr)~riagendr, bmx_demo, mean)
+aggregate(cbind(BMXHT,BMXWT, BMXLEG, BMXCALF, BMXTHICR)~RIAGENDR, bmx_demo, mean)
 ```
 
 ### Translation of Coded Values
@@ -66,11 +66,11 @@ nhanesTranslate('DEMO_D', 'RIAGENDR')
 
 If desired, we can use nhanesTranslate to apply the code translation to demo\_d directly by assigning data=demo\_d. 
 ```{r}
-levels(as.factor(demo_d$riagendr))
+levels(as.factor(demo_d$RIAGENDR))
 demo_d <- nhanesTranslate('DEMO_D', 'RIAGENDR', data=demo_d)
-levels(demo_d$riagendr)
+levels(demo_d$RIAGENDR)
 bmx_demo <- merge(demo_d, bmx_d)
-aggregate(cbind(bmxht,bmxwt, bmxleg, bmxcalf, bmxthicr)~riagendr, bmx_demo, mean)
+aggregate(cbind(BMXHT,BMXWT, BMXLEG, BMXCALF, BMXTHICR)~RIAGENDR, bmx_demo, mean)
 ```
 
 ### Downloading a Complete Survey
