@@ -21,7 +21,7 @@ types = data types of each column
 }
 \description{
 Returns attributes such as number of rows, columns, and memory size,
-but does not reutrn the table itself.
+but does not return the table itself.
 }
 \details{
 nhanesAttr allows one to check the size and other charactersistics of a data table

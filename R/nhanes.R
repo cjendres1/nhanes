@@ -107,7 +107,7 @@ xpath <- '//*[@id="ContentPlaceHolder1_GridView1"]'
 #' @importFrom plyr rename
 #' @param nh_surveygroup The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
 #' Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).
-#' @param year The year in yyyy format where 1999 <= yyyy <= 2012.
+#' @param year The year in yyyy format where 1999 <= yyyy <= 2014.
 #' @param nchar Truncates the table description to a max length of nchar.
 #' @param details If TRUE then a more detailed description of the tables is returned.
 #' @param namesonly If TRUE then only the table names are returned.
@@ -117,9 +117,9 @@ xpath <- '//*[@id="ContentPlaceHolder1_GridView1"]'
 #' It is often useful to display the table names in an NHANES survey. In effect this
 #' is a convenient way to browse the available NHANES tables.
 #' @examples
-# \donttest{nhanesTables('EXAM', 2007)}
+#' nhanesTables('EXAM', 2007)
 #' nhanesTables('LAB', 2009, details=TRUE, includerdc=TRUE)
-#' nhanesTables('Q', 2005, namesonly=TRUE)
+#' \donttest{nhanesTables('Q', 2005, namesonly=TRUE)}
 #' @export
 #'
 
@@ -269,7 +269,7 @@ nhanes <- function(nh_table) {
 #' Returns the attributes of an NHANES data table.
 #' 
 #' Returns attributes such as number of rows, columns, and memory size,
-#' but does not reutrn the table itself.
+#' but does not return the table itself.
 #' 
 #' @importFrom Hmisc sasxport.get
 #' @importFrom stringr str_c
@@ -429,5 +429,4 @@ nhanesTranslate <- function(nh_table, colnames, data = NULL, nchar = 32, details
     return(data)
   }
 }
-
 #------------------------------------------------------------------------------
