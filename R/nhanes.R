@@ -406,7 +406,7 @@ nhanesTranslate <- function(nh_table, colnames, data = NULL, nchar = 32, details
       if(!(i %in% nskip)) {
         cname <- unlist(colnames[i])
         sstr <- str_c('^', cname, '$') # Construct the search string
-        idx <- grep(sstr, names(data), ignore.case=TRUE) # Fields are lower case in data
+        idx <- grep(sstr, names(data)) 
         if(idx>0) { ## The column is present. Next we need to decide if it should be translated.
           if(length(levels(as.factor(data[[idx]]))) > 1) {
             data[[idx]] <- as.factor(data[[idx]])
@@ -427,6 +427,48 @@ nhanesTranslate <- function(nh_table, colnames, data = NULL, nchar = 32, details
       warning("No columns were translated")
     }
     return(data)
+  }
+}
+#------------------------------------------------------------------------------
+
+#' Open a browser to NHANES.
+#' 
+#' The browser may be directed to a specific year, survey, or table.
+#' 
+#' @importFrom stringr str_c str_to_title str_split str_sub str_extract_all
+#' @param year The year in yyyy format where 1999 <= yyyy <= 2014.
+#' @param nh_surveygroup The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
+#' Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).
+#' @param nh_table The name of an NHANES table.
+#' @details browseNHANES will open a web browser to the specified NHANES site.
+#' @examples
+#' \donttest{browseNHANES()}                     Defaults to the main data sets page
+#' \donttest{browseNHANES(2005)}                 The main page for the specified survey year
+#' \donttest{browseNHANES(2009, 'EXAM')}         Page for the specified year and survey group
+#' \donttest{browseNHANES(nh_table = 'VIX_D')}   Page for a specific table
+#' @export
+#' 
+
+browseNHANES <- function(year=NULL, nh_surveygroup=NULL, nh_table=NULL) {
+  if(!is.null(nh_table)){
+    nh_year <- get_year_from_nh_table(nh_table)
+    url <- str_c(nhanesURL, nh_year, '/', nh_table, '.htm', sep='')
+    browseURL(url)
+  } else if(!is.null(year)) {
+    if(!is.null(nh_surveygroup)) {
+      nh_year <- get_nh_survey_years(year)
+      url <- str_c(nhanesURL, 'Search/DataPage.aspx?Component=', 
+                   str_to_title(as.character(nhanes_group[nh_surveygroup])), 
+                   '&CycleBeginYear=', unlist(str_split(as.character(nh_year), '-'))[[1]] , sep='')
+      browseURL(url)
+    } else {
+      nh_year <- get_nh_survey_years(year)
+      nh_year <- str_c(str_sub(unlist(str_extract_all(nh_year,"[[:digit:]]{4}")),3,4),collapse='_')
+      url <- str_c(nhanesURL, 'search/nhanes', nh_year, '.aspx', sep='')
+      browseURL(url)
+    }
+  } else {
+    browseURL("http://www.cdc.gov/nchs/nhanes/nhanes_questionnaires.htm")
   }
 }
 #------------------------------------------------------------------------------

@@ -10,7 +10,7 @@
 
 <meta name="author" content="Christopher Endres" />
 
-<meta name="date" content="2015-10-04" />
+<meta name="date" content="2015-10-05" />
 
 <title>Introducing_nhanesA</title>
 
@@ -54,7 +54,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="header">
 <h1 class="title">Introducing_nhanesA</h1>
 <h4 class="author"><em>Christopher Endres</em></h4>
-<h4 class="date"><em>2015-10-04</em></h4>
+<h4 class="date"><em>2015-10-05</em></h4>
 </div>
 
 
@@ -148,7 +148,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">levels</span>(demo_d$RIAGENDR)</code></pre>
 <pre><code>## [1] &quot;Male&quot;   &quot;Female&quot;</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">bmx_demo &lt;-<span class="st"> </span><span class="kw">merge</span>(demo_d, bmx_d)
-<span class="kw">aggregate</span>(<span class="kw">cbind</span>(BMXHT,BMXWT, BMXLEG, BMXCALF, BMXTHICR)~RIAGENDR, bmx_demo, mean)</code></pre>
+<span class="kw">aggregate</span>(<span class="kw">cbind</span>(BMXHT, BMXWT, BMXLEG, BMXCALF, BMXTHICR)~RIAGENDR, bmx_demo, mean)</code></pre>
 <pre><code>##   RIAGENDR BMXHT BMXWT BMXLEG BMXCALF BMXTHICR
 ## 1     Male 170.0 76.91  40.50   37.48    51.46
 ## 2   Female 158.9 68.18  37.19   36.89    51.09</code></pre>
