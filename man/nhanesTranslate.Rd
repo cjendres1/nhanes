@@ -38,5 +38,6 @@ values are replaced with the code translations.
 \examples{
 nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN'))
 nhanesTranslate('BPX_F', 'BPACSZ', details=TRUE)
+\donttest{nhanesTranslate('BPX_F', 'BPACSZ', data=nhanes('BPX_F'))}
 }
 

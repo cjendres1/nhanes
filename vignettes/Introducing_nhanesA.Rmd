@@ -1,10 +1,10 @@
 ---
-title: "Introducing_nhanesA"
+title: "Introducing nhanesA"
 author: "Christopher Endres"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Introducing_nhanesA}
+  %\VignetteIndexEntry{Introducing nhanesA}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

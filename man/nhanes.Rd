@@ -17,8 +17,8 @@ Use to download NHANES data tables that are in SAS format.
 }
 \details{
 Downloads a table from the NHANES website in its entirety. NHANES tables
-are stored in SAS '.XPT' format. Function nhanes uses sasxport.get from package H
-misc to retrieve the data.
+are stored in SAS '.XPT' format. Function nhanes uses sasxport.get from package Hmisc
+to retrieve the data.
 }
 \examples{
 nhanes('BPX_E')

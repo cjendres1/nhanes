@@ -1,6 +1,7 @@
 Functions:
 =========
 
+browseNHANES			      Browse the NHANES website
 nhanes                        Download an nhanes table
 nhanesDisplayTableNames       Display names of nhanes tables in a given survey
 nhanesDisplayTableVariables   Display names of Variables in a given nhanes table

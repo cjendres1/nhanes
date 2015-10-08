@@ -55,12 +55,9 @@ data_idx["I"] <- '2015-2016'
 
 anomalytables2005 <- c('CHLMD_DR', 'SSUECD_R', 'HSV_DR')
 
-# An internal function that converts a year into the nhanes interval.
-# E.g. 2003 is converted to '2003-2004'
-# @param year where year is numeric in yyyy format
-# @return The 2-year interval that includes the year, e.g. 2001-2002
-# 
 #------------------------------------------------------------------------------
+# An internal function that determines which survey year the table belongs to.
+# For most tables the year can be determined by the letter suffix.
 get_year_from_nh_table <- function(nh_table) {
 if(nh_table %in% anomalytables2005) {return('2005-2006')}
 nhloc <- data.frame(stringr::str_locate_all(nh_table, '_'))
@@ -75,13 +72,17 @@ if(nn!=0){ #Underscores were found
       } else {stop('Invalid table name')}
     }
     return(data_idx[idx])
-  } else { ## Undersore not 2nd to last. Assume table is from the first set.
+  } else { ## Underscore not 2nd to last. Assume table is from the first set.
     return("1999-2000")}
 } else #If there are no underscores then table must be from first survey
   nh_year <- "1999-2000"
 }
 #------------------------------------------------------------------------------
-
+# An internal function that converts a year into the nhanes interval.
+# E.g. 2003 is converted to '2003-2004'
+# @param year where year is numeric in yyyy format
+# @return The 2-year interval that includes the year, e.g. 2001-2002
+# 
 get_nh_survey_years <- function(year) {
   if(as.character(year) %in% names(nh_years)) {
     return( as.character(nh_years[as.character(year)]) )
@@ -237,8 +238,8 @@ nhanesTableVars <- function(nh_surveygroup, nh_table, details = FALSE, nchar=100
 #' @param nh_table The name of the specific table to retrieve.
 #' @return The table is returned as a data frame.
 #' @details Downloads a table from the NHANES website in its entirety. NHANES tables 
-#' are stored in SAS '.XPT' format. Function nhanes uses sasxport.get from package H
-#' misc to retrieve the data.
+#' are stored in SAS '.XPT' format. Function nhanes uses sasxport.get from package Hmisc 
+#' to retrieve the data.
 #' @examples 
 #' nhanes('BPX_E')
 #' nhanes('FOLATE_F')
@@ -272,7 +273,7 @@ nhanes <- function(nh_table) {
 #' but does not return the table itself.
 #' 
 #' @importFrom Hmisc sasxport.get
-#' @importFrom stringr str_c
+#' @importFrom stringr str_c str_to_upper
 #' @importFrom utils object.size
 #' @param nh_table The name of the specific table to retrieve
 #' @return The following attributes are returned as a list \cr
@@ -296,6 +297,7 @@ nhanesAttr <- function(nh_table) {
     nh_year <- get_year_from_nh_table(nh_table)
     url <- str_c(nhanesURL, nh_year, '/', nh_table, '.XPT', collapse='')
     tmp <- sasxport.get(url)
+    names(tmp) <- str_to_upper(names(tmp))
     nhtatt <- attributes(tmp)
     nhtatt$row.names <- NULL
     nhtatt$nrow <- nrow(tmp)
@@ -346,6 +348,7 @@ nhanesAttr <- function(nh_table) {
 #' @examples
 #' nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN'))
 #' nhanesTranslate('BPX_F', 'BPACSZ', details=TRUE)
+#' \donttest{nhanesTranslate('BPX_F', 'BPACSZ', data=nhanes('BPX_F'))}
 #' @export
 #' 
 nhanesTranslate <- function(nh_table, colnames, data = NULL, nchar = 32, details=FALSE) {
@@ -436,6 +439,7 @@ nhanesTranslate <- function(nh_table, colnames, data = NULL, nchar = 32, details
 #' The browser may be directed to a specific year, survey, or table.
 #' 
 #' @importFrom stringr str_c str_to_title str_split str_sub str_extract_all
+#' @importFrom utils browseURL
 #' @param year The year in yyyy format where 1999 <= yyyy <= 2014.
 #' @param nh_surveygroup The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
 #' Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).
