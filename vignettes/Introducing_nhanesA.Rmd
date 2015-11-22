@@ -85,17 +85,31 @@ names(q2007tables) <- q2007names
 ### Apply All Possible Code Translations to a Table
 An NHANES table may have dozens of columns with coded values. Translating all possible columns is a three step process.
 1: Download the table
-2: Download the list of table variables using nhanesTableVars with namesonly=TRUE
+2: Save a list of table variables
 3: Pass the table and variable list to nhanesTranslate
 
 ```{r}
 bpx_d <- nhanes('BPX_D')
 head(bpx_d[,6:11])
 bpx_d_vars  <- nhanesTableVars('EXAM', 'BPX_D', namesonly=TRUE)
+#Alternatively may use bpx_d_vars = names(bpx_d)
 bpx_d <- suppressWarnings(nhanesTranslate('BPX_D', bpx_d_vars, data=bpx_d))
 head(bpx_d[,6:11])
 ```
 Some discretion is applied by nhanesTranslate such that not all of the coded columns will be translated. In general, columns that have at least two categories (e.g. Male, Female) will be translated.  In some cases the code translations are quite long, thus to improve readability the maximum translation string should be limited. The default translation string length is 32 but can be set as high as 128.
+
+### Import Dual X-Ray Absorptiometry Data
+Dual X-Ray Absorptiometry (DXA) Data were acquired from 1999-2006. The tables are considerably larger than most
+NHANES data tables and are available on an ftp server only. More information may be found at http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to download the data to a local file then
+import to R as needed.
+```{r, eval=FALSE}
+#Importing into R
+dxx_b <- nhanesDXA(2001)
+#Save to file
+nhanesDXA(2001, destfile="dxx_b.xpt")
+#Import supplemental data
+dxx_c_s <- nhanesDXA(2003, suppl=TRUE)
+```
 
 #### Please send any feedback or requests to cjendres1@gmail.com. Hope you enjoy your experience with nhanesA!
 Sincerely,  

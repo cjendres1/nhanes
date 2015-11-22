@@ -20,6 +20,11 @@ The table is returned as a data frame or else written to file.
 \description{
 Import Dual Energy X-ray Absorptiometry (DXA) from 1999-2006
 }
+\details{
+Provide destfile in order to write data to file. If destfile is not provided then
+the data will be imported into the R environment. The data files are rather large so the 
+nhanesDXA command may take over a minute to process.
+}
 \examples{
 \donttest{dxa_b <- nhanesDXA(2001)}
 \donttest{dxa_c_s <- nhanesDXA(2003, suppl=TRUE)}

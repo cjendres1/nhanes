@@ -10,7 +10,7 @@
 
 <meta name="author" content="Christopher Endres" />
 
-<meta name="date" content="2015-10-07" />
+<meta name="date" content="2015-11-22" />
 
 <title>Introducing nhanesA</title>
 
@@ -54,7 +54,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="header">
 <h1 class="title">Introducing nhanesA</h1>
 <h4 class="author"><em>Christopher Endres</em></h4>
-<h4 class="date"><em>2015-10-07</em></h4>
+<h4 class="date"><em>2015-11-22</em></h4>
 </div>
 
 
@@ -80,10 +80,12 @@ code > span.er { color: #ff0000; font-weight: bold; }
 ## 5     BMX_D                                     Body Measures
 ## 6   DXXAG_D Dual Energy X-ray Absorptiometry - Android/Gynoid
 ## 7  DXXFEM_D          Dual Energy X-ray Absorptiometry - Femur
-## 8  OPXFDT_D     Ophthalmology - Frequency Doubling Technology
-## 9     OHX_D                                       Oral Health
-## 10 PAXRAW_D                         Physical Activity Monitor
-## 11    VIX_D                                            Vision</code></pre>
+## 8  DXXSPN_D          Dual Energy X-ray Absorptiometry - Spine
+## 9  OPXFDT_D     Ophthalmology - Frequency Doubling Technology
+## 10 OPXRET_D                   Ophthalmology - Retinal Imaging
+## 11    OHX_D                                       Oral Health
+## 12 PAXRAW_D                         Physical Activity Monitor
+## 13    VIX_D                                            Vision</code></pre>
 <p>Note that the two-year survey intervals begin with the odd year. For convenience, only a single 4-digit year is entered such that <code>nhanesTables('EXAM', 2005)</code> and <code>nhanesTables('EXAM', 2006)</code> yield identical output.</p>
 </div>
 <div id="list-variables-in-an-nhanes-table" class="section level3">
@@ -162,7 +164,7 @@ q2007tables &lt;-<span class="st"> </span><span class="kw">lapply</span>(q2007na
 </div>
 <div id="apply-all-possible-code-translations-to-a-table" class="section level3">
 <h3>Apply All Possible Code Translations to a Table</h3>
-<p>An NHANES table may have dozens of columns with coded values. Translating all possible columns is a three step process. 1: Download the table 2: Download the list of table variables using nhanesTableVars with namesonly=TRUE 3: Pass the table and variable list to nhanesTranslate</p>
+<p>An NHANES table may have dozens of columns with coded values. Translating all possible columns is a three step process. 1: Download the table 2: Save a list of table variables 3: Pass the table and variable list to nhanesTranslate</p>
 <pre class="sourceCode r"><code class="sourceCode r">bpx_d &lt;-<span class="st"> </span><span class="kw">nhanes</span>(<span class="st">'BPX_D'</span>)</code></pre>
 <pre><code>## Processing SAS dataset BPX_D      ..</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(bpx_d[,<span class="dv">6</span>:<span class="dv">11</span>])</code></pre>
@@ -174,6 +176,7 @@ q2007tables &lt;-<span class="st"> </span><span class="kw">lapply</span>(q2007na
 ## 5       2       2       2       2      1      4
 ## 6       2       2       2       2      1      4</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">bpx_d_vars  &lt;-<span class="st"> </span><span class="kw">nhanesTableVars</span>(<span class="st">'EXAM'</span>, <span class="st">'BPX_D'</span>, <span class="dt">namesonly=</span><span class="ot">TRUE</span>)
+<span class="co">#Alternatively may use bpx_d_vars = names(bpx_d)</span>
 bpx_d &lt;-<span class="st"> </span><span class="kw">suppressWarnings</span>(<span class="kw">nhanesTranslate</span>(<span class="st">'BPX_D'</span>, bpx_d_vars, <span class="dt">data=</span>bpx_d))</code></pre>
 <pre><code>## Translated columns: PEASCST1 PEASCCT1 BPQ150A BPQ150B BPQ150C BPQ150D BPAARM BPACSZ BPXPULS BPXPTY BPAEN2 BPAEN3 BPAEN4</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(bpx_d[,<span class="dv">6</span>:<span class="dv">11</span>])</code></pre>
@@ -185,6 +188,16 @@ bpx_d &lt;-<span class="st"> </span><span class="kw">suppressWarnings</span>(<sp
 ## 5      No      No      No      No  Right Large (15X32)
 ## 6      No      No      No      No  Right Large (15X32)</code></pre>
 <p>Some discretion is applied by nhanesTranslate such that not all of the coded columns will be translated. In general, columns that have at least two categories (e.g. Male, Female) will be translated. In some cases the code translations are quite long, thus to improve readability the maximum translation string should be limited. The default translation string length is 32 but can be set as high as 128.</p>
+</div>
+<div id="import-dual-x-ray-absorptiometry-data" class="section level3">
+<h3>Import Dual X-Ray Absorptiometry Data</h3>
+<p>Dual X-Ray Absorptiometry (DXA) Data were acquired from 1999-2006. The tables are considerably larger than most NHANES data tables and are available on an ftp server only. More information may be found at <a href="http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm" class="uri">http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm</a>. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to download the data to a local file then import to R as needed.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Importing into R</span>
+dxx_b &lt;-<span class="st"> </span><span class="kw">nhanesDXA</span>(<span class="dv">2001</span>)
+<span class="co">#Save to file</span>
+<span class="kw">nhanesDXA</span>(<span class="dv">2001</span>, <span class="dt">destfile=</span><span class="st">&quot;dxx_b.xpt&quot;</span>)
+<span class="co">#Import supplemental data</span>
+dxx_c_s &lt;-<span class="st"> </span><span class="kw">nhanesDXA</span>(<span class="dv">2003</span>, <span class="dt">suppl=</span><span class="ot">TRUE</span>)</code></pre>
 <div id="please-send-any-feedback-or-requests-to-cjendres1gmail.com.-hope-you-enjoy-your-experience-with-nhanesa" class="section level4">
 <h4>Please send any feedback or requests to <a href="mailto:cjendres1@gmail.com">cjendres1@gmail.com</a>. Hope you enjoy your experience with nhanesA!</h4>
 <p>Sincerely,<br />Christopher Endres</p>
