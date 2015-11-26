@@ -38,10 +38,13 @@ bpx_d <- suppressWarnings(nhanesTranslate('BPX_D', bpx_d_vars, data=bpx_d))
 head(bpx_d[,6:11])
 
 ## ---- eval=FALSE---------------------------------------------------------
-#  #Importing into R
+#  #Import into R
 #  dxx_b <- nhanesDXA(2001)
 #  #Save to file
 #  nhanesDXA(2001, destfile="dxx_b.xpt")
 #  #Import supplemental data
 #  dxx_c_s <- nhanesDXA(2003, suppl=TRUE)
+#  #Apply code translations
+#  dxalist <- c('DXAEXSTS', 'DXITOT', 'DXIHE')
+#  dxx_b <- nhanesTranslate(colnames=dxalist, data=dxx_b, dxa=T)
 

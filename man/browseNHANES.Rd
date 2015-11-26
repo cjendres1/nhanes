@@ -4,7 +4,8 @@
 \alias{browseNHANES}
 \title{Open a browser to NHANES.}
 \usage{
-browseNHANES(year = NULL, nh_surveygroup = NULL, nh_table = NULL)
+browseNHANES(year = NULL, nh_surveygroup = NULL, nh_table = NULL,
+  dxa = FALSE)
 }
 \arguments{
 \item{year}{The year in yyyy format where 1999 <= yyyy <= 2014.}
@@ -13,6 +14,8 @@ browseNHANES(year = NULL, nh_surveygroup = NULL, nh_table = NULL)
 Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).}
 
 \item{nh_table}{The name of an NHANES table.}
+
+\item{dxa}{If TRUE then browse to the DXA page.}
 }
 \description{
 The browser may be directed to a specific year, survey, or table.
@@ -25,5 +28,6 @@ browseNHANES will open a web browser to the specified NHANES site.
 \donttest{browseNHANES(2005)}                 The main page for the specified survey year
 \donttest{browseNHANES(2009, 'EXAM')}         Page for the specified year and survey group
 \donttest{browseNHANES(nh_table = 'VIX_D')}   Page for a specific table
+\donttest{browseNHANES(dxa=T)}                DXA main page
 }
 

@@ -100,15 +100,17 @@ Some discretion is applied by nhanesTranslate such that not all of the coded col
 
 ### Import Dual X-Ray Absorptiometry Data
 Dual X-Ray Absorptiometry (DXA) Data were acquired from 1999-2006. The tables are considerably larger than most
-NHANES data tables and are available on an ftp server only. More information may be found at http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to download the data to a local file then
-import to R as needed.
+NHANES data tables and are available via ftp server only. More information may be found at http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. Note that nhanesTranslate can be applied to DXA data but that only the 2005-2006 translation tables are used as those are the only DXA codes that are available in html format.
 ```{r, eval=FALSE}
-#Importing into R
+#Import into R
 dxx_b <- nhanesDXA(2001)
 #Save to file
 nhanesDXA(2001, destfile="dxx_b.xpt")
 #Import supplemental data
 dxx_c_s <- nhanesDXA(2003, suppl=TRUE)
+#Apply code translations
+dxalist <- c('DXAEXSTS', 'DXITOT', 'DXIHE')
+dxx_b <- nhanesTranslate(colnames=dxalist, data=dxx_b, dxa=T)
 ```
 
 #### Please send any feedback or requests to cjendres1@gmail.com. Hope you enjoy your experience with nhanesA!

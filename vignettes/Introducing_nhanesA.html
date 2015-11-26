@@ -10,7 +10,7 @@
 
 <meta name="author" content="Christopher Endres" />
 
-<meta name="date" content="2015-11-22" />
+<meta name="date" content="2015-11-26" />
 
 <title>Introducing nhanesA</title>
 
@@ -54,7 +54,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="header">
 <h1 class="title">Introducing nhanesA</h1>
 <h4 class="author"><em>Christopher Endres</em></h4>
-<h4 class="date"><em>2015-11-22</em></h4>
+<h4 class="date"><em>2015-11-26</em></h4>
 </div>
 
 
@@ -191,13 +191,16 @@ bpx_d &lt;-<span class="st"> </span><span class="kw">suppressWarnings</span>(<sp
 </div>
 <div id="import-dual-x-ray-absorptiometry-data" class="section level3">
 <h3>Import Dual X-Ray Absorptiometry Data</h3>
-<p>Dual X-Ray Absorptiometry (DXA) Data were acquired from 1999-2006. The tables are considerably larger than most NHANES data tables and are available on an ftp server only. More information may be found at <a href="http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm" class="uri">http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm</a>. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to download the data to a local file then import to R as needed.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Importing into R</span>
+<p>Dual X-Ray Absorptiometry (DXA) Data were acquired from 1999-2006. The tables are considerably larger than most NHANES data tables and are available via ftp server only. More information may be found at <a href="http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm" class="uri">http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm</a>. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. Note that nhanesTranslate can be applied to DXA data but that only the 2005-2006 translation tables are used as those are the only DXA codes that are available in html format.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Import into R</span>
 dxx_b &lt;-<span class="st"> </span><span class="kw">nhanesDXA</span>(<span class="dv">2001</span>)
 <span class="co">#Save to file</span>
 <span class="kw">nhanesDXA</span>(<span class="dv">2001</span>, <span class="dt">destfile=</span><span class="st">&quot;dxx_b.xpt&quot;</span>)
 <span class="co">#Import supplemental data</span>
-dxx_c_s &lt;-<span class="st"> </span><span class="kw">nhanesDXA</span>(<span class="dv">2003</span>, <span class="dt">suppl=</span><span class="ot">TRUE</span>)</code></pre>
+dxx_c_s &lt;-<span class="st"> </span><span class="kw">nhanesDXA</span>(<span class="dv">2003</span>, <span class="dt">suppl=</span><span class="ot">TRUE</span>)
+<span class="co">#Apply code translations</span>
+dxalist &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">'DXAEXSTS'</span>, <span class="st">'DXITOT'</span>, <span class="st">'DXIHE'</span>)
+dxx_b &lt;-<span class="st"> </span><span class="kw">nhanesTranslate</span>(<span class="dt">colnames=</span>dxalist, <span class="dt">data=</span>dxx_b, <span class="dt">dxa=</span>T)</code></pre>
 <div id="please-send-any-feedback-or-requests-to-cjendres1gmail.com.-hope-you-enjoy-your-experience-with-nhanesa" class="section level4">
 <h4>Please send any feedback or requests to <a href="mailto:cjendres1@gmail.com">cjendres1@gmail.com</a>. Hope you enjoy your experience with nhanesA!</h4>
 <p>Sincerely,<br />Christopher Endres</p>
