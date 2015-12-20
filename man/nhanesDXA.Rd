@@ -2,7 +2,7 @@
 % Please edit documentation in R/nhanes.R
 \name{nhanesDXA}
 \alias{nhanesDXA}
-\title{Import Dual Energy X-ray Absorptiometry (DXA) from 1999-2006}
+\title{Import Dual Energy X-ray Absorptiometry (DXA) data.}
 \usage{
 nhanesDXA(year, suppl = FALSE, destfile = NULL)
 }
@@ -15,15 +15,15 @@ nhanesDXA(year, suppl = FALSE, destfile = NULL)
 into the R environment but no file is created.}
 }
 \value{
-The table is returned as a data frame or else written to file.
+By default the table is returned as a data frame. When downloading to file, the return argument
+is the integer code from download.file where 0 means success and non-zero indicates failure to download.
 }
 \description{
-Import Dual Energy X-ray Absorptiometry (DXA) from 1999-2006
+DXA data were acquired from 1999-2006.
 }
 \details{
-Provide destfile in order to write data to file. If destfile is not provided then
-the data will be imported into the R environment. The data files are rather large so the 
-nhanesDXA command may take over a minute to process.
+Provide destfile in order to write the data to file. If destfile is not provided then
+the data will be imported into the R environment.
 }
 \examples{
 \donttest{dxa_b <- nhanesDXA(2001)}

@@ -232,7 +232,7 @@ nhanesTableVars <- function(nh_surveygroup, nh_table, details = FALSE, nchar=100
 #' Use to download NHANES data tables that are in SAS format.
 #' 
 #' @importFrom Hmisc sasxport.get
-#' @importFrom stringr str_c str_to_upper
+#' @importFrom stringr str_c
 #' @param nh_table The name of the specific table to retrieve.
 #' @return The table is returned as a data frame.
 #' @details Downloads a table from the NHANES website in its entirety. NHANES tables 
@@ -247,10 +247,7 @@ nhanes <- function(nh_table) {
   nht <- tryCatch({    
     nh_year <- get_year_from_nh_table(nh_table)
     url <- str_c(nhanesURL, nh_year, '/', nh_table, '.XPT', collapse='')
-    nhanes_table <- sasxport.get(url)
-    names(nhanes_table) <- str_to_upper(names(nhanes_table))
-    return(nhanes_table)
-#    return(sasxport.get(url))
+    return(sasxport.get(url, lowernames=FALSE))
   },
   error = function(cond) {
     message(paste("Data set ", nh_table,  " is not available"), collapse='')
@@ -265,19 +262,21 @@ nhanes <- function(nh_table) {
 }
 
 #------------------------------------------------------------------------------
-#' Import Dual Energy X-ray Absorptiometry (DXA) from 1999-2006
+#' Import Dual Energy X-ray Absorptiometry (DXA) data.
 #' 
-#' @importFrom stringr str_c str_to_upper
+#' DXA data were acquired from 1999-2006. 
+#' 
+#' @importFrom stringr str_c
 #' @importFrom Hmisc sasxport.get
 #' @importFrom utils download.file
 #' @param year The year of the data to import, where 1999<=year<=2006. 
 #' @param suppl If TRUE then retrieve the supplemental data.
 #' @param destfile The name of a destination file. If NULL then the data are imported 
 #' into the R environment but no file is created.
-#' @return The table is returned as a data frame or else written to file.
-#' @details Provide destfile in order to write data to file. If destfile is not provided then
-#' the data will be imported into the R environment. The data files are rather large so the 
-#' nhanesDXA command may take over a minute to process.
+#' @return By default the table is returned as a data frame. When downloading to file, the return argument
+#' is the integer code from download.file where 0 means success and non-zero indicates failure to download.
+#' @details  Provide destfile in order to write the data to file. If destfile is not provided then
+#' the data will be imported into the R environment.
 #' @examples
 #' \donttest{dxa_b <- nhanesDXA(2001)}
 #' \donttest{dxa_c_s <- nhanesDXA(2003, suppl=TRUE)}
@@ -311,11 +310,8 @@ nhanesDXA <- function(year, suppl=FALSE, destfile=NULL) {
       } else {
         tf <- tempfile()
         download.file(url, tf, mode="wb", quiet=TRUE)
-        dxa_file <- Hmisc::sasxport.get(tf)
+        return(sasxport.get(tf,lowernames=FALSE))
       }
-      
-      names(dxa_file) <- str_to_upper(names(dxa_file))
-      return(dxa_file)
     }
   } else { #If no specific year is given then just retrieve all years
     stop("Year is required")
@@ -329,7 +325,7 @@ nhanesDXA <- function(year, suppl=FALSE, destfile=NULL) {
 #' but does not return the table itself.
 #' 
 #' @importFrom Hmisc sasxport.get
-#' @importFrom stringr str_c str_to_upper
+#' @importFrom stringr str_c
 #' @importFrom utils object.size
 #' @param nh_table The name of the specific table to retrieve
 #' @return The following attributes are returned as a list \cr
@@ -352,8 +348,7 @@ nhanesAttr <- function(nh_table) {
   nht <- tryCatch({    
     nh_year <- get_year_from_nh_table(nh_table)
     url <- str_c(nhanesURL, nh_year, '/', nh_table, '.XPT', collapse='')
-    tmp <- sasxport.get(url)
-    names(tmp) <- str_to_upper(names(tmp))
+    tmp <- sasxport.get(url,lowernames=FALSE)
     nhtatt <- attributes(tmp)
     nhtatt$row.names <- NULL
     nhtatt$nrow <- nrow(tmp)
