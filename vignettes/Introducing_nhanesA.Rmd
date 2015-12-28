@@ -100,7 +100,7 @@ Some discretion is applied by nhanesTranslate such that not all of the coded col
 
 ### Import Dual X-Ray Absorptiometry Data
 Dual X-Ray Absorptiometry (DXA) Data were acquired from 1999-2006. The tables are considerably larger than most
-NHANES data tables and are available via ftp server only. More information may be found at http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. Note that nhanesTranslate can be applied to DXA data but that only the 2005-2006 translation tables are used as those are the only DXA codes that are available in html format.
+NHANES data tables and are available via ftp server only. More information may be found at http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. Note that nhanesTranslate can be applied to DXA data but that only the 2005-2006 translation tables are used as those are the only DXA codes that are currently available in html format.
 ```{r, eval=FALSE}
 #Import into R
 dxx_b <- nhanesDXA(2001)
@@ -112,6 +112,8 @@ dxx_c_s <- nhanesDXA(2003, suppl=TRUE)
 dxalist <- c('DXAEXSTS', 'DXITOT', 'DXIHE')
 dxx_b <- nhanesTranslate(colnames=dxalist, data=dxx_b, dxa=T)
 ```
+
+If you are interested in working with accelerometer data from 2003-2006 then please see packages nhanesaccel http://r-forge.r-project.org/R/?group_id=1733 and accelerometry http://cran.r-project.org/package=accelerometry.
 
 #### Please send any feedback or requests to cjendres1@gmail.com. Hope you enjoy your experience with nhanesA!
 Sincerely,  

@@ -313,7 +313,7 @@ nhanesDXA <- function(year, suppl=FALSE, destfile=NULL) {
         return(sasxport.get(tf,lowernames=FALSE))
       }
     }
-  } else { #If no specific year is given then just retrieve all years
+  } else { # Year not provided - no data will be returned
     stop("Year is required")
   }
 }
