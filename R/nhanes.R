@@ -501,11 +501,11 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32, de
 #' @param dxa If TRUE then browse to the DXA page.
 #' @details browseNHANES will open a web browser to the specified NHANES site.
 #' @examples
-#' \donttest{browseNHANES()}                     Defaults to the main data sets page
-#' \donttest{browseNHANES(2005)}                 The main page for the specified survey year
-#' \donttest{browseNHANES(2009, 'EXAM')}         Page for the specified year and survey group
-#' \donttest{browseNHANES(nh_table = 'VIX_D')}   Page for a specific table
-#' \donttest{browseNHANES(dxa=T)}                DXA main page
+#' browseNHANES()                     # Defaults to the main data sets page
+#' browseNHANES(2005)                 # The main page for the specified survey year
+#' browseNHANES(2009, 'EXAM')         # Page for the specified year and survey group
+#' browseNHANES(nh_table = 'VIX_D')   # Page for a specific table
+#' browseNHANES(dxa = TRUE)           # DXA main page
 #' @export
 #' 
 
