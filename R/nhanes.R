@@ -1,5 +1,6 @@
 #nhanesA - retrieve data from the CDC NHANES repository
 nhanesURL <- 'http://wwwn.cdc.gov/Nchs/Nhanes/'
+varURL <- 'http://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx'
 
 # Create a list of nhanes groups
 # Include convenient aliases
@@ -369,6 +370,90 @@ nhanesAttr <- function(nh_table) {
   }  
   )
   return(nht)  
+}
+
+#------------------------------------------------------------------------------
+#' Perform a search over the comprehensive NHANES variable list.
+#' 
+#' The descriptions in the master variable list will be filtered by the
+#' provided search terms to retrieve a list of relevant variables. 
+#' The search can be restricted to specific survey years by specifying ystart and/or ystop.
+#' 
+#' @importFrom rvest html_table
+#' @importFrom xml2 read_html
+#' @param search_terms List of terms or keywords.
+#' @param ignore.case Ignore case if TRUE. Default value is FALSE.
+#' @param ystart Four digit year of first survey included in search, where ystart >= 1999.
+#' @param ystop  Four digit year of final survey included in search, where ystop >= ystart.
+#' @param includerdc If TRUE then RDC only tables are included in list.
+#' @param nchar Truncates the variable description to a max length of nchar.
+#' @param namesonly If TRUE then only the table names are returned.
+#' @return A list of tables that match the search terms. 
+#' If namesonly=TRUE, then only the table names are returned.
+#' @details nhanesSearch is useful to obtain a comprehensive list of relevant tables.
+#' @examples
+#'  \donttest{nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)}
+#'  \donttest{nhanesSearch("urin", ignore.case=TRUE, ystart=2009, namesonly=TRUE)}
+#'  \donttest{nhanesSearch(c("urine", "urinary"), ignore.case=TRUE, ystop=2006, namesonly=TRUE)}
+#' @export
+#' 
+nhanesSearch <- function(search_terms=NULL, ignore.case=FALSE, ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=100, namesonly=FALSE){
+  is.even <- function(x) {x %% 2 == 0}
+  df  <- data.frame(read_html(varURL) %>% html_table())
+  if(includerdc == FALSE){
+    df <- df[(df$Use.Constraints != "RDC Only"),]
+  }
+  if(is.null(search_terms)) {
+    if(namesonly == TRUE) {
+      return(unique(df$Data.File.Name))
+    } else { return(df) }
+  }
+  df <- df[grep(paste(search_terms,collapse="|"), df[['Variable.Description']], ignore.case=ignore.case, value=FALSE),]
+  
+  if(!is.null(ystop)){  # ystop has been provided
+    if(is.numeric(ystop)) {
+      if(ystop < 1999) {stop("Invalid stop year")}
+    } else {
+      stop(paste( c(ystop, "is not a valid stop year"), collapse=' '))
+    }
+    if(!is.null(ystart)) { # ystart has also been provided
+      if(!is.numeric(ystart)) {stop("Start year (ystart) must be a 4-digit year")}
+      if( ystart > ystop ) {
+        stop('Stop year (ystop) cannot precede the Start year (ystart)')
+      } else { #Determine if Start year is odd or even
+        if(is.even(ystart)) {
+          df <- df[(df$EndYear >= ystart),]
+        } else {
+          df <- df[(df$Begin.Year >= ystart),]
+        }
+        if(is.even(ystop)) {
+          df <- df[(df$EndYear <= ystop),]
+        } else {
+          df <- df[(df$Begin.Year <= ystop),]
+        }
+      }
+    } else { # No ystart, assume it is 1999 (i.e. the first survey)
+      if(is.even(ystop)) {
+        df <- df[(df$EndYear <= ystop),]
+      } else {
+        df <- df[(df$Begin.Year <= ystop),]
+      }
+    }
+  } else if(!is.null(ystart)) { # ystart only, i.e. no ystop
+    if(!is.numeric(ystart)) {stop("Start year (ystart) must be a 4-digit year")}
+    if(is.even(ystart)) {
+      df <- df[(df$EndYear >= ystart),]
+    } else {
+      df <- df[(df$Begin.Year >= ystart),]
+    }
+  }
+  
+  row.names(df) <- NULL
+  if(namesonly) {
+    return(unique(df$Data.File.Name))
+  }
+  df$Variable.Description <- str_sub(df$Variable.Description, 1, nchar)
+  return(df)
 }
 
 #------------------------------------------------------------------------------

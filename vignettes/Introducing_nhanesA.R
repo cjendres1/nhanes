@@ -12,7 +12,7 @@ demo_d <- nhanes('DEMO_D')
 ## ------------------------------------------------------------------------
 bmx_demo <- merge(demo_d, bmx_d)
 options(digits=4)
-aggregate(cbind(BMXHT,BMXWT, BMXLEG, BMXCALF, BMXTHICR)~RIAGENDR, bmx_demo, mean)
+aggregate(cbind(BMXHT, BMXWT, BMXLEG, BMXCALF, BMXTHICR)~RIAGENDR, bmx_demo, mean)
 
 ## ------------------------------------------------------------------------
 nhanesTranslate('DEMO_D', 'RIAGENDR')
@@ -47,4 +47,20 @@ head(bpx_d[,6:11])
 #  #Apply code translations
 #  dxalist <- c('DXAEXSTS', 'DXITOT', 'DXIHE')
 #  dxx_b <- nhanesTranslate(colnames=dxalist, data=dxx_b, dxa=T)
+
+## ---- eval=FALSE---------------------------------------------------------
+#  # nhanesSearch use examples
+#  #
+#  # Search on the word bladder, restrict to the 2001-2008 surveys,
+#  # print out 50 characters of the variable description
+#  nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)
+#  #
+#  # Search on "urin" (will match urine, urinary, etc), from 1999-2010, return table names only
+#  nhanesSearch("urin", ignore.case=TRUE, ystop=2010, namesonly=TRUE)
+#  #
+#  # Search on "tooth" or "teeth", all years
+#  nhanesSearch(c("tooth", "teeth"), ignore.case=TRUE)
+#  #
+#  # Search for variables where the variable description begins with "Tooth"
+#  nhanesSearch("^Tooth")
 

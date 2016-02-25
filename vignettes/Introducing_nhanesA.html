@@ -10,7 +10,7 @@
 
 <meta name="author" content="Christopher Endres" />
 
-<meta name="date" content="2015-12-28" />
+<meta name="date" content="2016-02-24" />
 
 <title>Introducing nhanesA</title>
 
@@ -72,7 +72,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="header">
 <h1 class="title">Introducing nhanesA</h1>
 <h4 class="author"><em>Christopher Endres</em></h4>
-<h4 class="date"><em>2015-12-28</em></h4>
+<h4 class="date"><em>2016-02-24</em></h4>
 </div>
 
 
@@ -146,7 +146,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>We then merge the tables and compute average values by gender for several variables:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bmx_demo &lt;-<span class="st"> </span><span class="kw">merge</span>(demo_d, bmx_d)
 <span class="kw">options</span>(<span class="dt">digits=</span><span class="dv">4</span>)
-<span class="kw">aggregate</span>(<span class="kw">cbind</span>(BMXHT,BMXWT, BMXLEG, BMXCALF, BMXTHICR)~RIAGENDR, bmx_demo, mean)</code></pre></div>
+<span class="kw">aggregate</span>(<span class="kw">cbind</span>(BMXHT, BMXWT, BMXLEG, BMXCALF, BMXTHICR)~RIAGENDR, bmx_demo, mean)</code></pre></div>
 <pre><code>##   RIAGENDR BMXHT BMXWT BMXLEG BMXCALF BMXTHICR
 ## 1        1 170.0 76.91  40.50   37.48    51.46
 ## 2        2 158.9 68.18  37.19   36.89    51.09</code></pre>
@@ -220,6 +220,24 @@ dxx_c_s &lt;-<span class="st"> </span><span class="kw">nhanesDXA</span>(<span cl
 dxalist &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">'DXAEXSTS'</span>, <span class="st">'DXITOT'</span>, <span class="st">'DXIHE'</span>)
 dxx_b &lt;-<span class="st"> </span><span class="kw">nhanesTranslate</span>(<span class="dt">colnames=</span>dxalist, <span class="dt">data=</span>dxx_b, <span class="dt">dxa=</span>T)</code></pre></div>
 <p>If you are interested in working with accelerometer data from 2003-2006 then please see packages nhanesaccel <a href="http://r-forge.r-project.org/R/?group_id=1733" class="uri">http://r-forge.r-project.org/R/?group_id=1733</a> and accelerometry <a href="http://cran.r-project.org/package=accelerometry" class="uri">http://cran.r-project.org/package=accelerometry</a>.</p>
+</div>
+<div id="searching-across-the-comprehensive-list-of-nhanes-variables" class="section level3">
+<h3>Searching across the comprehensive list of NHANES variables</h3>
+<p>The NHANES repository is extensive, thus it is helpful to be able to perform a targeted search to identify relevant tables and variables easily. A comprehensive list of NHANES variables is maintained at <a href="http://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx" class="uri">http://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx</a> The nhanesSearch function allows the investigator to input search terms, match against the comprehensive variable descriptions, and retrieve the list of matching variables.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># nhanesSearch use examples</span>
+<span class="co">#</span>
+<span class="co"># Search on the word bladder, restrict to the 2001-2008 surveys, </span>
+<span class="co"># print out 50 characters of the variable description</span>
+<span class="kw">nhanesSearch</span>(<span class="st">&quot;bladder&quot;</span>, <span class="dt">ystart=</span><span class="dv">2001</span>, <span class="dt">ystop=</span><span class="dv">2008</span>, <span class="dt">nchar=</span><span class="dv">50</span>)
+<span class="co">#</span>
+<span class="co"># Search on &quot;urin&quot; (will match urine, urinary, etc), from 1999-2010, return table names only</span>
+<span class="kw">nhanesSearch</span>(<span class="st">&quot;urin&quot;</span>, <span class="dt">ignore.case=</span><span class="ot">TRUE</span>, <span class="dt">ystop=</span><span class="dv">2010</span>, <span class="dt">namesonly=</span><span class="ot">TRUE</span>)
+<span class="co">#</span>
+<span class="co"># Search on &quot;tooth&quot; or &quot;teeth&quot;, all years</span>
+<span class="kw">nhanesSearch</span>(<span class="kw">c</span>(<span class="st">&quot;tooth&quot;</span>, <span class="st">&quot;teeth&quot;</span>), <span class="dt">ignore.case=</span><span class="ot">TRUE</span>)
+<span class="co">#</span>
+<span class="co"># Search for variables where the variable description begins with &quot;Tooth&quot;</span>
+<span class="kw">nhanesSearch</span>(<span class="st">&quot;^Tooth&quot;</span>)</code></pre></div>
 <div id="please-send-any-feedback-or-requests-to-cjendres1gmail.com.-hope-you-enjoy-your-experience-with-nhanesa" class="section level4">
 <h4>Please send any feedback or requests to <a href="mailto:cjendres1@gmail.com">cjendres1@gmail.com</a>. Hope you enjoy your experience with nhanesA!</h4>
 <p>Sincerely,<br />

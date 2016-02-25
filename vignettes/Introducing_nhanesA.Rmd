@@ -54,7 +54,7 @@ We then merge the tables and compute average values by gender for several variab
 ```{r}
 bmx_demo <- merge(demo_d, bmx_d)
 options(digits=4)
-aggregate(cbind(BMXHT,BMXWT, BMXLEG, BMXCALF, BMXTHICR)~RIAGENDR, bmx_demo, mean)
+aggregate(cbind(BMXHT, BMXWT, BMXLEG, BMXCALF, BMXTHICR)~RIAGENDR, bmx_demo, mean)
 ```
 
 ### Translation of Coded Values
@@ -114,6 +114,26 @@ dxx_b <- nhanesTranslate(colnames=dxalist, data=dxx_b, dxa=T)
 ```
 
 If you are interested in working with accelerometer data from 2003-2006 then please see packages nhanesaccel http://r-forge.r-project.org/R/?group_id=1733 and accelerometry http://cran.r-project.org/package=accelerometry.
+
+### Searching across the comprehensive list of NHANES variables
+The NHANES repository is extensive, thus it is helpful to be able to perform a targeted search to identify relevant tables and variables easily. A comprehensive list of NHANES variables is maintained at http://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx
+The nhanesSearch function allows the investigator to input search terms, match against the comprehensive variable descriptions, and retrieve the list of matching variables.
+```{r, eval=FALSE}
+# nhanesSearch use examples
+#
+# Search on the word bladder, restrict to the 2001-2008 surveys, 
+# print out 50 characters of the variable description
+nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)
+#
+# Search on "urin" (will match urine, urinary, etc), from 1999-2010, return table names only
+nhanesSearch("urin", ignore.case=TRUE, ystop=2010, namesonly=TRUE)
+#
+# Search on "tooth" or "teeth", all years
+nhanesSearch(c("tooth", "teeth"), ignore.case=TRUE)
+#
+# Search for variables where the variable description begins with "Tooth"
+nhanesSearch("^Tooth")
+```
 
 #### Please send any feedback or requests to cjendres1@gmail.com. Hope you enjoy your experience with nhanesA!
 Sincerely,  
