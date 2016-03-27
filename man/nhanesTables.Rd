@@ -4,11 +4,11 @@
 \alias{nhanesTables}
 \title{Returns a list of table names for the specified survey group.}
 \usage{
-nhanesTables(nh_surveygroup, year, nchar = 100, details = FALSE,
+nhanesTables(data_group, year, nchar = 100, details = FALSE,
   namesonly = FALSE, includerdc = FALSE)
 }
 \arguments{
-\item{nh_surveygroup}{The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
+\item{data_group}{The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
 Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).}
 
 \item{year}{The year in yyyy format where 1999 <= yyyy <= 2014.}

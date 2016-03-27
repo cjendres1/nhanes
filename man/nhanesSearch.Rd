@@ -4,11 +4,16 @@
 \alias{nhanesSearch}
 \title{Perform a search over the comprehensive NHANES variable list.}
 \usage{
-nhanesSearch(search_terms = NULL, ignore.case = FALSE, ystart = NULL,
-  ystop = NULL, includerdc = FALSE, nchar = 100, namesonly = FALSE)
+nhanesSearch(search_terms = NULL, exclude_terms = NULL, data_group = NULL,
+  ignore.case = FALSE, ystart = NULL, ystop = NULL, includerdc = FALSE,
+  nchar = 100, namesonly = FALSE)
 }
 \arguments{
 \item{search_terms}{List of terms or keywords.}
+
+\item{exclude_terms}{List of exclusive terms or keywords.}
+
+\item{data_group}{Which data groups (e.g. DIET, EXAM, LAB) to search. Default is to search all groups.}
 
 \item{ignore.case}{Ignore case if TRUE. Default value is FALSE.}
 
@@ -33,10 +38,15 @@ The search can be restricted to specific survey years by specifying ystart and/o
 }
 \details{
 nhanesSearch is useful to obtain a comprehensive list of relevant tables.
+Search terms will be matched against the variable descriptions in the master variable list.
+Matching variables must have at least one of the search_terms and not have any exclude_terms.
+The search may be restricted to specific surveys using ystart and ystop.
+Use namesonly=TRUE to return a list of table names only, which can then be piped into the nhanes
+command to download tables that contain the matching variables.
 }
 \examples{
  \donttest{nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)}
- \donttest{nhanesSearch("urin", ignore.case=TRUE, ystart=2009, namesonly=TRUE)}
+ \donttest{nhanesSearch("urin", exclude_terms="During", ystart=2009)}
  \donttest{nhanesSearch(c("urine", "urinary"), ignore.case=TRUE, ystop=2006, namesonly=TRUE)}
 }
 

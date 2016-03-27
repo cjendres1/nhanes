@@ -4,11 +4,11 @@
 \alias{nhanesTableVars}
 \title{Displays a list of variables in the specified NHANES table.}
 \usage{
-nhanesTableVars(nh_surveygroup, nh_table, details = FALSE, nchar = 100,
+nhanesTableVars(data_group, nh_table, details = FALSE, nchar = 100,
   namesonly = FALSE)
 }
 \arguments{
-\item{nh_surveygroup}{The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
+\item{data_group}{The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
 Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).}
 
 \item{nh_table}{The name of the specific table to retrieve.}

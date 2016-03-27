@@ -4,13 +4,13 @@
 \alias{browseNHANES}
 \title{Open a browser to NHANES.}
 \usage{
-browseNHANES(year = NULL, nh_surveygroup = NULL, nh_table = NULL,
+browseNHANES(year = NULL, data_group = NULL, nh_table = NULL,
   dxa = FALSE)
 }
 \arguments{
 \item{year}{The year in yyyy format where 1999 <= yyyy <= 2014.}
 
-\item{nh_surveygroup}{The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
+\item{data_group}{The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
 Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).}
 
 \item{nh_table}{The name of an NHANES table.}

@@ -60,23 +60,23 @@ anomalytables2005 <- c('CHLMD_DR', 'SSUECD_R', 'HSV_DR')
 # An internal function that determines which survey year the table belongs to.
 # For most tables the year can be determined by the letter suffix.
 get_year_from_nh_table <- function(nh_table) {
-if(nh_table %in% anomalytables2005) {return('2005-2006')}
-nhloc <- data.frame(stringr::str_locate_all(nh_table, '_'))
-nn <- nrow(nhloc)
-if(nn!=0){ #Underscores were found
-  if((nhloc$start[nn]+1) == nchar(nh_table)) {
-    idx <- str_sub(nh_table, -1, -1)
-    if(idx=='r'||idx=='R') {
-      if(nn > 1) {
-        newloc <- nhloc$start[nn-1]+1
-        idx <- str_sub(nh_table, newloc, newloc)
-      } else {stop('Invalid table name')}
-    }
-    return(data_idx[idx])
-  } else { ## Underscore not 2nd to last. Assume table is from the first set.
-    return("1999-2000")}
-} else #If there are no underscores then table must be from first survey
-  nh_year <- "1999-2000"
+  if(nh_table %in% anomalytables2005) {return('2005-2006')}
+  nhloc <- data.frame(stringr::str_locate_all(nh_table, '_'))
+  nn <- nrow(nhloc)
+  if(nn!=0){ #Underscores were found
+    if((nhloc$start[nn]+1) == nchar(nh_table)) {
+      idx <- str_sub(nh_table, -1, -1)
+      if(idx=='r'||idx=='R') {
+        if(nn > 1) {
+          newloc <- nhloc$start[nn-1]+1
+          idx <- str_sub(nh_table, newloc, newloc)
+        } else {stop('Invalid table name')}
+      }
+      return(data_idx[idx])
+    } else { ## Underscore not 2nd to last. Assume table is from the first set.
+      return("1999-2000")}
+  } else #If there are no underscores then table must be from first survey
+    nh_year <- "1999-2000"
 }
 
 #------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ xpath <- '//*[@id="ContentPlaceHolder1_GridView1"]'
 #' @importFrom xml2 read_html
 #' @importFrom magrittr %>%
 #' @importFrom plyr rename
-#' @param nh_surveygroup The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
+#' @param data_group The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
 #' Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).
 #' @param year The year in yyyy format where 1999 <= yyyy <= 2014.
 #' @param nchar Truncates the table description to a max length of nchar.
@@ -125,8 +125,8 @@ xpath <- '//*[@id="ContentPlaceHolder1_GridView1"]'
 #' @export
 #'
 
-nhanesTables <- function(nh_surveygroup, year, nchar=100, details = FALSE, namesonly=FALSE, includerdc=FALSE) {
-  if( !(nh_surveygroup %in% names(nhanes_group)) ) {
+nhanesTables <- function(data_group, year, nchar=100, details = FALSE, namesonly=FALSE, includerdc=FALSE) {
+  if( !(data_group %in% names(nhanes_group)) ) {
     stop("Invalid survey group")
     return(NULL)
   }
@@ -134,7 +134,7 @@ nhanesTables <- function(nh_surveygroup, year, nchar=100, details = FALSE, names
   nh_year <- get_nh_survey_years(year)
   
   turl <- str_c(nhanesURL, 'search/variablelist.aspx?Component=', 
-                str_to_title(as.character(nhanes_group[nh_surveygroup])), 
+                str_to_title(as.character(nhanes_group[data_group])), 
                 '&CycleBeginYear=', unlist(str_split(as.character(nh_year), '-'))[[1]] , sep='')
   # At this point df contains every table
   df <- as.data.frame(turl %>% read_html() %>% xml_nodes(xpath=xpath) %>% html_table())
@@ -176,7 +176,7 @@ nhanesTables <- function(nh_surveygroup, year, nchar=100, details = FALSE, names
 #' @importFrom rvest xml_nodes html_table
 #' @importFrom xml2 read_html
 #' @importFrom magrittr %>%
-#' @param nh_surveygroup The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
+#' @param data_group The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
 #' Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).
 #' @param nh_table The name of the specific table to retrieve.
 #' @param details If TRUE then only the variable names and descriptions are returned, which is often sufficient.
@@ -193,20 +193,20 @@ nhanesTables <- function(nh_surveygroup, year, nchar=100, details = FALSE, names
 #' nhanesTableVars('DEMO', 'DEMO_F', namesonly = TRUE)
 #' @export
 #' 
-nhanesTableVars <- function(nh_surveygroup, nh_table, details = FALSE, nchar=100, namesonly = FALSE) {
-  if( !(nh_surveygroup %in% names(nhanes_group)) ) {
+nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=100, namesonly = FALSE) {
+  if( !(data_group %in% names(nhanes_group)) ) {
     stop("Invalid survey group")
     return(NULL)
   }
   
   nh_year <- get_year_from_nh_table(nh_table)
   turl <- str_c(nhanesURL, 'search/variablelist.aspx?Component=', 
-                str_to_title(as.character(nhanes_group[nh_surveygroup])), 
+                str_to_title(as.character(nhanes_group[data_group])), 
                 '&CycleBeginYear=', unlist(str_split(as.character(nh_year), '-'))[[1]] , sep='')
   df <- as.data.frame(turl %>% read_html() %>% xml_nodes(xpath=xpath) %>% html_table())
-
+  
   if(!(nh_table %in% df$Data.File.Name)) {
-    stop('Table ', nh_table, ' not present in the ', nh_surveygroup, ' survey' )
+    stop('Table ', nh_table, ' not present in the ', data_group, ' survey' )
     return(NULL)
   }
   
@@ -252,7 +252,7 @@ nhanes <- function(nh_table) {
   },
   error = function(cond) {
     message(paste("Data set ", nh_table,  " is not available"), collapse='')
-#    message(url)
+    #    message(url)
     return(NULL)
   },
   warning = function(cond) {
@@ -382,6 +382,8 @@ nhanesAttr <- function(nh_table) {
 #' @importFrom rvest html_table
 #' @importFrom xml2 read_html
 #' @param search_terms List of terms or keywords.
+#' @param exclude_terms List of exclusive terms or keywords.
+#' @param data_group Which data groups (e.g. DIET, EXAM, LAB) to search. Default is to search all groups.
 #' @param ignore.case Ignore case if TRUE. Default value is FALSE.
 #' @param ystart Four digit year of first survey included in search, where ystart >= 1999.
 #' @param ystop  Four digit year of final survey included in search, where ystop >= ystart.
@@ -391,24 +393,45 @@ nhanesAttr <- function(nh_table) {
 #' @return A list of tables that match the search terms. 
 #' If namesonly=TRUE, then only the table names are returned.
 #' @details nhanesSearch is useful to obtain a comprehensive list of relevant tables.
+#' Search terms will be matched against the variable descriptions in the master variable list.
+#' Matching variables must have at least one of the search_terms and not have any exclude_terms.
+#' The search may be restricted to specific surveys using ystart and ystop.
+#' Use namesonly=TRUE to return a list of table names only, which can then be piped into the nhanes
+#' command to download tables that contain the matching variables.
 #' @examples
 #'  \donttest{nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)}
-#'  \donttest{nhanesSearch("urin", ignore.case=TRUE, ystart=2009, namesonly=TRUE)}
+#'  \donttest{nhanesSearch("urin", exclude_terms="During", ystart=2009)}
 #'  \donttest{nhanesSearch(c("urine", "urinary"), ignore.case=TRUE, ystop=2006, namesonly=TRUE)}
 #' @export
 #' 
-nhanesSearch <- function(search_terms=NULL, ignore.case=FALSE, ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=100, namesonly=FALSE){
+nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL, ignore.case=FALSE, 
+                         ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=100, namesonly=FALSE){
   is.even <- function(x) {x %% 2 == 0}
   df  <- data.frame(read_html(varURL) %>% html_table())
   if(includerdc == FALSE){
     df <- df[(df$Use.Constraints != "RDC Only"),]
   }
+  
+  if(!is.null(data_group)){ # Restrict search to specific data group(s) e.g. 'EXAM' or 'LAB'
+    sgroups <- list()
+    for(i in 1:length(data_group)) {
+      if(data_group[i] %in% names(nhanes_group)) {
+        sgroups <- c(sgroups, nhanes_group[[data_group[i]]])
+      }
+    }
+    if(length(sgroups)>0) {
+      df <- df[grep(paste(unlist(sgroups),collapse="|"), df$Component, ignore.case=TRUE),]
+    }
+  }
+  
   if(is.null(search_terms)) {
     if(namesonly == TRUE) {
       return(unique(df$Data.File.Name))
     } else { return(df) }
   }
-  df <- df[grep(paste(search_terms,collapse="|"), df[['Variable.Description']], ignore.case=ignore.case, value=FALSE),]
+  idx <- grep(paste(search_terms,collapse="|"), df[['Variable.Description']], ignore.case=ignore.case, value=FALSE)
+  if(length(idx) > 0) {df <- df[idx,]} else {return(NULL)}
+#  df <- df[grep(paste(search_terms,collapse="|"), df[['Variable.Description']], ignore.case=ignore.case, value=FALSE),]
   
   if(!is.null(ystop)){  # ystop has been provided
     if(is.numeric(ystop)) {
@@ -448,6 +471,10 @@ nhanesSearch <- function(search_terms=NULL, ignore.case=FALSE, ystart=NULL, ysto
     }
   }
   
+  if(!is.null(exclude_terms)) {
+    idx <- grep(paste(exclude_terms,collapse="|"), df[['Variable.Description']], ignore.case=ignore.case, value=FALSE)
+    if(length(idx)>0) {df <- df[-idx,]}
+  }
   row.names(df) <- NULL
   if(namesonly) {
     return(unique(df$Data.File.Name))
@@ -553,7 +580,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32, de
           if(length(levels(as.factor(data[[idx]]))) > 1) {
             data[[idx]] <- as.factor(data[[idx]])
             data[[idx]] <- suppressMessages(plyr::mapvalues(data[[idx]], from = translations[[cname]][['Code.or.Value']], 
-                                                      to = str_sub(translations[[cname]][['Value.Description']], 1, nchar)))
+                                                            to = str_sub(translations[[cname]][['Value.Description']], 1, nchar)))
             translated <- c(translated, cname) }
         } else {
           notfound <- c(notfound, cname)
@@ -580,7 +607,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32, de
 #' @importFrom stringr str_c str_to_title str_split str_sub str_extract_all
 #' @importFrom utils browseURL
 #' @param year The year in yyyy format where 1999 <= yyyy <= 2014.
-#' @param nh_surveygroup The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
+#' @param data_group The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
 #' Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).
 #' @param nh_table The name of an NHANES table.
 #' @param dxa If TRUE then browse to the DXA page.
@@ -594,7 +621,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32, de
 #' @export
 #' 
 
-browseNHANES <- function(year=NULL, nh_surveygroup=NULL, nh_table=NULL, dxa=FALSE) {
+browseNHANES <- function(year=NULL, data_group=NULL, nh_table=NULL, dxa=FALSE) {
   if(dxa) {
     browseURL("http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm")
   } else {
@@ -603,10 +630,10 @@ browseNHANES <- function(year=NULL, nh_surveygroup=NULL, nh_table=NULL, dxa=FALS
       url <- str_c(nhanesURL, nh_year, '/', nh_table, '.htm', sep='')
       browseURL(url)
     } else if(!is.null(year)) {
-      if(!is.null(nh_surveygroup)) {
+      if(!is.null(data_group)) {
         nh_year <- get_nh_survey_years(year)
         url <- str_c(nhanesURL, 'Search/DataPage.aspx?Component=', 
-                     str_to_title(as.character(nhanes_group[nh_surveygroup])), 
+                     str_to_title(as.character(nhanes_group[data_group])), 
                      '&CycleBeginYear=', unlist(str_split(as.character(nh_year), '-'))[[1]] , sep='')
         browseURL(url)
       } else {
