@@ -65,11 +65,11 @@ get_year_from_nh_table <- function(nh_table) {
   nn <- nrow(nhloc)
   if(nn!=0){ #Underscores were found
     if((nhloc$start[nn]+1) == nchar(nh_table)) {
-      idx <- str_sub(nh_table, -1, -1)
+      idx <- stringr::str_sub(nh_table, -1, -1)
       if(idx=='r'||idx=='R') {
         if(nn > 1) {
           newloc <- nhloc$start[nn-1]+1
-          idx <- str_sub(nh_table, newloc, newloc)
+          idx <- stringr::str_sub(nh_table, newloc, newloc)
         } else {stop('Invalid table name')}
       }
       return(data_idx[idx])
@@ -499,6 +499,7 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
 #' In that case the return argument is the code-translated data frame.
 #' @param nchar Applies only when data is defined. Code translations can be very long. \cr
 #' Truncate the length by setting nchar. Default is nchar = 32.
+#' @param mincategories The minimum number of categories needed for code translations to be applied to the data.
 #' @param details If TRUE then all available table translation information is displayed.
 #' @param dxa If TRUE then the 2005-2006 DXA translation table will be used.
 #' @return The code translation table (or translated data frame when data is defined).
@@ -514,7 +515,8 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
 #' \donttest{nhanesTranslate('BPX_F', 'BPACSZ', data=nhanes('BPX_F'))}
 #' @export
 #' 
-nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32, details=FALSE, dxa=FALSE) {
+nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32, 
+                            mincategories = 2, details=FALSE, dxa=FALSE) {
   if(is.null(colnames)) {
     message('Column name is required')
     return(0)
@@ -523,14 +525,37 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32, de
   # Parse nh_table to find the suffix, e.g. for table 'BPX_E', the suffix is '_E'
   # If there is no suffix, then we are likely dealing with data from 1999-2000
   
-  get_translation_table <- function(colname, url) {
+  get_translation_table <- function(colname, url, details) {
     xpt <- str_c('//*[h3[a[@name="', colname, '"]]]', sep='')
     tabletree <- url %>% read_html() %>% xml_nodes(xpath=xpt)
+    if(length(tabletree)==0) { # If not found then try 'id' instead of 'name'
+      xpt <- str_c('//*[h3[@id="', colname, '"]]', sep='')
+      tabletree <- url %>% read_html() %>% xml_nodes(xpath=xpt)
+    }
     if(length(tabletree)>0) {
       tabletrans <- as.data.frame(xml_nodes(tabletree, 'table') %>% html_table())
-    } else {
-      warning(c('Column "', colname, '" not found'), collapse='')
-      return(NULL)
+    } else { # Code table not found so let's see if last letter should be lowercase
+      nc <- nchar(colname)
+      if(length(grep("[[:upper:]]", str_sub(colname, start=nc, end=nc)))>0){
+        lcnm <- colname
+        str_sub(lcnm, start=nc, end=nc) <- tolower(str_sub(lcnm, start=nc, end=nc))
+        xpt <- str_c('//*[h3[a[@name="', lcnm, '"]]]', sep='')
+        tabletree <- url %>% read_html() %>% xml_nodes(xpath=xpt)
+        if(length(tabletree)==0) { # If not found then try 'id' instead of 'name'
+          xpt <- str_c('//*[h3[@id="', lcnm, '"]]', sep='')
+          tabletree <- url %>% read_html() %>% xml_nodes(xpath=xpt)
+        }
+        
+        if(length(tabletree)>0) {
+          tabletrans <- as.data.frame(xml_nodes(tabletree, 'table') %>% html_table())
+        } else { # Still not found even after converting to lowercase
+          warning(c('Column "', colname, '" not found'), collapse='')
+          return(NULL)
+        }
+      } else { #Last character is not an uppercase letter, thus can't convert to lowercase
+        warning(c('Column "', colname, '" not found'), collapse='')
+        return(NULL)
+      }
     }
     
     if(length(tabletrans) > 0) {
@@ -553,7 +578,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32, de
     }  
     code_translation_url <- str_c(nhanesURL, nh_year, '/', nh_table, '.htm', sep='')
   }
-  translations <- lapply(colnames, get_translation_table, code_translation_url)
+  translations <- lapply(colnames, get_translation_table, code_translation_url, details)
   names(translations) <- colnames
   
   nchar_max <- 128
@@ -576,8 +601,8 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32, de
         cname <- unlist(colnames[i])
         sstr <- str_c('^', cname, '$') # Construct the search string
         idx <- grep(sstr, names(data)) 
-        if(idx>0) { ## The column is present. Next we need to decide if it should be translated.
-          if(length(levels(as.factor(data[[idx]]))) > 1) {
+        if(length(idx)>0) { ## The column is present. Next we need to decide if it should be translated.
+          if(length(levels(as.factor(data[[idx]]))) >= mincategories) {
             data[[idx]] <- as.factor(data[[idx]])
             data[[idx]] <- suppressMessages(plyr::mapvalues(data[[idx]], from = translations[[cname]][['Code.or.Value']], 
                                                             to = str_sub(translations[[cname]][['Value.Description']], 1, nchar)))
