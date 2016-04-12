@@ -58,7 +58,9 @@ anomalytables2005 <- c('CHLMD_DR', 'SSUECD_R', 'HSV_DR')
 
 #------------------------------------------------------------------------------
 # An internal function that determines which survey year the table belongs to.
-# For most tables the year can be determined by the letter suffix.
+# For most tables the year is indicated by the letter suffix following an underscore.
+# E.g. for table 'BPX_E', the suffix is '_E'
+# If there is no suffix, then we are likely dealing with data from 1999-2000.
 get_year_from_nh_table <- function(nh_table) {
   if(nh_table %in% anomalytables2005) {return('2005-2006')}
   nhloc <- data.frame(stringr::str_locate_all(nh_table, '_'))
@@ -190,7 +192,7 @@ nhanesTables <- function(data_group, year, nchar=100, details = FALSE, namesonly
 #' @examples
 #' nhanesTableVars('LAB', 'CBC_E')
 #' nhanesTableVars('EXAM', 'OHX_E', details=TRUE, nchar=50)
-#' nhanesTableVars('DEMO', 'DEMO_F', namesonly = TRUE)
+#' \donttest{nhanesTableVars('DEMO', 'DEMO_F', namesonly = TRUE)}
 #' @export
 #' 
 nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=100, namesonly = FALSE) {
@@ -522,9 +524,6 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
     return(0)
   }
   
-  # Parse nh_table to find the suffix, e.g. for table 'BPX_E', the suffix is '_E'
-  # If there is no suffix, then we are likely dealing with data from 1999-2000
-  
   get_translation_table <- function(colname, url, details) {
     xpt <- str_c('//*[h3[a[@name="', colname, '"]]]', sep='')
     tabletree <- url %>% read_html() %>% xml_nodes(xpath=xpt)
@@ -538,7 +537,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
       nc <- nchar(colname)
       if(length(grep("[[:upper:]]", str_sub(colname, start=nc, end=nc)))>0){
         lcnm <- colname
-        str_sub(lcnm, start=nc, end=nc) <- tolower(str_sub(lcnm, start=nc, end=nc))
+        str_sub(lcnm, start=nc, end=nc) <- tolower(stringr::str_sub(lcnm, start=nc, end=nc))
         xpt <- str_c('//*[h3[a[@name="', lcnm, '"]]]', sep='')
         tabletree <- url %>% read_html() %>% xml_nodes(xpath=xpt)
         if(length(tabletree)==0) { # If not found then try 'id' instead of 'name'
