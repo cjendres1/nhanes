@@ -62,11 +62,22 @@ head(bpx_d[,6:11])
 #  nhanesSearch("urin", exclude_terms="during", ignore.case=TRUE, ystop=2010, namesonly=TRUE)
 #  #
 #  # Restrict search to 'EXAM' and 'LAB' data groups. Explicitly list matching and exclude terms, leave ignore.case set to default value of FALSE. Search surveys from 2009 to present.
-#  nhanesSearch(c("urin", "Urin"), exclude_terms=c("During", "eaten during", "do during"), data_group=c( 'EXAM', 'LAB'), ystart=2009)
+#  nhanesSearch(c("urin", "Urin"), exclude_terms=c("During", "eaten during", "do during"), data_group=c('EXAM', 'LAB'), ystart=2009)
 #  #
 #  # Search on "tooth" or "teeth", all years
 #  nhanesSearch(c("tooth", "teeth"), ignore.case=TRUE)
 #  #
 #  # Search for variables where the variable description begins with "Tooth"
 #  nhanesSearch("^Tooth")
+
+## ------------------------------------------------------------------------
+#nhanesSearchVarName use examples
+
+nhanesSearchVarName('BPXPULS')
+nhanesSearchVarName('CSQ260i', includerdc=TRUE, nchar=38, namesonly=FALSE)
+
+## ------------------------------------------------------------------------
+# nhanesSearchTableNames use examples
+nhanesSearchTableNames('BMX')
+nhanesSearchTableNames('HPVS', includerdc=TRUE, nchar=42, details=TRUE)
 

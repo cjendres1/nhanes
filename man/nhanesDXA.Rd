@@ -9,7 +9,7 @@ nhanesDXA(year, suppl = FALSE, destfile = NULL)
 \arguments{
 \item{year}{The year of the data to import, where 1999<=year<=2006.}
 
-\item{suppl}{If TRUE then retrieve the supplemental data.}
+\item{suppl}{If TRUE then retrieve the supplemental data (default=FALSE).}
 
 \item{destfile}{The name of a destination file. If NULL then the data are imported 
 into the R environment but no file is created.}

@@ -1,6 +1,7 @@
 #nhanesA - retrieve data from the CDC NHANES repository
 nhanesURL <- 'http://wwwn.cdc.gov/Nchs/Nhanes/'
 varURL <- 'http://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx'
+dataURL <- 'http://wwwn.cdc.gov/nchs/nhanes/search/DataPage.aspx'
 
 # Create a list of nhanes groups
 # Include convenient aliases
@@ -97,6 +98,9 @@ get_nh_survey_years <- function(year) {
   }
 }
 
+# Internal function to determine if a number is even
+is.even <- function(x) {x %% 2 == 0}
+
 xpath <- '//*[@id="ContentPlaceHolder1_GridView1"]'
 
 #------------------------------------------------------------------------------
@@ -113,9 +117,9 @@ xpath <- '//*[@id="ContentPlaceHolder1_GridView1"]'
 #' Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).
 #' @param year The year in yyyy format where 1999 <= yyyy <= 2014.
 #' @param nchar Truncates the table description to a max length of nchar.
-#' @param details If TRUE then a more detailed description of the tables is returned.
-#' @param namesonly If TRUE then only the table names are returned.
-#' @param includerdc If TRUE then RDC only tables are included in list.
+#' @param details If TRUE then a more detailed description of the tables is returned (default=FALSE).
+#' @param namesonly If TRUE then only the table names are returned (default=FALSE).
+#' @param includerdc If TRUE then RDC only tables are included in list (default=FALSE).
 #' @return The names of the tables in the specified survey group.
 #' @details Data are retrieved via web scraping using html wrappers from package rvest.
 #' It is often useful to display the table names in an NHANES survey. In effect this
@@ -181,10 +185,10 @@ nhanesTables <- function(data_group, year, nchar=100, details = FALSE, namesonly
 #' @param data_group The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
 #' Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).
 #' @param nh_table The name of the specific table to retrieve.
-#' @param details If TRUE then only the variable names and descriptions are returned, which is often sufficient.
+#' @param details If TRUE then all columns in the variable description are returned (default=FALSE).
 #' @param nchar The number of characters in the Variable Description to print. Values are limited to 0<=nchar<=128.
 #' This is used to enhance readability, cause variable descriptions can be very long.
-#' @param namesonly If TRUE then only the variable names are returned.
+#' @param namesonly If TRUE then only the variable names are returned (default=FALSE).
 #' @return The names of the tables in the specified survey group
 #' @details Data are retrieved via web scraping using html wrappers from package rvest.
 #' Each data table contains multiple, sometimes more than 100, fields. It is helpful to list the field
@@ -273,7 +277,7 @@ nhanes <- function(nh_table) {
 #' @importFrom Hmisc sasxport.get
 #' @importFrom utils download.file
 #' @param year The year of the data to import, where 1999<=year<=2006. 
-#' @param suppl If TRUE then retrieve the supplemental data.
+#' @param suppl If TRUE then retrieve the supplemental data (default=FALSE).
 #' @param destfile The name of a destination file. If NULL then the data are imported 
 #' into the R environment but no file is created.
 #' @return By default the table is returned as a data frame. When downloading to file, the return argument
@@ -382,24 +386,24 @@ nhanesAttr <- function(nh_table) {
 #' The search can be restricted to specific survey years by specifying ystart and/or ystop.
 #' 
 #' @importFrom rvest html_table
-#' @importFrom xml2 read_html
+#' @importFrom xml2 xml_children xml_text read_html
+#' @importFrom magrittr %>%
 #' @param search_terms List of terms or keywords.
 #' @param exclude_terms List of exclusive terms or keywords.
 #' @param data_group Which data groups (e.g. DIET, EXAM, LAB) to search. Default is to search all groups.
-#' @param ignore.case Ignore case if TRUE. Default value is FALSE.
+#' @param ignore.case Ignore case if TRUE. (Default=FALSE).
 #' @param ystart Four digit year of first survey included in search, where ystart >= 1999.
 #' @param ystop  Four digit year of final survey included in search, where ystop >= ystart.
-#' @param includerdc If TRUE then RDC only tables are included in list.
+#' @param includerdc If TRUE then RDC only tables are included in list (default=FALSE).
 #' @param nchar Truncates the variable description to a max length of nchar.
-#' @param namesonly If TRUE then only the table names are returned.
+#' @param namesonly If TRUE then only the table names are returned (default=FALSE).
 #' @return A list of tables that match the search terms. 
-#' If namesonly=TRUE, then only the table names are returned.
 #' @details nhanesSearch is useful to obtain a comprehensive list of relevant tables.
 #' Search terms will be matched against the variable descriptions in the master variable list.
 #' Matching variables must have at least one of the search_terms and not have any exclude_terms.
 #' The search may be restricted to specific surveys using ystart and ystop.
-#' Use namesonly=TRUE to return a list of table names only, which can then be piped into the nhanes
-#' command to download tables that contain the matching variables.
+#' If no arguments are given, then nhanesSearch returns the complete master variable list which
+#' currently contains over 30,000 variables.
 #' @examples
 #'  \donttest{nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)}
 #'  \donttest{nhanesSearch("urin", exclude_terms="During", ystart=2009)}
@@ -407,9 +411,13 @@ nhanesAttr <- function(nh_table) {
 #' @export
 #' 
 nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL, ignore.case=FALSE, 
-                         ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=100, namesonly=FALSE){
-  is.even <- function(x) {x %% 2 == 0}
-  df  <- data.frame(read_html(varURL) %>% html_table())
+                         ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=100, namesonly=FALSE) {
+  df  <- data.frame(read_html(varURL) %>% html_table()) 
+  if(!is.null(search_terms)) {
+    idx <- grep(paste(search_terms,collapse="|"), df[['Variable.Description']], ignore.case=ignore.case, value=FALSE)
+    if(length(idx) > 0) {df <- df[idx,]}
+  }
+  
   if(includerdc == FALSE){
     df <- df[(df$Use.Constraints != "RDC Only"),]
   }
@@ -425,15 +433,6 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
       df <- df[grep(paste(unlist(sgroups),collapse="|"), df$Component, ignore.case=TRUE),]
     }
   }
-  
-  if(is.null(search_terms)) {
-    if(namesonly == TRUE) {
-      return(unique(df$Data.File.Name))
-    } else { return(df) }
-  }
-  idx <- grep(paste(search_terms,collapse="|"), df[['Variable.Description']], ignore.case=ignore.case, value=FALSE)
-  if(length(idx) > 0) {df <- df[idx,]} else {return(NULL)}
-#  df <- df[grep(paste(search_terms,collapse="|"), df[['Variable.Description']], ignore.case=ignore.case, value=FALSE),]
   
   if(!is.null(ystop)){  # ystop has been provided
     if(is.numeric(ystop)) {
@@ -484,6 +483,170 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
   df$Variable.Description <- str_sub(df$Variable.Description, 1, nchar)
   return(df)
 }
+#------------------------------------------------------------------------------
+#' Search for matching table names
+#' 
+#' Returns a list of table names that match a specified pattern.
+#' 
+#' @importFrom rvest html_table
+#' @importFrom xml2 read_html
+#' @importFrom magrittr %>%
+#' @param pattern Pattern of table names to match  
+#' @param ystart Four digit year of first survey included in search, where ystart >= 1999.
+#' @param ystop  Four digit year of final survey included in search, where ystop >= ystart.
+#' @param includerdc If TRUE then RDC only tables are included (default=FALSE).
+#' @param nchar Truncates the variable description to a max length of nchar.
+#' @param details If TRUE then complete table information from the comprehensive
+#' data list is returned (default=FALSE).
+#' @return A list of table names that match the pattern.
+#' @details Searching the table names is useful for retrieving a full list of
+#' tables that share a common name pattern. Only a single pattern may be entered.
+#' @examples
+#' \donttest{nhanesSearchTableNames('BMX')}
+#' nhanesSearchTableNames('HPVS', includerdc=TRUE, details=TRUE)
+#' @export
+#' 
+nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=100, details=FALSE) {
+  if(is.null(pattern)) {stop('No pattern was entered')}
+  if(length(pattern)>1) {
+    pattern <- pattern[1]
+    warning("Multiple patterns entered. Only the first will be matched.")
+  }
+  
+  df <- data.frame(read_html(dataURL) %>% html_table())
+  df <- df[grep(paste(pattern,collapse="|"), df$Doc.File),]
+  if(nrow(df)==0) {return(NULL)}
+  if(!includerdc) {
+    df <- df[!(df$Data.File=='RDC Only'),]
+  }
+  
+  if( !is.null(ystart) || !is.null(ystop) ) {
+    # Use the first year of cycle (the odd year) for comparison
+    year1 <- as.integer(matrix(unlist(strsplit(df$Years, '-')), ncol=2, byrow=TRUE)[,1])
+  
+    if(!is.null(ystop)){  # ystop has been provided
+      if(is.numeric(ystop)) {
+        if(ystop < 1999) {stop("Invalid stop year")}
+      } else {
+        stop(paste( c(ystop, "is not a valid stop year"), collapse=' '))
+      }
+      if(!is.null(ystart)) { # ystart has also been provided
+        if(!is.numeric(ystart)) {stop("Start year (ystart) must be a 4-digit year")}
+        if( ystart > ystop ) {
+          stop('Stop year (ystop) cannot precede the Start year (ystart)')
+        } else { #Determine if Start year is odd or even. If even then convert to odd year.
+          if(is.even(ystart)) {
+            ystart <- ystart - 1
+          }
+          df <- df[(year1 >= ystart & year1 <= ystop),]
+         }
+      } else { # No ystart, assume it is 1999 (i.e. the first survey)
+        df <- df[(year1 <= ystop),]
+      }
+    } else if(!is.null(ystart)) { # ystart only, i.e. no ystop
+      if(!is.numeric(ystart)) {stop("Start year (ystart) must be a 4-digit year")}
+      if(is.even(ystart)) {
+        ystart <- ystart - 1
+      } 
+      df <- df[(year1 >= ystart),]
+    }
+  }
+  
+  if(nrow(df)==0) {return(NULL)}
+  row.names(df) <- NULL
+  if(details==TRUE){
+    df$Data.File.Name <- str_sub(df$Data.File.Name, 1, nchar)
+    return(df)
+    } else {
+    return(unlist(strsplit(df$Doc.File, " Doc")))
+  }
+}
+#------------------------------------------------------------------------------
+#' Search for tables that contain a specified variable.
+#' 
+#' Returns a list of table names that contain the variable
+#' @importFrom rvest xml_nodes html_table
+#' @importFrom xml2 xml_children xml_text read_html
+#' @importFrom magrittr %>%
+#' @param varname Name of variable to match.
+#' @param ystart Four digit year of first survey included in search, where ystart >= 1999.
+#' @param ystop  Four digit year of final survey included in search, where ystop >= ystart.
+#' @param includerdc If TRUE then RDC only tables are included in list (default=FALSE).
+#' @param nchar Truncates the variable description to a max length of nchar.
+#' @param namesonly If TRUE then only the table names are returned (default=TRUE).
+#' @details Searching for a specific variable is useful to generate a complete list of
+#' table names that contain that variable. Only a single variable name may be entered, and
+#' only exact matches will be returned.
+#' @examples 
+#' \donttest{nhanesSearchVarName('BMXLEG')}
+#' \donttest{nhanesSearchVarName('BMXHEAD', ystart=2003)}
+#' @export
+#'  
+nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=100, namesonly=TRUE) {
+  if(is.null(varname)) {stop('No varname was entered')}
+  if(length(varname)>1) {
+    varname <- varname[1]
+    warning("Multiple variable names entered. Only the first will be matched.")
+  }
+  
+  xpt <- str_c('//*[@id="ContentPlaceHolder1_GridView1"]/*[td[1]="', varname, '"]', sep='')
+  tabletree <- varURL %>% read_html() %>% xml_nodes(xpath=xpt)
+  ttlist <- lapply(lapply(tabletree, xml_children), xml_text)
+  # Convert the list to a data frame
+  df <- unique(data.frame(matrix(unlist(ttlist), nrow=length(ttlist), byrow=TRUE), stringsAsFactors = FALSE))
+  names(df) <- c('Variable.Name', 'Variable.Description', 'Data.File.Name', 'Data.File.Description', 
+                 'Begin.Year', 'EndYear', 'Component', 'Use.Constraints')
+  
+  if(includerdc == FALSE){
+    df <- df[(df$Use.Constraints != "RDC Only"),]
+  }
+  
+  if(!is.null(ystop)){  # ystop has been provided
+    if(is.numeric(ystop)) {
+      if(ystop < 1999) {stop("Invalid stop year")}
+    } else {
+      stop(paste( c(ystop, "is not a valid stop year"), collapse=' '))
+    }
+    if(!is.null(ystart)) { # ystart has also been provided
+      if(!is.numeric(ystart)) {stop("Start year (ystart) must be a 4-digit year")}
+      if( ystart > ystop ) {
+        stop('Stop year (ystop) cannot precede the Start year (ystart)')
+      } else { #Determine if Start year is odd or even
+        if(is.even(ystart)) {
+          df <- df[(df$EndYear >= ystart),]
+        } else {
+          df <- df[(df$Begin.Year >= ystart),]
+        }
+        if(is.even(ystop)) {
+          df <- df[(df$EndYear <= ystop),]
+        } else {
+          df <- df[(df$Begin.Year <= ystop),]
+        }
+      }
+    } else { # No ystart, assume it is 1999 (i.e. the first survey)
+      if(is.even(ystop)) {
+        df <- df[(df$EndYear <= ystop),]
+      } else {
+        df <- df[(df$Begin.Year <= ystop),]
+      }
+    }
+  } else if(!is.null(ystart)) { # ystart only, i.e. no ystop
+    if(!is.numeric(ystart)) {stop("Start year (ystart) must be a 4-digit year")}
+    if(is.even(ystart)) {
+      df <- df[(df$EndYear >= ystart),]
+    } else {
+      df <- df[(df$Begin.Year >= ystart),]
+    }
+  }
+  
+  row.names(df) <- NULL
+  if(nrow(df)==0) { return(NULL) }
+  if(namesonly) {
+    return( unique(df$Data.File.Name) )
+  }
+  df$Variable.Description <- str_sub(df$Variable.Description, 1, nchar)
+  return(df)
+}
 
 #------------------------------------------------------------------------------
 #' Display code translation information for the specified table.
@@ -500,10 +663,10 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
 #' @param data If a data frame is passed, then code translation will be applied directly to the data frame. \cr
 #' In that case the return argument is the code-translated data frame.
 #' @param nchar Applies only when data is defined. Code translations can be very long. \cr
-#' Truncate the length by setting nchar. Default is nchar = 32.
-#' @param mincategories The minimum number of categories needed for code translations to be applied to the data.
-#' @param details If TRUE then all available table translation information is displayed.
-#' @param dxa If TRUE then the 2005-2006 DXA translation table will be used.
+#' Truncate the length by setting nchar (default = 32).
+#' @param mincategories The minimum number of categories needed for code translations to be applied to the data (default=2).
+#' @param details If TRUE then all available table translation information is displayed (default=FALSE).
+#' @param dxa If TRUE then the 2005-2006 DXA translation table will be used (default=FALSE).
 #' @return The code translation table (or translated data frame when data is defined).
 #' @details Code translation tables are retrieved via webscraping using rvest. 
 #' Many of the NHANES data tables have encoded values. E.g. 1 = 'Male', 2 = 'Female'.
@@ -535,9 +698,9 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
       tabletrans <- as.data.frame(xml_nodes(tabletree, 'table') %>% html_table())
     } else { # Code table not found so let's see if last letter should be lowercase
       nc <- nchar(colname)
-      if(length(grep("[[:upper:]]", str_sub(colname, start=nc, end=nc)))>0){
+      if(length(grep("[[:upper:]]", stringr::str_sub(colname, start=nc, end=nc)))>0){
         lcnm <- colname
-        str_sub(lcnm, start=nc, end=nc) <- tolower(stringr::str_sub(lcnm, start=nc, end=nc))
+        stringr::str_sub(lcnm, start=nc, end=nc) <- tolower(stringr::str_sub(lcnm, start=nc, end=nc))
         xpt <- str_c('//*[h3[a[@name="', lcnm, '"]]]', sep='')
         tabletree <- url %>% read_html() %>% xml_nodes(xpath=xpt)
         if(length(tabletree)==0) { # If not found then try 'id' instead of 'name'
@@ -634,41 +797,40 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
 #' @param data_group The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
 #' Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).
 #' @param nh_table The name of an NHANES table.
-#' @param dxa If TRUE then browse to the DXA page.
 #' @details browseNHANES will open a web browser to the specified NHANES site.
 #' @examples
 #' browseNHANES()                     # Defaults to the main data sets page
 #' browseNHANES(2005)                 # The main page for the specified survey year
 #' browseNHANES(2009, 'EXAM')         # Page for the specified year and survey group
 #' browseNHANES(nh_table = 'VIX_D')   # Page for a specific table
-#' browseNHANES(dxa = TRUE)           # DXA main page
+#' browseNHANES(nh_table = 'DXA')     # DXA main page
 #' @export
 #' 
 
-browseNHANES <- function(year=NULL, data_group=NULL, nh_table=NULL, dxa=FALSE) {
-  if(dxa) {
-    browseURL("http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm")
-  } else {
-    if(!is.null(nh_table)){
+browseNHANES <- function(year=NULL, data_group=NULL, nh_table=NULL) {
+  if(!is.null(nh_table)){ # Specific table name was given
+    if('DXA'==toupper(nh_table)) { # Special case for DXA
+      browseURL("http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm")
+    } else {
       nh_year <- get_year_from_nh_table(nh_table)
       url <- str_c(nhanesURL, nh_year, '/', nh_table, '.htm', sep='')
       browseURL(url)
-    } else if(!is.null(year)) {
-      if(!is.null(data_group)) {
-        nh_year <- get_nh_survey_years(year)
-        url <- str_c(nhanesURL, 'Search/DataPage.aspx?Component=', 
-                     str_to_title(as.character(nhanes_group[data_group])), 
-                     '&CycleBeginYear=', unlist(str_split(as.character(nh_year), '-'))[[1]] , sep='')
-        browseURL(url)
-      } else {
-        nh_year <- get_nh_survey_years(year)
-        nh_year <- str_c(str_sub(unlist(str_extract_all(nh_year,"[[:digit:]]{4}")),3,4),collapse='_')
-        url <- str_c(nhanesURL, 'search/nhanes', nh_year, '.aspx', sep='')
-        browseURL(url)
-      }
-    } else {
-      browseURL("http://www.cdc.gov/nchs/nhanes/nhanes_questionnaires.htm")
     }
+  } else if(!is.null(year)) {
+    if(!is.null(data_group)) {
+      nh_year <- get_nh_survey_years(year)
+      url <- str_c(nhanesURL, 'Search/DataPage.aspx?Component=', 
+                   str_to_title(as.character(nhanes_group[data_group])), 
+                   '&CycleBeginYear=', unlist(str_split(as.character(nh_year), '-'))[[1]] , sep='')
+      browseURL(url)
+    } else {
+      nh_year <- get_nh_survey_years(year)
+      nh_year <- str_c(str_sub(unlist(str_extract_all(nh_year,"[[:digit:]]{4}")),3,4),collapse='_')
+      url <- str_c(nhanesURL, 'search/nhanes', nh_year, '.aspx', sep='')
+      browseURL(url)
+    }
+  } else {
+    browseURL("http://www.cdc.gov/nchs/nhanes/nhanes_questionnaires.htm")
   }
 }
 #------------------------------------------------------------------------------

@@ -132,13 +132,38 @@ nhanesSearch("urin", ignore.case=TRUE, ystop=2010, namesonly=TRUE)
 nhanesSearch("urin", exclude_terms="during", ignore.case=TRUE, ystop=2010, namesonly=TRUE)
 #
 # Restrict search to 'EXAM' and 'LAB' data groups. Explicitly list matching and exclude terms, leave ignore.case set to default value of FALSE. Search surveys from 2009 to present.
-nhanesSearch(c("urin", "Urin"), exclude_terms=c("During", "eaten during", "do during"), data_group=c( 'EXAM', 'LAB'), ystart=2009)
+nhanesSearch(c("urin", "Urin"), exclude_terms=c("During", "eaten during", "do during"), data_group=c('EXAM', 'LAB'), ystart=2009)
 #
 # Search on "tooth" or "teeth", all years
 nhanesSearch(c("tooth", "teeth"), ignore.case=TRUE)
 #
 # Search for variables where the variable description begins with "Tooth"
 nhanesSearch("^Tooth")
+```
+### Searching for tables that contain a specific variable
+nhanesSearch is a versatile search function as it
+imports the entire comprehensive variable list to a data frame. That allows for detailed
+conditional extraction of the variables.
+However, each call to nhanesSearch takes a minute or more to process.  Faster processing can be
+achieved when we know the name of a specific variable of interest and we look only for exact
+matches to the variable name. Function nhanesSearchVarName matches a given variable name in the html directly, 
+then only the matching elements are converted to a data frame. Consequently, a call to nhanesSearchVarName
+executes much faster than nhanesSearch; typically under 30s. nhanesSearchVarName is useful for finding all
+data tables that contain a given variable.
+
+```{r}
+#nhanesSearchVarName use examples
+
+nhanesSearchVarName('BPXPULS')
+nhanesSearchVarName('CSQ260i', includerdc=TRUE, nchar=38, namesonly=FALSE)
+```
+
+### Searching for tables by name pattern
+It is common to group data across surveys, and for that purpose it is useful to list all available tables that follow a given naming pattern. Function nhanesSearchTableNames is used for such pattern matching. For example, if we want to work with all available body measures data we can retrieve the full list of available tables with nhanesSearchTableNames('BMX'). The comprehensive table list is much smaller than the variable list, such that a call to nhanesSearchTableNames takes only a few seconds.
+```{r}
+# nhanesSearchTableNames use examples
+nhanesSearchTableNames('BMX')
+nhanesSearchTableNames('HPVS', includerdc=TRUE, nchar=42, details=TRUE)
 ```
 
 #### Please send any feedback or requests to cjendres1@gmail.com. Hope you enjoy your experience with nhanesA!

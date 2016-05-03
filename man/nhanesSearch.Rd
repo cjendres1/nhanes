@@ -15,21 +15,20 @@ nhanesSearch(search_terms = NULL, exclude_terms = NULL, data_group = NULL,
 
 \item{data_group}{Which data groups (e.g. DIET, EXAM, LAB) to search. Default is to search all groups.}
 
-\item{ignore.case}{Ignore case if TRUE. Default value is FALSE.}
+\item{ignore.case}{Ignore case if TRUE. (Default=FALSE).}
 
 \item{ystart}{Four digit year of first survey included in search, where ystart >= 1999.}
 
 \item{ystop}{Four digit year of final survey included in search, where ystop >= ystart.}
 
-\item{includerdc}{If TRUE then RDC only tables are included in list.}
+\item{includerdc}{If TRUE then RDC only tables are included in list (default=FALSE).}
 
 \item{nchar}{Truncates the variable description to a max length of nchar.}
 
-\item{namesonly}{If TRUE then only the table names are returned.}
+\item{namesonly}{If TRUE then only the table names are returned (default=FALSE).}
 }
 \value{
-A list of tables that match the search terms. 
-If namesonly=TRUE, then only the table names are returned.
+A list of tables that match the search terms.
 }
 \description{
 The descriptions in the master variable list will be filtered by the
@@ -41,8 +40,8 @@ nhanesSearch is useful to obtain a comprehensive list of relevant tables.
 Search terms will be matched against the variable descriptions in the master variable list.
 Matching variables must have at least one of the search_terms and not have any exclude_terms.
 The search may be restricted to specific surveys using ystart and ystop.
-Use namesonly=TRUE to return a list of table names only, which can then be piped into the nhanes
-command to download tables that contain the matching variables.
+If no arguments are given, then nhanesSearch returns the complete master variable list which
+currently contains over 30,000 variables.
 }
 \examples{
  \donttest{nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)}

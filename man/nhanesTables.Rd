@@ -15,11 +15,11 @@ Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).}
 
 \item{nchar}{Truncates the table description to a max length of nchar.}
 
-\item{details}{If TRUE then a more detailed description of the tables is returned.}
+\item{details}{If TRUE then a more detailed description of the tables is returned (default=FALSE).}
 
-\item{namesonly}{If TRUE then only the table names are returned.}
+\item{namesonly}{If TRUE then only the table names are returned (default=FALSE).}
 
-\item{includerdc}{If TRUE then RDC only tables are included in list.}
+\item{includerdc}{If TRUE then RDC only tables are included in list (default=FALSE).}
 }
 \value{
 The names of the tables in the specified survey group.
