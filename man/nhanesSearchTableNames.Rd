@@ -28,8 +28,9 @@ A list of table names that match the pattern.
 Returns a list of table names that match a specified pattern.
 }
 \details{
-Searching the table names is useful for retrieving a full list of
-tables that share a common name pattern. Only a single pattern may be entered.
+Searches the Doc File field in the NHANES Comprehensive Data List 
+(see http://wwwn.cdc.gov/nchs/nhanes/search/DataPage.aspx) for tables
+that match a given name pattern. Only a single pattern may be entered.
 }
 \examples{
 \donttest{nhanesSearchTableNames('BMX')}

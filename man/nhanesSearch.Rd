@@ -37,11 +37,11 @@ The search can be restricted to specific survey years by specifying ystart and/o
 }
 \details{
 nhanesSearch is useful to obtain a comprehensive list of relevant tables.
-Search terms will be matched against the variable descriptions in the master variable list.
+Search terms will be matched against the variable descriptions in the NHANES Comprehensive
+Variable List (see http://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx).
 Matching variables must have at least one of the search_terms and not have any exclude_terms.
 The search may be restricted to specific surveys using ystart and ystop.
-If no arguments are given, then nhanesSearch returns the complete master variable list which
-currently contains over 30,000 variables.
+If no arguments are given, then nhanesSearch returns the complete variable list.
 }
 \examples{
  \donttest{nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)}

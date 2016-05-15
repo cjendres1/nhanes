@@ -62,7 +62,7 @@ anomalytables2005 <- c('CHLMD_DR', 'SSUECD_R', 'HSV_DR')
 # For most tables the year is indicated by the letter suffix following an underscore.
 # E.g. for table 'BPX_E', the suffix is '_E'
 # If there is no suffix, then we are likely dealing with data from 1999-2000.
-get_year_from_nh_table <- function(nh_table) {
+.get_year_from_nh_table <- function(nh_table) {
   if(nh_table %in% anomalytables2005) {return('2005-2006')}
   nhloc <- data.frame(stringr::str_locate_all(nh_table, '_'))
   nn <- nrow(nhloc)
@@ -88,7 +88,7 @@ get_year_from_nh_table <- function(nh_table) {
 # @param year where year is numeric in yyyy format
 # @return The 2-year interval that includes the year, e.g. 2001-2002
 # 
-get_nh_survey_years <- function(year) {
+.get_nh_survey_years <- function(year) {
   if(as.character(year) %in% names(nh_years)) {
     return( as.character(nh_years[as.character(year)]) )
   }
@@ -99,7 +99,7 @@ get_nh_survey_years <- function(year) {
 }
 
 # Internal function to determine if a number is even
-is.even <- function(x) {x %% 2 == 0}
+.is.even <- function(x) {x %% 2 == 0}
 
 xpath <- '//*[@id="ContentPlaceHolder1_GridView1"]'
 
@@ -137,7 +137,7 @@ nhanesTables <- function(data_group, year, nchar=100, details = FALSE, namesonly
     return(NULL)
   }
   
-  nh_year <- get_nh_survey_years(year)
+  nh_year <- .get_nh_survey_years(year)
   
   turl <- str_c(nhanesURL, 'search/variablelist.aspx?Component=', 
                 str_to_title(as.character(nhanes_group[data_group])), 
@@ -205,7 +205,7 @@ nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=100, na
     return(NULL)
   }
   
-  nh_year <- get_year_from_nh_table(nh_table)
+  nh_year <- .get_year_from_nh_table(nh_table)
   turl <- str_c(nhanesURL, 'search/variablelist.aspx?Component=', 
                 str_to_title(as.character(nhanes_group[data_group])), 
                 '&CycleBeginYear=', unlist(str_split(as.character(nh_year), '-'))[[1]] , sep='')
@@ -252,7 +252,7 @@ nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=100, na
 #' 
 nhanes <- function(nh_table) {
   nht <- tryCatch({    
-    nh_year <- get_year_from_nh_table(nh_table)
+    nh_year <- .get_year_from_nh_table(nh_table)
     url <- str_c(nhanesURL, nh_year, '/', nh_table, '.XPT', collapse='')
     return(sasxport.get(url, lowernames=FALSE))
   },
@@ -353,7 +353,7 @@ nhanesDXA <- function(year, suppl=FALSE, destfile=NULL) {
 #' 
 nhanesAttr <- function(nh_table) {
   nht <- tryCatch({    
-    nh_year <- get_year_from_nh_table(nh_table)
+    nh_year <- .get_year_from_nh_table(nh_table)
     url <- str_c(nhanesURL, nh_year, '/', nh_table, '.XPT', collapse='')
     tmp <- sasxport.get(url,lowernames=FALSE)
     nhtatt <- attributes(tmp)
@@ -399,11 +399,11 @@ nhanesAttr <- function(nh_table) {
 #' @param namesonly If TRUE then only the table names are returned (default=FALSE).
 #' @return A list of tables that match the search terms. 
 #' @details nhanesSearch is useful to obtain a comprehensive list of relevant tables.
-#' Search terms will be matched against the variable descriptions in the master variable list.
+#' Search terms will be matched against the variable descriptions in the NHANES Comprehensive
+#' Variable List (see http://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx).
 #' Matching variables must have at least one of the search_terms and not have any exclude_terms.
 #' The search may be restricted to specific surveys using ystart and ystop.
-#' If no arguments are given, then nhanesSearch returns the complete master variable list which
-#' currently contains over 30,000 variables.
+#' If no arguments are given, then nhanesSearch returns the complete variable list.
 #' @examples
 #'  \donttest{nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)}
 #'  \donttest{nhanesSearch("urin", exclude_terms="During", ystart=2009)}
@@ -445,19 +445,19 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
       if( ystart > ystop ) {
         stop('Stop year (ystop) cannot precede the Start year (ystart)')
       } else { #Determine if Start year is odd or even
-        if(is.even(ystart)) {
+        if(.is.even(ystart)) {
           df <- df[(df$EndYear >= ystart),]
         } else {
           df <- df[(df$Begin.Year >= ystart),]
         }
-        if(is.even(ystop)) {
+        if(.is.even(ystop)) {
           df <- df[(df$EndYear <= ystop),]
         } else {
           df <- df[(df$Begin.Year <= ystop),]
         }
       }
     } else { # No ystart, assume it is 1999 (i.e. the first survey)
-      if(is.even(ystop)) {
+      if(.is.even(ystop)) {
         df <- df[(df$EndYear <= ystop),]
       } else {
         df <- df[(df$Begin.Year <= ystop),]
@@ -465,7 +465,7 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
     }
   } else if(!is.null(ystart)) { # ystart only, i.e. no ystop
     if(!is.numeric(ystart)) {stop("Start year (ystart) must be a 4-digit year")}
-    if(is.even(ystart)) {
+    if(.is.even(ystart)) {
       df <- df[(df$EndYear >= ystart),]
     } else {
       df <- df[(df$Begin.Year >= ystart),]
@@ -499,8 +499,9 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
 #' @param details If TRUE then complete table information from the comprehensive
 #' data list is returned (default=FALSE).
 #' @return A list of table names that match the pattern.
-#' @details Searching the table names is useful for retrieving a full list of
-#' tables that share a common name pattern. Only a single pattern may be entered.
+#' @details Searches the Doc File field in the NHANES Comprehensive Data List 
+#' (see http://wwwn.cdc.gov/nchs/nhanes/search/DataPage.aspx) for tables
+#' that match a given name pattern. Only a single pattern may be entered.
 #' @examples
 #' \donttest{nhanesSearchTableNames('BMX')}
 #' nhanesSearchTableNames('HPVS', includerdc=TRUE, details=TRUE)
@@ -535,7 +536,7 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
         if( ystart > ystop ) {
           stop('Stop year (ystop) cannot precede the Start year (ystart)')
         } else { #Determine if Start year is odd or even. If even then convert to odd year.
-          if(is.even(ystart)) {
+          if(.is.even(ystart)) {
             ystart <- ystart - 1
           }
           df <- df[(year1 >= ystart & year1 <= ystop),]
@@ -545,7 +546,7 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
       }
     } else if(!is.null(ystart)) { # ystart only, i.e. no ystop
       if(!is.numeric(ystart)) {stop("Start year (ystart) must be a 4-digit year")}
-      if(is.even(ystart)) {
+      if(.is.even(ystart)) {
         ystart <- ystart - 1
       } 
       df <- df[(year1 >= ystart),]
@@ -574,9 +575,9 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
 #' @param includerdc If TRUE then RDC only tables are included in list (default=FALSE).
 #' @param nchar Truncates the variable description to a max length of nchar.
 #' @param namesonly If TRUE then only the table names are returned (default=TRUE).
-#' @details Searching for a specific variable is useful to generate a complete list of
-#' table names that contain that variable. Only a single variable name may be entered, and
-#' only exact matches will be returned.
+#' @details The NHANES Comprehensive Variable List is scanned to find all data tables that
+#' contain the given variable name. Only a single variable name may be entered, and only
+#' exact matches will be found.
 #' @examples 
 #' \donttest{nhanesSearchVarName('BMXLEG')}
 #' \donttest{nhanesSearchVarName('BMXHEAD', ystart=2003)}
@@ -612,19 +613,19 @@ nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerd
       if( ystart > ystop ) {
         stop('Stop year (ystop) cannot precede the Start year (ystart)')
       } else { #Determine if Start year is odd or even
-        if(is.even(ystart)) {
+        if(.is.even(ystart)) {
           df <- df[(df$EndYear >= ystart),]
         } else {
           df <- df[(df$Begin.Year >= ystart),]
         }
-        if(is.even(ystop)) {
+        if(.is.even(ystop)) {
           df <- df[(df$EndYear <= ystop),]
         } else {
           df <- df[(df$Begin.Year <= ystop),]
         }
       }
     } else { # No ystart, assume it is 1999 (i.e. the first survey)
-      if(is.even(ystop)) {
+      if(.is.even(ystop)) {
         df <- df[(df$EndYear <= ystop),]
       } else {
         df <- df[(df$Begin.Year <= ystop),]
@@ -632,7 +633,7 @@ nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerd
     }
   } else if(!is.null(ystart)) { # ystart only, i.e. no ystop
     if(!is.numeric(ystart)) {stop("Start year (ystart) must be a 4-digit year")}
-    if(is.even(ystart)) {
+    if(.is.even(ystart)) {
       df <- df[(df$EndYear >= ystart),]
     } else {
       df <- df[(df$Begin.Year >= ystart),]
@@ -734,7 +735,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
   if(dxa) {
     code_translation_url <- "http://www.cdc.gov/nchs/nhanes/nhanes2005-2006/DXX_D.htm"
   } else {
-    nh_year <- get_year_from_nh_table(nh_table)
+    nh_year <- .get_year_from_nh_table(nh_table)
     if(is.null(nh_year)) {
       return(NULL)
     }  
@@ -812,19 +813,19 @@ browseNHANES <- function(year=NULL, data_group=NULL, nh_table=NULL) {
     if('DXA'==toupper(nh_table)) { # Special case for DXA
       browseURL("http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm")
     } else {
-      nh_year <- get_year_from_nh_table(nh_table)
+      nh_year <- .get_year_from_nh_table(nh_table)
       url <- str_c(nhanesURL, nh_year, '/', nh_table, '.htm', sep='')
       browseURL(url)
     }
   } else if(!is.null(year)) {
     if(!is.null(data_group)) {
-      nh_year <- get_nh_survey_years(year)
+      nh_year <- .get_nh_survey_years(year)
       url <- str_c(nhanesURL, 'Search/DataPage.aspx?Component=', 
                    str_to_title(as.character(nhanes_group[data_group])), 
                    '&CycleBeginYear=', unlist(str_split(as.character(nh_year), '-'))[[1]] , sep='')
       browseURL(url)
     } else {
-      nh_year <- get_nh_survey_years(year)
+      nh_year <- .get_nh_survey_years(year)
       nh_year <- str_c(str_sub(unlist(str_extract_all(nh_year,"[[:digit:]]{4}")),3,4),collapse='_')
       url <- str_c(nhanesURL, 'search/nhanes', nh_year, '.aspx', sep='')
       browseURL(url)

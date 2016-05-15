@@ -24,9 +24,9 @@ nhanesSearchVarName(varname = NULL, ystart = NULL, ystop = NULL,
 Returns a list of table names that contain the variable
 }
 \details{
-Searching for a specific variable is useful to generate a complete list of
-table names that contain that variable. Only a single variable name may be entered, and
-only exact matches will be returned.
+The NHANES Comprehensive Variable List is scanned to find all data tables that
+contain the given variable name. Only a single variable name may be entered, and only
+exact matches will be found.
 }
 \examples{
 \donttest{nhanesSearchVarName('BMXLEG')}

@@ -12,7 +12,7 @@
 
 <meta name="author" content="Christopher Endres" />
 
-<meta name="date" content="2016-05-02" />
+<meta name="date" content="2016-05-15" />
 
 <title>Introducing nhanesA</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Introducing nhanesA</h1>
 <h4 class="author"><em>Christopher Endres</em></h4>
-<h4 class="date"><em>2016-05-02</em></h4>
+<h4 class="date"><em>2016-05-15</em></h4>
 
 
 
@@ -196,7 +196,7 @@ bpx_d &lt;-<span class="st"> </span><span class="kw">suppressWarnings</span>(<sp
 ## 4      No      No      No      No  Right Adult (12X22)
 ## 5      No      No      No      No  Right Large (15X32)
 ## 6      No      No      No      No  Right Large (15X32)</code></pre>
-<p>Some discretion is applied by nhanesTranslate such that not all of the coded columns will be translated. In general, columns that have at least two categories (e.g. Male, Female) will be translated. In some cases the code translations are quite long, thus to improve readability the maximum translation string should be limited. The default translation string length is 32 but can be set as high as 128.</p>
+<p>Some discretion should be applied when translating coded columns as code translations can be quite long. To improve readability the translation string is restricted to a default length of 32 but can be set as high as 128. Also, columns that have at least two categories (e.g. Male, Female) will be translated, but mincategories can be set to 1 to perform the translation even if only a single category is present.</p>
 </div>
 <div id="downloading-a-complete-survey" class="section level3">
 <h3>Downloading a Complete Survey</h3>
@@ -245,7 +245,7 @@ dxx_b &lt;-<span class="st"> </span><span class="kw">nhanesTranslate</span>(<spa
 </div>
 <div id="searching-for-tables-that-contain-a-specific-variable" class="section level3">
 <h3>Searching for tables that contain a specific variable</h3>
-<p>nhanesSearch is a versatile search function as it imports the entire comprehensive variable list to a data frame. That allows for detailed conditional extraction of the variables. However, each call to nhanesSearch takes a minute or more to process. Faster processing can be achieved when we know the name of a specific variable of interest and we look only for exact matches to the variable name. Function nhanesSearchVarName matches a given variable name in the html directly, then only the matching elements are converted to a data frame. Consequently, a call to nhanesSearchVarName executes much faster than nhanesSearch; typically under 30s. nhanesSearchVarName is useful for finding all data tables that contain a given variable.</p>
+<p>nhanesSearch is a versatile search function as it imports the entire comprehensive variable list to a data frame. That allows for detailed conditional extraction of the variables. However, each call to nhanesSearch takes up to a minute or more to process. Faster processing can be achieved when we know the name of a specific variable of interest and we look only for exact matches to the variable name. Function nhanesSearchVarName matches a given variable name in the html directly, then only the matching elements are converted to a data frame. Consequently, a call to nhanesSearchVarName executes much faster than nhanesSearch; typically under 30s. nhanesSearchVarName is useful for finding all data tables that contain a given variable.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#nhanesSearchVarName use examples</span>
 
 <span class="kw">nhanesSearchVarName</span>(<span class="st">'BPXPULS'</span>)</code></pre></div>
@@ -260,7 +260,7 @@ dxx_b &lt;-<span class="st"> </span><span class="kw">nhanesTranslate</span>(<spa
 </div>
 <div id="searching-for-tables-by-name-pattern" class="section level3">
 <h3>Searching for tables by name pattern</h3>
-<p>It is common to group data across surveys, and for that purpose it is useful to list all available tables that follow a given naming pattern. Function nhanesSearchTableNames is used for such pattern matching. For example, if we want to work with all available body measures data we can retrieve the full list of available tables with nhanesSearchTableNames(‘BMX’). The comprehensive table list is much smaller than the variable list, such that a call to nhanesSearchTableNames takes only a few seconds.</p>
+<p>In order to group data across surveys, it is useful to list all available tables that follow a given naming pattern. Function nhanesSearchTableNames is used for such pattern matching. For example, if we want to work with all available body measures data we can retrieve the full list of available tables with nhanesSearchTableNames(‘BMX’). The search is conducted over the comprehensive table list, which is much smaller than the comprehensive variable list, such that a call to nhanesSearchTableNames takes only a few seconds.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># nhanesSearchTableNames use examples</span>
 <span class="kw">nhanesSearchTableNames</span>(<span class="st">'BMX'</span>)</code></pre></div>
 <pre><code>## [1] &quot;BMX&quot;   &quot;BMX_B&quot; &quot;BMX_C&quot; &quot;BMX_D&quot; &quot;BMX_E&quot; &quot;BMX_F&quot; &quot;BMX_G&quot; &quot;BMX_H&quot;</code></pre>
