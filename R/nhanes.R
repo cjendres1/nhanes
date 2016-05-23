@@ -268,7 +268,7 @@ nhanes <- function(nh_table) {
   return(nht)
 }
 
-#------------------------------------------------------------------------------
+## #------------------------------------------------------------------------------
 #' Import Dual Energy X-ray Absorptiometry (DXA) data.
 #' 
 #' DXA data were acquired from 1999-2006. 
@@ -310,14 +310,18 @@ nhanesDXA <- function(year, suppl=FALSE, destfile=NULL) {
       stop("Invalid survey year for DXA data")
     } else {
       fname <- dxa_fname(year, suppl)
-      url <- str_c(dxaURL, fname, '.xpt', collapse='')
+      url <- stringr::str_c(dxaURL, fname, '.xpt', collapse='')
       if(!is.null(destfile)) {
-        ok <- download.file(url, destfile, mode="wb", quiet=TRUE)
+        ok <- suppressWarnings(tryCatch({download.file(url, destfile, mode="wb", quiet=TRUE)},
+                                        error=function(cond){message(cond); return(NULL)}))         
         return(ok)
       } else {
         tf <- tempfile()
-        download.file(url, tf, mode="wb", quiet=TRUE)
+        ok <- suppressWarnings(tryCatch({download.file(url, tf, mode="wb", quiet=TRUE)},
+                                  error=function(cond){message(cond); return(NULL)}))
+        if(!is.null(ok)) {
         return(sasxport.get(tf,lowernames=FALSE))
+        } else { return(NULL) }
       }
     }
   } else { # Year not provided - no data will be returned
