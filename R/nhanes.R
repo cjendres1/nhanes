@@ -1,7 +1,8 @@
 #nhanesA - retrieve data from the CDC NHANES repository
 nhanesURL <- 'http://wwwn.cdc.gov/Nchs/Nhanes/'
+#varURL <- 'http://wwwn.cdc.gov/Nchs/Nhanes/search/variablelist.aspx'
 varURL <- 'http://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx'
-dataURL <- 'http://wwwn.cdc.gov/nchs/nhanes/search/DataPage.aspx'
+dataURL <- 'http://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx'
 
 # Create a list of nhanes groups
 # Include convenient aliases
@@ -101,7 +102,8 @@ anomalytables2005 <- c('CHLMD_DR', 'SSUECD_R', 'HSV_DR')
 # Internal function to determine if a number is even
 .is.even <- function(x) {x %% 2 == 0}
 
-xpath <- '//*[@id="ContentPlaceHolder1_GridView1"]'
+#xpath <- '//*[@id="ContentPlaceHolder1_GridView1"]'
+xpath <- '//*[@id="GridView1"]'
 
 #------------------------------------------------------------------------------
 #' Returns a list of table names for the specified survey group.
@@ -594,7 +596,8 @@ nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerd
     warning("Multiple variable names entered. Only the first will be matched.")
   }
   
-  xpt <- str_c('//*[@id="ContentPlaceHolder1_GridView1"]/*[td[1]="', varname, '"]', sep='')
+#  xpt <- str_c('//*[@id="ContentPlaceHolder1_GridView1"]/*[td[1]="', varname, '"]', sep='')
+  xpt <- str_c('//*[@id="GridView1"]/tbody/*[td[1]="', varname, '"]', sep='')
   tabletree <- varURL %>% read_html() %>% xml_nodes(xpath=xpt)
   ttlist <- lapply(lapply(tabletree, xml_children), xml_text)
   # Convert the list to a data frame

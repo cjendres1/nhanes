@@ -44,6 +44,9 @@ nhanesTableVars('EXAM', 'BMX_D')
 ```
 
 We see that there are 27 columns in table BMX_D. The first column (SEQN) is the respondent sequence number and is included in every NHANES table. Effectively, SEQN is a subject identifier that is used to join information across tables.
+
+### Import NHANES Tables
+
 We now import BMX\_D along with the demographics table DEMO\_D.
 ```{r}
 bmx_d  <- nhanes('BMX_D')
@@ -100,7 +103,7 @@ names(q2007tables) <- q2007names
 
 ### Import Dual X-Ray Absorptiometry Data
 Dual X-Ray Absorptiometry (DXA) Data were acquired from 1999-2006. The tables are considerably larger than most
-NHANES data tables and are available via ftp server only. More information may be found at http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. When nhanesTranslate is applied to DXA data, only the 2005-2006 translation tables are used as those are the only DXA codes that are currently available in html format. Note that in a recent upgrade to the NHANES website it appears that the DXA tables may have been moved or deleted.
+NHANES data tables and are available via ftp server only. More information may be found at http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. When nhanesTranslate is applied to DXA data, only the 2005-2006 translation tables are used as those are the only DXA codes that are currently available in html format. **Note that in a recent upgrade to the NHANES website it appears that the DXA tables may have been moved or deleted.**
 ```{r, eval=FALSE}
 #Import into R
 dxx_b <- nhanesDXA(2001)
