@@ -12,7 +12,7 @@
 
 <meta name="author" content="Christopher Endres" />
 
-<meta name="date" content="2016-07-10" />
+<meta name="date" content="2016-07-16" />
 
 <title>Introducing nhanesA</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Introducing nhanesA</h1>
 <h4 class="author"><em>Christopher Endres</em></h4>
-<h4 class="date"><em>2016-07-10</em></h4>
+<h4 class="date"><em>2016-07-16</em></h4>
 
 
 
@@ -80,7 +80,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="nhanes-data" class="section level2">
 <h2>NHANES Data</h2>
-<p>Since 1999, the NHANES survey has been conducted continuously, and the surveys during that period are referred to as “continous NHANES” to distinguish from several prior surveys. Continuous NHANES surveys are grouped in two-year intervals, with the first interval being 1999-2000.</p>
+<p>Since 1999, the NHANES survey has been conducted continuously, and the surveys during that period are referred to as “continuous NHANES” to distinguish from several prior surveys. Continuous NHANES surveys are grouped in two-year intervals, with the first interval being 1999-2000.</p>
 <p>Most NHANES data are in the form of tables in SAS ‘XPT’ format. The survey is grouped into five data categories that are publicly available, as well as an additional category (Limited access data) that requires written justification and prior approval before access. Package nhanesA is intended mostly for use with the publicly available data, but some information pertaining to the limited access data can also be retrieved.</p>
 <p>The five publicly available data categories are: - Demographics (DEMO) - Dietary (DIET) - Examination (EXAM) - Laboratory (LAB) - Questionnaire (Q) The abbreviated forms in parentheses may be substituted for the long form in nhanesA commands.</p>
 <div id="list-nhanes-tables" class="section level3">
@@ -211,7 +211,7 @@ q2007tables &lt;-<span class="st"> </span><span class="kw">lapply</span>(q2007na
 </div>
 <div id="import-dual-x-ray-absorptiometry-data" class="section level3">
 <h3>Import Dual X-Ray Absorptiometry Data</h3>
-<p>Dual X-Ray Absorptiometry (DXA) Data were acquired from 1999-2006. The tables are considerably larger than most NHANES data tables and are available via ftp server only. More information may be found at <a href="http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm" class="uri">http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm</a>. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. When nhanesTranslate is applied to DXA data, only the 2005-2006 translation tables are used as those are the only DXA codes that are currently available in html format. Note that in a recent upgrade to the NHANES website it appears that the DXA tables may have been moved or deleted.</p>
+<p>Dual X-Ray Absorptiometry (DXA) Data were acquired from 1999-2006. The tables are considerably larger than most NHANES data tables and are available via ftp server only. More information may be found at <a href="http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm" class="uri">http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm</a>. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. When nhanesTranslate is applied to DXA data, only the 2005-2006 translation tables are used as those are the only DXA codes that are currently available in html format. <strong>Note that in a recent upgrade to the NHANES website it appears that the DXA tables may have been moved or deleted.</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Import into R</span>
 dxx_b &lt;-<span class="st"> </span><span class="kw">nhanesDXA</span>(<span class="dv">2001</span>)
 <span class="co">#Save to file</span>
@@ -269,30 +269,18 @@ dxx_b &lt;-<span class="st"> </span><span class="kw">nhanesTranslate</span>(<spa
 <span class="kw">nhanesSearchTableNames</span>(<span class="st">'BMX'</span>)</code></pre></div>
 <pre><code>## [1] &quot;BMX&quot;   &quot;BMX_B&quot; &quot;BMX_C&quot; &quot;BMX_D&quot; &quot;BMX_E&quot; &quot;BMX_F&quot; &quot;BMX_G&quot; &quot;BMX_H&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">nhanesSearchTableNames</span>(<span class="st">'HPVS'</span>, <span class="dt">includerdc=</span><span class="ot">TRUE</span>, <span class="dt">nchar=</span><span class="dv">42</span>, <span class="dt">details=</span><span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>##                X1     X2     Years
-## 1  Search The CDC submit 2005-2006
-## 2  Search The CDC submit 2007-2008
-## 3  Search The CDC submit 2009-2010
-## 4  Search The CDC submit 2005-2006
-## 5  Search The CDC submit 2005-2006
-## 6  Search The CDC submit 2005-2006
-## 7  Search The CDC submit 2007-2008
-## 8  Search The CDC submit 2009-2010
-## 9  Search The CDC submit 2009-2010
-## 10 Search The CDC submit 2011-2012
-## 11 Search The CDC submit 2011-2012
-##                                Data.File.Name     Doc.File
-## 1  Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVSER_D Doc
-## 2  Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVSER_E Doc
-## 3  Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVSER_F Doc
-## 4  Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVS_D_R Doc
-## 5  Human Papillomavirus (HPV) - Multiplexed 6 HPVSRM_D Doc
-## 6  Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_D Doc
-## 7  Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_E Doc
-## 8  Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_F Doc
-## 9  Human Papillomavirus (HPV) DNA - Vaginal S HPVS_F_R Doc
-## 10 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_G_R Doc
-## 11 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_G Doc
+<pre><code>##        Years                             Data.File.Name     Doc.File
+## 1  2005-2006 Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVSER_D Doc
+## 2  2007-2008 Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVSER_E Doc
+## 3  2009-2010 Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVSER_F Doc
+## 4  2005-2006 Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVS_D_R Doc
+## 5  2005-2006 Human Papillomavirus (HPV) - Multiplexed 6 HPVSRM_D Doc
+## 6  2005-2006 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_D Doc
+## 7  2007-2008 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_E Doc
+## 8  2009-2010 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_F Doc
+## 9  2009-2010 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_F_R Doc
+## 10 2011-2012 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_G_R Doc
+## 11 2011-2012 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_G Doc
 ##                        Data.File Date.Published
 ## 1  HPVSER_D Data [XPT, 151.6 KB]     July, 2013
 ## 2  HPVSER_E Data [XPT, 155.7 KB] November, 2013

@@ -13,7 +13,7 @@ vignette: >
 nhanesA was developed to enable fully customizable retrieval of data from the National Health and Nutrition Examination Survey (NHANES). The survey is conducted by the National Center for Health Statistics (NCHS), and data are publicly available at: http://www.cdc.gov/nchs/nhanes.htm. NHANES data are reported in well over one thousand peer-reviewed journal publications every year. 
 
 ## NHANES Data
-Since 1999, the NHANES survey has been conducted continuously, and the surveys during that period are referred to as "continous NHANES" to distinguish from several prior surveys. Continuous NHANES surveys are grouped in two-year intervals, with the first interval being 1999-2000.
+Since 1999, the NHANES survey has been conducted continuously, and the surveys during that period are referred to as "continuous NHANES" to distinguish from several prior surveys. Continuous NHANES surveys are grouped in two-year intervals, with the first interval being 1999-2000.
 
 Most NHANES data are in the form of tables in SAS 'XPT' format. The survey is grouped into five data categories that are publicly available, as well as an additional category (Limited access data) that requires written justification and prior approval before access. Package nhanesA is intended mostly for use with the publicly available data, but some information pertaining to the limited access data can also be retrieved.
 

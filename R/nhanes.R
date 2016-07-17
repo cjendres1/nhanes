@@ -1,7 +1,6 @@
 #nhanesA - retrieve data from the CDC NHANES repository
 nhanesURL <- 'http://wwwn.cdc.gov/Nchs/Nhanes/'
-#varURL <- 'http://wwwn.cdc.gov/Nchs/Nhanes/search/variablelist.aspx'
-varURL <- 'http://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx'
+varURL <- 'http://wwwn.cdc.gov/Nchs/Nhanes/search/variablelist.aspx'
 dataURL <- 'http://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx'
 
 # Create a list of nhanes groups
@@ -418,7 +417,19 @@ nhanesAttr <- function(nh_table) {
 #' 
 nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL, ignore.case=FALSE, 
                          ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=100, namesonly=FALSE) {
-  df  <- data.frame(read_html(varURL) %>% html_table()) 
+
+  vlhtml <- read_html(varURL)
+  
+  xpathh <- '//*[@id="GridView1"]/thead/tr'
+  hnodes <- xml_nodes(vlhtml, xpath=xpathh)
+  vmcols <- sapply(xml_children(hnodes),xml_text)
+  vmcols <- unlist(lapply(str_split(vmcols, " "), paste0, collapse='.'))
+  
+  xpathv <- '//*[@id="GridView1"]/tbody/tr'
+  vnodes <- xml_nodes(vlhtml, xpath=xpathv)
+  df <- t(sapply(lapply(vnodes,xml_children),xml_text)) %>% as.data.frame(stringsAsFactors=FALSE)
+  names(df) <- vmcols
+
   if(!is.null(search_terms)) {
     idx <- grep(paste(search_terms,collapse="|"), df[['Variable.Description']], ignore.case=ignore.case, value=FALSE)
     if(length(idx) > 0) {df <- df[idx,]}
@@ -452,29 +463,29 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
         stop('Stop year (ystop) cannot precede the Start year (ystart)')
       } else { #Determine if Start year is odd or even
         if(.is.even(ystart)) {
-          df <- df[(df$EndYear >= ystart),]
+          df <- df[(as.numeric(df$EndYear) >= ystart),]
         } else {
-          df <- df[(df$Begin.Year >= ystart),]
+          df <- df[(as.numeric(df$Begin.Year) >= ystart),]
         }
         if(.is.even(ystop)) {
-          df <- df[(df$EndYear <= ystop),]
+          df <- df[(as.numeric(df$EndYear) <= ystop),]
         } else {
-          df <- df[(df$Begin.Year <= ystop),]
+          df <- df[(as.numeric(df$Begin.Year) <= ystop),]
         }
       }
     } else { # No ystart, assume it is 1999 (i.e. the first survey)
       if(.is.even(ystop)) {
-        df <- df[(df$EndYear <= ystop),]
+        df <- df[(as.numeric(df$EndYear) <= ystop),]
       } else {
-        df <- df[(df$Begin.Year <= ystop),]
+        df <- df[(as.numeric(df$Begin.Year) <= ystop),]
       }
     }
   } else if(!is.null(ystart)) { # ystart only, i.e. no ystop
     if(!is.numeric(ystart)) {stop("Start year (ystart) must be a 4-digit year")}
     if(.is.even(ystart)) {
-      df <- df[(df$EndYear >= ystart),]
+      df <- df[(as.numeric(df$EndYear) >= ystart),]
     } else {
-      df <- df[(df$Begin.Year >= ystart),]
+      df <- df[(as.numeric(df$Begin.Year) >= ystart),]
     }
   }
   
@@ -520,7 +531,7 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
     warning("Multiple patterns entered. Only the first will be matched.")
   }
   
-  df <- data.frame(read_html(dataURL) %>% html_table())
+  df <- data.frame(read_html(dataURL) %>% xml_nodes(xpath=xpath) %>% html_table())
   df <- df[grep(paste(pattern,collapse="|"), df$Doc.File),]
   if(nrow(df)==0) {return(NULL)}
   if(!includerdc) {
