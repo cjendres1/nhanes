@@ -12,7 +12,7 @@
 
 <meta name="author" content="Christopher Endres" />
 
-<meta name="date" content="2016-07-16" />
+<meta name="date" content="2016-07-19" />
 
 <title>Introducing nhanesA</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Introducing nhanesA</h1>
 <h4 class="author"><em>Christopher Endres</em></h4>
-<h4 class="date"><em>2016-07-16</em></h4>
+<h4 class="date"><em>2016-07-19</em></h4>
 
 
 
@@ -211,7 +211,7 @@ q2007tables &lt;-<span class="st"> </span><span class="kw">lapply</span>(q2007na
 </div>
 <div id="import-dual-x-ray-absorptiometry-data" class="section level3">
 <h3>Import Dual X-Ray Absorptiometry Data</h3>
-<p>Dual X-Ray Absorptiometry (DXA) Data were acquired from 1999-2006. The tables are considerably larger than most NHANES data tables and are available via ftp server only. More information may be found at <a href="http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm" class="uri">http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm</a>. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. When nhanesTranslate is applied to DXA data, only the 2005-2006 translation tables are used as those are the only DXA codes that are currently available in html format. <strong>Note that in a recent upgrade to the NHANES website it appears that the DXA tables may have been moved or deleted.</strong></p>
+<p>Dual X-Ray Absorptiometry (DXA) data were acquired from 1999-2006. More information may be found at <a href="http://wwwn.cdc.gov/Nchs/Nhanes/Dxx/dxa.aspx" class="uri">http://wwwn.cdc.gov/Nchs/Nhanes/Dxx/dxa.aspx</a>. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. When nhanesTranslate is applied to DXA data, only the 2005-2006 translation tables are used as those are the only DXA codes that are currently available in html format.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Import into R</span>
 dxx_b &lt;-<span class="st"> </span><span class="kw">nhanesDXA</span>(<span class="dv">2001</span>)
 <span class="co">#Save to file</span>

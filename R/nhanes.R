@@ -291,7 +291,8 @@ nhanes <- function(nh_table) {
 #' \donttest{nhanesDXA(1999, destfile="dxx.xpt")}
 #' @export
 nhanesDXA <- function(year, suppl=FALSE, destfile=NULL) {
-  dxaURL <- "ftp://ftp.cdc.gov/pub/health_Statistics/nchs/nhanes/dxx/"
+#  dxaURL <- "ftp://ftp.cdc.gov/pub/health_Statistics/nchs/nhanes/dxx/"
+  dxaURL <- "http://wwwn.cdc.gov/Nchs/Nhanes/Dxx/"
   
   dxa_fname <- function(year, suppl) {
     if(year == 1999 | year == 2000) {fname = 'dxx'}
@@ -751,7 +752,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
   }
   
   if(dxa) {
-    code_translation_url <- "http://www.cdc.gov/nchs/nhanes/nhanes2005-2006/DXX_D.htm"
+    code_translation_url <- "https://wwwn.cdc.gov/Nchs/Nhanes/2005-2006/DXX_D.htm"
   } else {
     nh_year <- .get_year_from_nh_table(nh_table)
     if(is.null(nh_year)) {
@@ -829,7 +830,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
 browseNHANES <- function(year=NULL, data_group=NULL, nh_table=NULL) {
   if(!is.null(nh_table)){ # Specific table name was given
     if('DXA'==toupper(nh_table)) { # Special case for DXA
-      browseURL("http://www.cdc.gov/nchs/nhanes/dxx/dxa.htm")
+      browseURL("http://wwwn.cdc.gov/Nchs/Nhanes/Dxx/dxa.aspx")
     } else {
       nh_year <- .get_year_from_nh_table(nh_table)
       url <- str_c(nhanesURL, nh_year, '/', nh_table, '.htm', sep='')
