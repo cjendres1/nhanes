@@ -1,10 +1,15 @@
 # nhanesA
-R package for browsing and retrieving NHANES data.
 
-The goal of nhanesA is to allow fully customizable selection and import of NHANES data, as well as retrieval of information pertaining to NHANES data.
-With nhanesA, most NHANES tables that are in SAS 'XPT' format can be readily imported as a data frame object.
-NHANES tables are imported directly from the NHANES website so it is essential to have an active network connection. 
-No data is stored internally to nhanesA.
+R package for browsing and retrieving data from the National Health And Nutrition Examination Survey (NHANES).
+This package is designed to be useful for research and instructional purposes.
 
-Several functions are provided to browse the NHANES database, including browseNHANES() which opens a browser to the NHANES website. 
-There are also functions that make use of rvest web scraping utilities to list available NHANES tables, their attributes, constituent variables, and code translations.
+The functions in the nhanesA package allow for fully customizable selection and import of data directly from the [NHANES website](http://www.cdc.gov/nchs/nhanes/) thus it is essential to have an active network connection. 
+
+Install from CRAN: install.packages("nhanesA")
+
+Install from the dev repo: install_github("cjendres1/nhanes")
+
+[Manual](https://cran.r-project.org/web/packages/nhanesA/nhanesA.pdf)
+
+[Vignette: Introducing nhanesA](https://cran.r-project.org/web/packages/nhanesA/vignettes/Introducing_nhanesA.html)
+

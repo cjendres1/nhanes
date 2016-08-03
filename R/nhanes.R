@@ -813,7 +813,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
 #' 
 #' @importFrom stringr str_c str_to_title str_split str_sub str_extract_all
 #' @importFrom utils browseURL
-#' @param year The year in yyyy format where 1999 <= yyyy <= 2014.
+#' @param year The year in yyyy format where 1999 <= yyyy <= 2016.
 #' @param data_group The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
 #' Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).
 #' @param nh_table The name of an NHANES table.
