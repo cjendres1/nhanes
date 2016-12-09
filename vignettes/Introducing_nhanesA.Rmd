@@ -29,7 +29,7 @@ The abbreviated forms in parentheses may be substituted for the long form in nha
 To quickly get familiar with NHANES data, it is helpful to display a listing of tables.
 Use nhanesTables to get information on tables that are available for a given category for a given year.
 
-```{r}
+```{r nhanestables}
 library(nhanesA)
 nhanesTables('EXAM', 2005)
 ```
@@ -40,7 +40,7 @@ Note that the two-year survey intervals begin with the odd year. For convenience
 
 After viewing the output, we decide we are interested in table 'BMX_D' that contains body measures data.
 To better determine if that table is of interest, we can display detailed information on the table contents using nhanesTableVars.
-```{r}
+```{r nhanestablevars}
 nhanesTableVars('EXAM', 'BMX_D')
 ```
 
@@ -49,13 +49,13 @@ We see that there are 27 columns in table BMX_D. The first column (SEQN) is the 
 ### Import NHANES Tables
 
 We now import BMX\_D along with the demographics table DEMO\_D.
-```{r}
+```{r nhanes}
 bmx_d  <- nhanes('BMX_D')
 demo_d <- nhanes('DEMO_D')
 ```
 
 We then merge the tables and compute average values by gender for several variables: 
-```{r}
+```{r bmx1}
 bmx_demo <- merge(demo_d, bmx_d)
 options(digits=4)
 aggregate(cbind(BMXHT, BMXWT, BMXLEG, BMXCALF, BMXTHICR) ~ RIAGENDR, bmx_demo,mean)
@@ -64,12 +64,12 @@ aggregate(cbind(BMXHT, BMXWT, BMXLEG, BMXCALF, BMXTHICR) ~ RIAGENDR, bmx_demo,me
 ### Translation of Coded Values
 
 NHANES uses coded values for many fields. In the preceding example, gender is coded as 1 or 2. To determine what the values mean, we can list the code translations for the gender field RIAGENDR in table DEMO_D
-```{r}
+```{r nhanestranslate}
 nhanesTranslate('DEMO_D', 'RIAGENDR')
 ```
 
 If desired, we can use nhanesTranslate to apply the code translation to demo\_d directly by assigning data=demo\_d. 
-```{r}
+```{r bmx2}
 levels(as.factor(demo_d$RIAGENDR))
 demo_d <- nhanesTranslate('DEMO_D', 'RIAGENDR', data=demo_d)
 levels(demo_d$RIAGENDR)
@@ -83,7 +83,7 @@ An NHANES table may have dozens of columns with coded values. Translating all po
 2: Save a list of table variables
 3: Pass the table and variable list to nhanesTranslate
 
-```{r}
+```{r nhanestranslate2}
 bpx_d <- nhanes('BPX_D')
 head(bpx_d[,6:11])
 bpx_d_vars  <- nhanesTableVars('EXAM', 'BPX_D', namesonly=TRUE)
@@ -96,7 +96,7 @@ Some discretion should be applied when translating coded columns as code transla
 ### Downloading a Complete Survey
 The primary goal of nhanesA is to enable fully customizable processing of select NHANES tables. However, it is quite easy to download entire surveys using nhanesA functions.
 Say we want to download every questionnaire in the 2007-2008 survey.  We first get a list of the table names by using nhanesTables with namesonly = TRUE. The tables can then be downloaded using nhanes with lapply.
-```{r,eval=FALSE}
+```{r nhaneslapplytables, eval=FALSE}
 q2007names  <- nhanesTables('Q', 2007, namesonly=TRUE)
 q2007tables <- lapply(q2007names, nhanes)
 names(q2007tables) <- q2007names
@@ -105,7 +105,7 @@ names(q2007tables) <- q2007names
 ### Import Dual X-Ray Absorptiometry Data
 Dual X-Ray Absorptiometry (DXA) data were acquired from 1999-2006. More information may be found at https://wwwn.cdc.gov/Nchs/Nhanes/Dxx/dxa.aspx. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. When nhanesTranslate is applied to DXA data, only the 2005-2006 translation tables are used as those are the only DXA codes that are currently available in html format.
 
-```{r, eval=FALSE}
+```{r nhanesdxa, eval=FALSE}
 #Import into R
 dxx_b <- nhanesDXA(2001)
 #Save to file
@@ -122,7 +122,7 @@ If you are interested in working with accelerometer data from 2003-2006 then ple
 ### Searching across the comprehensive list of NHANES variables
 The NHANES repository is extensive, thus it is helpful to perform a targeted search to identify relevant tables and variables. A comprehensive list of NHANES variables is maintained at https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx
 The nhanesSearch function allows the investigator to input search terms, match against the comprehensive variable descriptions, and retrieve the list of matching variables. Matching search terms (variable descriptions must contain one of the terms) and exclusive search terms (variable descriptions must NOT contain any exclusive terms) may be provided.  The search can be restricted to a specific survey range as well as specific data groups.
-```{r, eval=FALSE}
+```{r nhanessearch, eval=FALSE}
 # nhanesSearch use examples
 #
 # Search on the word bladder, restrict to the 2001-2008 surveys, 
@@ -147,7 +147,7 @@ nhanesSearch("^Tooth")
 ### Searching for tables that contain a specific variable
 nhanesSearch is a versatile search function as it imports the entire comprehensive variable list to a data frame. That allows for detailed conditional extraction of the variables. However, each call to nhanesSearch takes up to a minute or more to process.  Faster processing can be achieved when we know the name of a specific variable of interest and we look only for exact matches to the variable name. Function nhanesSearchVarName matches a given variable name in the html directly, then only the matching elements are converted to a data frame. Consequently, a call to nhanesSearchVarName executes much faster than nhanesSearch; typically under 30s. nhanesSearchVarName is useful for finding all data tables that contain a given variable.
 
-```{r}
+```{r nhanessearchvarname}
 #nhanesSearchVarName use examples
 
 nhanesSearchVarName('BPXPULS')
@@ -157,7 +157,7 @@ nhanesSearchVarName('CSQ260i', includerdc=TRUE, nchar=38, namesonly=FALSE)
 ### Searching for tables by name pattern
 
 In order to group data across surveys, it is useful to list all available tables that follow a given naming pattern. Function nhanesSearchTableNames is used for such pattern matching. For example, if we want to work with all available body measures data we can retrieve the full list of available tables with nhanesSearchTableNames('BMX'). The search is conducted over the comprehensive table list, which is much smaller than the comprehensive variable list, such that a call to nhanesSearchTableNames takes only a few seconds.
-```{r}
+```{r nhanessearchtablenames}
 # nhanesSearchTableNames use examples
 nhanesSearchTableNames('BMX')
 nhanesSearchTableNames('HPVS', includerdc=TRUE, nchar=42, details=TRUE)

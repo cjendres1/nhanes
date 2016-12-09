@@ -1,30 +1,30 @@
-## ------------------------------------------------------------------------
+## ----nhanestables--------------------------------------------------------
 library(nhanesA)
 nhanesTables('EXAM', 2005)
 
-## ------------------------------------------------------------------------
+## ----nhanestablevars-----------------------------------------------------
 nhanesTableVars('EXAM', 'BMX_D')
 
-## ------------------------------------------------------------------------
+## ----nhanes--------------------------------------------------------------
 bmx_d  <- nhanes('BMX_D')
 demo_d <- nhanes('DEMO_D')
 
-## ------------------------------------------------------------------------
+## ----bmx1----------------------------------------------------------------
 bmx_demo <- merge(demo_d, bmx_d)
 options(digits=4)
 aggregate(cbind(BMXHT, BMXWT, BMXLEG, BMXCALF, BMXTHICR) ~ RIAGENDR, bmx_demo,mean)
 
-## ------------------------------------------------------------------------
+## ----nhanestranslate-----------------------------------------------------
 nhanesTranslate('DEMO_D', 'RIAGENDR')
 
-## ------------------------------------------------------------------------
+## ----bmx2----------------------------------------------------------------
 levels(as.factor(demo_d$RIAGENDR))
 demo_d <- nhanesTranslate('DEMO_D', 'RIAGENDR', data=demo_d)
 levels(demo_d$RIAGENDR)
 bmx_demo <- merge(demo_d, bmx_d)
 aggregate(cbind(BMXHT, BMXWT, BMXLEG, BMXCALF, BMXTHICR)~RIAGENDR, bmx_demo, mean)
 
-## ------------------------------------------------------------------------
+## ----nhanestranslate2----------------------------------------------------
 bpx_d <- nhanes('BPX_D')
 head(bpx_d[,6:11])
 bpx_d_vars  <- nhanesTableVars('EXAM', 'BPX_D', namesonly=TRUE)
@@ -32,12 +32,12 @@ bpx_d_vars  <- nhanesTableVars('EXAM', 'BPX_D', namesonly=TRUE)
 bpx_d <- suppressWarnings(nhanesTranslate('BPX_D', bpx_d_vars, data=bpx_d))
 head(bpx_d[,6:11])
 
-## ----eval=FALSE----------------------------------------------------------
+## ----nhaneslapplytables, eval=FALSE--------------------------------------
 #  q2007names  <- nhanesTables('Q', 2007, namesonly=TRUE)
 #  q2007tables <- lapply(q2007names, nhanes)
 #  names(q2007tables) <- q2007names
 
-## ---- eval=FALSE---------------------------------------------------------
+## ----nhanesdxa, eval=FALSE-----------------------------------------------
 #  #Import into R
 #  dxx_b <- nhanesDXA(2001)
 #  #Save to file
@@ -48,7 +48,7 @@ head(bpx_d[,6:11])
 #  dxalist <- c('DXAEXSTS', 'DXITOT', 'DXIHE')
 #  dxx_b <- nhanesTranslate(colnames=dxalist, data=dxx_b, dxa=TRUE)
 
-## ---- eval=FALSE---------------------------------------------------------
+## ----nhanessearch, eval=FALSE--------------------------------------------
 #  # nhanesSearch use examples
 #  #
 #  # Search on the word bladder, restrict to the 2001-2008 surveys,
@@ -70,13 +70,13 @@ head(bpx_d[,6:11])
 #  # Search for variables where the variable description begins with "Tooth"
 #  nhanesSearch("^Tooth")
 
-## ------------------------------------------------------------------------
+## ----nhanessearchvarname-------------------------------------------------
 #nhanesSearchVarName use examples
 
 nhanesSearchVarName('BPXPULS')
 nhanesSearchVarName('CSQ260i', includerdc=TRUE, nchar=38, namesonly=FALSE)
 
-## ------------------------------------------------------------------------
+## ----nhanessearchtablenames----------------------------------------------
 # nhanesSearchTableNames use examples
 nhanesSearchTableNames('BMX')
 nhanesSearchTableNames('HPVS', includerdc=TRUE, nchar=42, details=TRUE)
