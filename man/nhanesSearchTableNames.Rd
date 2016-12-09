@@ -29,7 +29,7 @@ Returns a list of table names that match a specified pattern.
 }
 \details{
 Searches the Doc File field in the NHANES Comprehensive Data List 
-(see http://wwwn.cdc.gov/nchs/nhanes/search/DataPage.aspx) for tables
+(see https://wwwn.cdc.gov/nchs/nhanes/search/DataPage.aspx) for tables
 that match a given name pattern. Only a single pattern may be entered.
 }
 \examples{

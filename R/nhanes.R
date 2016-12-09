@@ -1,7 +1,7 @@
 #nhanesA - retrieve data from the CDC NHANES repository
 nhanesURL <- 'http://wwwn.cdc.gov/Nchs/Nhanes/'
-varURL <- 'http://wwwn.cdc.gov/Nchs/Nhanes/search/variablelist.aspx'
-dataURL <- 'http://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx'
+varURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/variablelist.aspx'
+dataURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx'
 
 # Create a list of nhanes groups
 # Include convenient aliases
@@ -292,7 +292,7 @@ nhanes <- function(nh_table) {
 #' @export
 nhanesDXA <- function(year, suppl=FALSE, destfile=NULL) {
 #  dxaURL <- "ftp://ftp.cdc.gov/pub/health_Statistics/nchs/nhanes/dxx/"
-  dxaURL <- "http://wwwn.cdc.gov/Nchs/Nhanes/Dxx/"
+  dxaURL <- "https://wwwn.cdc.gov/Nchs/Nhanes/Dxx/"
   
   dxa_fname <- function(year, suppl) {
     if(year == 1999 | year == 2000) {fname = 'dxx'}
@@ -406,7 +406,7 @@ nhanesAttr <- function(nh_table) {
 #' @return A list of tables that match the search terms. 
 #' @details nhanesSearch is useful to obtain a comprehensive list of relevant tables.
 #' Search terms will be matched against the variable descriptions in the NHANES Comprehensive
-#' Variable List (see http://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx).
+#' Variable List (see https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx).
 #' Matching variables must have at least one of the search_terms and not have any exclude_terms.
 #' The search may be restricted to specific surveys using ystart and ystop.
 #' If no arguments are given, then nhanesSearch returns the complete variable list.
@@ -518,7 +518,7 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
 #' data list is returned (default=FALSE).
 #' @return A list of table names that match the pattern.
 #' @details Searches the Doc File field in the NHANES Comprehensive Data List 
-#' (see http://wwwn.cdc.gov/nchs/nhanes/search/DataPage.aspx) for tables
+#' (see https://wwwn.cdc.gov/nchs/nhanes/search/DataPage.aspx) for tables
 #' that match a given name pattern. Only a single pattern may be entered.
 #' @examples
 #' \donttest{nhanesSearchTableNames('BMX')}
@@ -830,7 +830,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
 browseNHANES <- function(year=NULL, data_group=NULL, nh_table=NULL) {
   if(!is.null(nh_table)){ # Specific table name was given
     if('DXA'==toupper(nh_table)) { # Special case for DXA
-      browseURL("http://wwwn.cdc.gov/Nchs/Nhanes/Dxx/dxa.aspx")
+      browseURL("https://wwwn.cdc.gov/Nchs/Nhanes/Dxx/dxa.aspx")
     } else {
       nh_year <- .get_year_from_nh_table(nh_table)
       url <- str_c(nhanesURL, nh_year, '/', nh_table, '.htm', sep='')
@@ -850,7 +850,7 @@ browseNHANES <- function(year=NULL, data_group=NULL, nh_table=NULL) {
       browseURL(url)
     }
   } else {
-    browseURL("http://www.cdc.gov/nchs/nhanes/nhanes_questionnaires.htm")
+    browseURL("https://www.cdc.gov/nchs/nhanes/nhanes_questionnaires.htm")
   }
 }
 #------------------------------------------------------------------------------

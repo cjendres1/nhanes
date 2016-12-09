@@ -1,5 +1,5 @@
 ## ------------------------------------------------------------------------
-suppressWarnings(library(nhanesA))
+library(nhanesA)
 nhanesTables('EXAM', 2005)
 
 ## ------------------------------------------------------------------------
@@ -12,7 +12,7 @@ demo_d <- nhanes('DEMO_D')
 ## ------------------------------------------------------------------------
 bmx_demo <- merge(demo_d, bmx_d)
 options(digits=4)
-aggregate(cbind(BMXHT, BMXWT, BMXLEG, BMXCALF, BMXTHICR)~RIAGENDR, bmx_demo, mean)
+aggregate(cbind(BMXHT, BMXWT, BMXLEG, BMXCALF, BMXTHICR) ~ RIAGENDR, bmx_demo,mean)
 
 ## ------------------------------------------------------------------------
 nhanesTranslate('DEMO_D', 'RIAGENDR')

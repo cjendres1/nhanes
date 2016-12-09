@@ -10,7 +10,7 @@ vignette: >
 ---
 
 ## Background
-nhanesA was developed to enable fully customizable retrieval of data from the National Health and Nutrition Examination Survey (NHANES). The survey is conducted by the National Center for Health Statistics (NCHS), and data are publicly available at: http://www.cdc.gov/nchs/nhanes.htm. NHANES data are reported in well over one thousand peer-reviewed journal publications every year. 
+nhanesA was developed to enable fully customizable retrieval of data from the National Health and Nutrition Examination Survey (NHANES). The survey is conducted by the National Center for Health Statistics (NCHS), and data are publicly available at: https://www.cdc.gov/nchs/nhanes.htm. NHANES data are reported in well over one thousand peer-reviewed journal publications every year. 
 
 ## NHANES Data
 Since 1999, the NHANES survey has been conducted continuously, and the surveys during that period are referred to as "continuous NHANES" to distinguish from several prior surveys. Continuous NHANES surveys are grouped in two-year intervals, with the first interval being 1999-2000.
@@ -28,8 +28,9 @@ The abbreviated forms in parentheses may be substituted for the long form in nha
 ### List NHANES Tables
 To quickly get familiar with NHANES data, it is helpful to display a listing of tables.
 Use nhanesTables to get information on tables that are available for a given category for a given year.
+
 ```{r}
-suppressWarnings(library(nhanesA))
+library(nhanesA)
 nhanesTables('EXAM', 2005)
 ```
 
@@ -57,7 +58,7 @@ We then merge the tables and compute average values by gender for several variab
 ```{r}
 bmx_demo <- merge(demo_d, bmx_d)
 options(digits=4)
-aggregate(cbind(BMXHT, BMXWT, BMXLEG, BMXCALF, BMXTHICR)~RIAGENDR, bmx_demo, mean)
+aggregate(cbind(BMXHT, BMXWT, BMXLEG, BMXCALF, BMXTHICR) ~ RIAGENDR, bmx_demo,mean)
 ```
 
 ### Translation of Coded Values
@@ -102,7 +103,7 @@ names(q2007tables) <- q2007names
 ```
 
 ### Import Dual X-Ray Absorptiometry Data
-Dual X-Ray Absorptiometry (DXA) data were acquired from 1999-2006. More information may be found at http://wwwn.cdc.gov/Nchs/Nhanes/Dxx/dxa.aspx. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. When nhanesTranslate is applied to DXA data, only the 2005-2006 translation tables are used as those are the only DXA codes that are currently available in html format.
+Dual X-Ray Absorptiometry (DXA) data were acquired from 1999-2006. More information may be found at https://wwwn.cdc.gov/Nchs/Nhanes/Dxx/dxa.aspx. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. When nhanesTranslate is applied to DXA data, only the 2005-2006 translation tables are used as those are the only DXA codes that are currently available in html format.
 
 ```{r, eval=FALSE}
 #Import into R
@@ -116,10 +117,10 @@ dxalist <- c('DXAEXSTS', 'DXITOT', 'DXIHE')
 dxx_b <- nhanesTranslate(colnames=dxalist, data=dxx_b, dxa=TRUE)
 ```
 
-If you are interested in working with accelerometer data from 2003-2006 then please see packages nhanesaccel http://r-forge.r-project.org/R/?group_id=1733 and accelerometry http://cran.r-project.org/package=accelerometry.
+If you are interested in working with accelerometer data from 2003-2006 then please see packages nhanesaccel https://r-forge.r-project.org/R/?group_id=1733 and accelerometry https://cran.r-project.org/package=accelerometry.
 
 ### Searching across the comprehensive list of NHANES variables
-The NHANES repository is extensive, thus it is helpful to perform a targeted search to identify relevant tables and variables. A comprehensive list of NHANES variables is maintained at http://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx
+The NHANES repository is extensive, thus it is helpful to perform a targeted search to identify relevant tables and variables. A comprehensive list of NHANES variables is maintained at https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx
 The nhanesSearch function allows the investigator to input search terms, match against the comprehensive variable descriptions, and retrieve the list of matching variables. Matching search terms (variable descriptions must contain one of the terms) and exclusive search terms (variable descriptions must NOT contain any exclusive terms) may be provided.  The search can be restricted to a specific survey range as well as specific data groups.
 ```{r, eval=FALSE}
 # nhanesSearch use examples

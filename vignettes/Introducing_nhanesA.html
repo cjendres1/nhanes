@@ -12,7 +12,7 @@
 
 <meta name="author" content="Christopher Endres" />
 
-<meta name="date" content="2016-12-08" />
+<meta name="date" content="2016-12-09" />
 
 <title>Introducing nhanesA</title>
 
@@ -70,13 +70,13 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Introducing nhanesA</h1>
 <h4 class="author"><em>Christopher Endres</em></h4>
-<h4 class="date"><em>2016-12-08</em></h4>
+<h4 class="date"><em>2016-12-09</em></h4>
 
 
 
 <div id="background" class="section level2">
 <h2>Background</h2>
-<p>nhanesA was developed to enable fully customizable retrieval of data from the National Health and Nutrition Examination Survey (NHANES). The survey is conducted by the National Center for Health Statistics (NCHS), and data are publicly available at: <a href="http://www.cdc.gov/nchs/nhanes.htm" class="uri">http://www.cdc.gov/nchs/nhanes.htm</a>. NHANES data are reported in well over one thousand peer-reviewed journal publications every year.</p>
+<p>nhanesA was developed to enable fully customizable retrieval of data from the National Health and Nutrition Examination Survey (NHANES). The survey is conducted by the National Center for Health Statistics (NCHS), and data are publicly available at: <a href="https://www.cdc.gov/nchs/nhanes.htm" class="uri">https://www.cdc.gov/nchs/nhanes.htm</a>. NHANES data are reported in well over one thousand peer-reviewed journal publications every year.</p>
 </div>
 <div id="nhanes-data" class="section level2">
 <h2>NHANES Data</h2>
@@ -86,7 +86,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="list-nhanes-tables" class="section level3">
 <h3>List NHANES Tables</h3>
 <p>To quickly get familiar with NHANES data, it is helpful to display a listing of tables. Use nhanesTables to get information on tables that are available for a given category for a given year.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">suppressWarnings</span>(<span class="kw">library</span>(nhanesA))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(nhanesA)
 <span class="kw">nhanesTables</span>(<span class="st">'EXAM'</span>, <span class="dv">2005</span>)</code></pre></div>
 <pre><code>##    FileName                                       Description
 ## 1     AUX_D                                        Audiometry
@@ -148,7 +148,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>We then merge the tables and compute average values by gender for several variables:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bmx_demo &lt;-<span class="st"> </span><span class="kw">merge</span>(demo_d, bmx_d)
 <span class="kw">options</span>(<span class="dt">digits=</span><span class="dv">4</span>)
-<span class="kw">aggregate</span>(<span class="kw">cbind</span>(BMXHT, BMXWT, BMXLEG, BMXCALF, BMXTHICR)~RIAGENDR, bmx_demo, mean)</code></pre></div>
+<span class="kw">aggregate</span>(<span class="kw">cbind</span>(BMXHT, BMXWT, BMXLEG, BMXCALF, BMXTHICR) ~<span class="st"> </span>RIAGENDR, bmx_demo,mean)</code></pre></div>
 <pre><code>##   RIAGENDR BMXHT BMXWT BMXLEG BMXCALF BMXTHICR
 ## 1        1 170.0 76.91  40.50   37.48    51.46
 ## 2        2 158.9 68.18  37.19   36.89    51.09</code></pre>
@@ -211,7 +211,7 @@ q2007tables &lt;-<span class="st"> </span><span class="kw">lapply</span>(q2007na
 </div>
 <div id="import-dual-x-ray-absorptiometry-data" class="section level3">
 <h3>Import Dual X-Ray Absorptiometry Data</h3>
-<p>Dual X-Ray Absorptiometry (DXA) data were acquired from 1999-2006. More information may be found at <a href="http://wwwn.cdc.gov/Nchs/Nhanes/Dxx/dxa.aspx" class="uri">http://wwwn.cdc.gov/Nchs/Nhanes/Dxx/dxa.aspx</a>. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. When nhanesTranslate is applied to DXA data, only the 2005-2006 translation tables are used as those are the only DXA codes that are currently available in html format.</p>
+<p>Dual X-Ray Absorptiometry (DXA) data were acquired from 1999-2006. More information may be found at <a href="https://wwwn.cdc.gov/Nchs/Nhanes/Dxx/dxa.aspx" class="uri">https://wwwn.cdc.gov/Nchs/Nhanes/Dxx/dxa.aspx</a>. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. When nhanesTranslate is applied to DXA data, only the 2005-2006 translation tables are used as those are the only DXA codes that are currently available in html format.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Import into R</span>
 dxx_b &lt;-<span class="st"> </span><span class="kw">nhanesDXA</span>(<span class="dv">2001</span>)
 <span class="co">#Save to file</span>
@@ -221,11 +221,11 @@ dxx_c_s &lt;-<span class="st"> </span><span class="kw">nhanesDXA</span>(<span cl
 <span class="co">#Apply code translations</span>
 dxalist &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">'DXAEXSTS'</span>, <span class="st">'DXITOT'</span>, <span class="st">'DXIHE'</span>)
 dxx_b &lt;-<span class="st"> </span><span class="kw">nhanesTranslate</span>(<span class="dt">colnames=</span>dxalist, <span class="dt">data=</span>dxx_b, <span class="dt">dxa=</span><span class="ot">TRUE</span>)</code></pre></div>
-<p>If you are interested in working with accelerometer data from 2003-2006 then please see packages nhanesaccel <a href="http://r-forge.r-project.org/R/?group_id=1733" class="uri">http://r-forge.r-project.org/R/?group_id=1733</a> and accelerometry <a href="http://cran.r-project.org/package=accelerometry" class="uri">http://cran.r-project.org/package=accelerometry</a>.</p>
+<p>If you are interested in working with accelerometer data from 2003-2006 then please see packages nhanesaccel <a href="https://r-forge.r-project.org/R/?group_id=1733" class="uri">https://r-forge.r-project.org/R/?group_id=1733</a> and accelerometry <a href="https://cran.r-project.org/package=accelerometry" class="uri">https://cran.r-project.org/package=accelerometry</a>.</p>
 </div>
 <div id="searching-across-the-comprehensive-list-of-nhanes-variables" class="section level3">
 <h3>Searching across the comprehensive list of NHANES variables</h3>
-<p>The NHANES repository is extensive, thus it is helpful to perform a targeted search to identify relevant tables and variables. A comprehensive list of NHANES variables is maintained at <a href="http://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx" class="uri">http://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx</a> The nhanesSearch function allows the investigator to input search terms, match against the comprehensive variable descriptions, and retrieve the list of matching variables. Matching search terms (variable descriptions must contain one of the terms) and exclusive search terms (variable descriptions must NOT contain any exclusive terms) may be provided. The search can be restricted to a specific survey range as well as specific data groups.</p>
+<p>The NHANES repository is extensive, thus it is helpful to perform a targeted search to identify relevant tables and variables. A comprehensive list of NHANES variables is maintained at <a href="https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx" class="uri">https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx</a> The nhanesSearch function allows the investigator to input search terms, match against the comprehensive variable descriptions, and retrieve the list of matching variables. Matching search terms (variable descriptions must contain one of the terms) and exclusive search terms (variable descriptions must NOT contain any exclusive terms) may be provided. The search can be restricted to a specific survey range as well as specific data groups.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># nhanesSearch use examples</span>
 <span class="co">#</span>
 <span class="co"># Search on the word bladder, restrict to the 2001-2008 surveys, </span>
