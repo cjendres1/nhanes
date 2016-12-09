@@ -1,9 +1,10 @@
 Package: nhanesA
-Version: 0.6.4.2
-Date: 2016-07-29
+Version: 0.6.4.3
+Date: 2016-12-08
 Title: NHANES Data Retrieval
 Author: Christopher Endres
 Maintainer: Christopher Endres <cjendres1@gmail.com>
+BugReports: https://github.com/cjendres1/nhanes
 Depends:
     R (>= 3.0.0)
 Imports:
