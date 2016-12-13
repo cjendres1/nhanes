@@ -1,5 +1,5 @@
 #nhanesA - retrieve data from the CDC NHANES repository
-nhanesURL <- 'http://wwwn.cdc.gov/Nchs/Nhanes/'
+nhanesURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/'
 varURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/variablelist.aspx'
 dataURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx'
 
@@ -255,7 +255,10 @@ nhanes <- function(nh_table) {
   nht <- tryCatch({    
     nh_year <- .get_year_from_nh_table(nh_table)
     url <- str_c(nhanesURL, nh_year, '/', nh_table, '.XPT', collapse='')
-    return(sasxport.get(url, lowernames=FALSE))
+    
+    tf <- tempfile()
+    download.file(url, tf, mode = "wb", quiet = TRUE)
+    return(sasxport.get(tf, lowernames=FALSE))
   },
   error = function(cond) {
     message(paste("Data set ", nh_table,  " is not available"), collapse='')
