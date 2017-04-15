@@ -37,4 +37,3 @@ nhanesTables('EXAM', 2007)
 nhanesTables('LAB', 2009, details=TRUE, includerdc=TRUE)
 \donttest{nhanesTables('Q', 2005, namesonly=TRUE)}
 }
-

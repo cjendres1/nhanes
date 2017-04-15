@@ -1,10 +1,10 @@
 Package: nhanesA
-Version: 0.6.4.3.3
-Date: 2016-12-13
+Version: 0.6.4.4
+Date: 2017-04-15
 Title: NHANES Data Retrieval
-Author: Christopher Endres
-Maintainer: Christopher Endres <cjendres1@gmail.com>
-BugReports: https://github.com/cjendres1/nhanes
+Author: Christopher J. Endres
+Maintainer: Christopher J. Endres <cjendres1@gmail.com>
+BugReports: https://github.com/cjendres1/nhanes/issues
 Depends:
     R (>= 3.0.0)
 Imports:
@@ -23,4 +23,4 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

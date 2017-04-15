@@ -27,4 +27,3 @@ browseNHANES(2009, 'EXAM')         # Page for the specified year and survey grou
 browseNHANES(nh_table = 'VIX_D')   # Page for a specific table
 browseNHANES(nh_table = 'DXA')     # DXA main page
 }
-

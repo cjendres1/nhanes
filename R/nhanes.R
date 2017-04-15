@@ -16,6 +16,8 @@ nhanes_group['LABORATORY']    <- "LABORATORY"
 nhanes_group['LAB']           <- "LABORATORY"
 nhanes_group['QUESTIONNAIRE'] <- "QUESTIONNAIRE"
 nhanes_group['Q']             <- "QUESTIONNAIRE"
+nhanes_group['LIMITED']       <- "NON-PUBLIC"
+nhanes_group['LTD']           <- "NON-PUBLIC"
 nhanes_survey_groups <- unlist(unique(nhanes_group))
 
 # Although continuous NHANES is grouped in 2-year intervals,
@@ -146,8 +148,11 @@ nhanesTables <- function(data_group, year, nchar=100, details = FALSE, namesonly
   # At this point df contains every table
   df <- as.data.frame(turl %>% read_html() %>% xml_nodes(xpath=xpath) %>% html_table())
   # By default we exclude RDC Only tables as those cannot be downloaded
-  if(!includerdc) {
-    df <- df[(df$Use.Constraints != "RDC Only"),]
+  
+  if(!(nhanes_group[data_group]=='NON-PUBLIC')){
+    if(!includerdc) {
+      df <- df[(df$Use.Constraints != "RDC Only"),]
+    }
   }
   
   if(details) {
@@ -244,8 +249,8 @@ nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=100, na
 #' @param nh_table The name of the specific table to retrieve.
 #' @return The table is returned as a data frame.
 #' @details Downloads a table from the NHANES website in its entirety. NHANES tables 
-#' are stored in SAS '.XPT' format. Function nhanes uses sasxport.get from package Hmisc 
-#' to retrieve the data.
+#' are stored in SAS '.XPT' format. Function nhanes cannot be used to import limited 
+#' access data.
 #' @examples 
 #' nhanes('BPX_E')
 #' nhanes('FOLATE_F')
@@ -294,7 +299,7 @@ nhanes <- function(nh_table) {
 #' \donttest{nhanesDXA(1999, destfile="dxx.xpt")}
 #' @export
 nhanesDXA <- function(year, suppl=FALSE, destfile=NULL) {
-#  dxaURL <- "ftp://ftp.cdc.gov/pub/health_Statistics/nchs/nhanes/dxx/"
+  #  dxaURL <- "ftp://ftp.cdc.gov/pub/health_Statistics/nchs/nhanes/dxx/"
   dxaURL <- "https://wwwn.cdc.gov/Nchs/Nhanes/Dxx/"
   
   dxa_fname <- function(year, suppl) {
@@ -323,9 +328,9 @@ nhanesDXA <- function(year, suppl=FALSE, destfile=NULL) {
       } else {
         tf <- tempfile()
         ok <- suppressWarnings(tryCatch({download.file(url, tf, mode="wb", quiet=TRUE)},
-                                  error=function(cond){message(cond); return(NULL)}))
+                                        error=function(cond){message(cond); return(NULL)}))
         if(!is.null(ok)) {
-        return(sasxport.get(tf,lowernames=FALSE))
+          return(sasxport.get(tf,lowernames=FALSE))
         } else { return(NULL) }
       }
     }
@@ -421,7 +426,7 @@ nhanesAttr <- function(nh_table) {
 #' 
 nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL, ignore.case=FALSE, 
                          ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=100, namesonly=FALSE) {
-
+  
   vlhtml <- read_html(varURL)
   
   xpathh <- '//*[@id="GridView1"]/thead/tr'
@@ -433,7 +438,7 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
   vnodes <- xml_nodes(vlhtml, xpath=xpathv)
   df <- t(sapply(lapply(vnodes,xml_children),xml_text)) %>% as.data.frame(stringsAsFactors=FALSE)
   names(df) <- vmcols
-
+  
   if(!is.null(search_terms)) {
     idx <- grep(paste(search_terms,collapse="|"), df[['Variable.Description']], ignore.case=ignore.case, value=FALSE)
     if(length(idx) > 0) {df <- df[idx,]}
@@ -545,7 +550,7 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
   if( !is.null(ystart) || !is.null(ystop) ) {
     # Use the first year of cycle (the odd year) for comparison
     year1 <- as.integer(matrix(unlist(strsplit(df$Years, '-')), ncol=2, byrow=TRUE)[,1])
-  
+    
     if(!is.null(ystop)){  # ystop has been provided
       if(is.numeric(ystop)) {
         if(ystop < 1999) {stop("Invalid stop year")}
@@ -561,7 +566,7 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
             ystart <- ystart - 1
           }
           df <- df[(year1 >= ystart & year1 <= ystop),]
-         }
+        }
       } else { # No ystart, assume it is 1999 (i.e. the first survey)
         df <- df[(year1 <= ystop),]
       }
@@ -579,7 +584,7 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
   if(details==TRUE){
     df$Data.File.Name <- str_sub(df$Data.File.Name, 1, nchar)
     return(df)
-    } else {
+  } else {
     return(unlist(strsplit(df$Doc.File, " Doc")))
   }
 }
@@ -611,7 +616,7 @@ nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerd
     warning("Multiple variable names entered. Only the first will be matched.")
   }
   
-#  xpt <- str_c('//*[@id="ContentPlaceHolder1_GridView1"]/*[td[1]="', varname, '"]', sep='')
+  #  xpt <- str_c('//*[@id="ContentPlaceHolder1_GridView1"]/*[td[1]="', varname, '"]', sep='')
   xpt <- str_c('//*[@id="GridView1"]/tbody/*[td[1]="', varname, '"]', sep='')
   tabletree <- varURL %>% read_html() %>% xml_nodes(xpath=xpt)
   ttlist <- lapply(lapply(tabletree, xml_children), xml_text)

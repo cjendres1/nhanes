@@ -36,4 +36,3 @@ that match a given name pattern. Only a single pattern may be entered.
 \donttest{nhanesSearchTableNames('BMX')}
 nhanesSearchTableNames('HPVS', includerdc=TRUE, details=TRUE)
 }
-

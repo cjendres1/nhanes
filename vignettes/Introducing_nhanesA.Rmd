@@ -23,6 +23,11 @@ The five publicly available data categories are:
 - Examination   (EXAM)
 - Laboratory    (LAB)
 - Questionnaire (Q)
+
+For limited access data, the available tables and variable names can be listed, but the data cannot be downloaded directly.
+To indicate limited access data in nhanesA functions, use:
+- Limited       (LTD)
+
 The abbreviated forms in parentheses may be substituted for the long form in nhanesA commands.
 
 ### List NHANES Tables
@@ -165,4 +170,4 @@ nhanesSearchTableNames('HPVS', includerdc=TRUE, nchar=42, details=TRUE)
 
 #### Please send any feedback or requests to cjendres1@gmail.com. Hope you enjoy your experience with nhanesA!
 Sincerely,  
-Christopher Endres
+Christopher J. Endres

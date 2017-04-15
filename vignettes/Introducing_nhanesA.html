@@ -4,7 +4,7 @@
 
 <head>
 
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 
@@ -12,7 +12,7 @@
 
 <meta name="author" content="Christopher Endres" />
 
-<meta name="date" content="2016-12-09" />
+<meta name="date" content="2017-04-15" />
 
 <title>Introducing nhanesA</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Introducing nhanesA</h1>
 <h4 class="author"><em>Christopher Endres</em></h4>
-<h4 class="date"><em>2016-12-09</em></h4>
+<h4 class="date"><em>2017-04-15</em></h4>
 
 
 
@@ -82,7 +82,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2>NHANES Data</h2>
 <p>Since 1999, the NHANES survey has been conducted continuously, and the surveys during that period are referred to as “continuous NHANES” to distinguish from several prior surveys. Continuous NHANES surveys are grouped in two-year intervals, with the first interval being 1999-2000.</p>
 <p>Most NHANES data are in the form of tables in SAS ‘XPT’ format. The survey is grouped into five data categories that are publicly available, as well as an additional category (Limited access data) that requires written justification and prior approval before access. Package nhanesA is intended mostly for use with the publicly available data, but some information pertaining to the limited access data can also be retrieved.</p>
-<p>The five publicly available data categories are: - Demographics (DEMO) - Dietary (DIET) - Examination (EXAM) - Laboratory (LAB) - Questionnaire (Q) The abbreviated forms in parentheses may be substituted for the long form in nhanesA commands.</p>
+<p>The five publicly available data categories are: - Demographics (DEMO) - Dietary (DIET) - Examination (EXAM) - Laboratory (LAB) - Questionnaire (Q)</p>
+<p>For limited access data, the available tables and variable names can be listed, but the data cannot be downloaded directly. To indicate limited access data in nhanesA functions, use: - Limited (LTD)</p>
+<p>The abbreviated forms in parentheses may be substituted for the long form in nhanesA commands.</p>
 <div id="list-nhanes-tables" class="section level3">
 <h3>List NHANES Tables</h3>
 <p>To quickly get familiar with NHANES data, it is helpful to display a listing of tables. Use nhanesTables to get information on tables that are available for a given category for a given year.</p>
@@ -281,6 +283,8 @@ dxx_b &lt;-<span class="st"> </span><span class="kw">nhanesTranslate</span>(<spa
 ## 9  2009-2010 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_F_R Doc
 ## 10 2011-2012 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_G_R Doc
 ## 11 2011-2012 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_G Doc
+## 12 2013-2014 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_H Doc
+## 13 2013-2014 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_H_R Doc
 ##                         Data.File Date.Published
 ## 1  HPVSER_D Data [XPT - 151.6 KB]     July, 2013
 ## 2  HPVSER_E Data [XPT - 155.7 KB] November, 2013
@@ -292,11 +296,13 @@ dxx_b &lt;-<span class="st"> </span><span class="kw">nhanesTranslate</span>(<spa
 ## 8  HPVSWR_F Data [XPT - 725.2 KB]   August, 2012
 ## 9                        RDC Only   August, 2012
 ## 10                       RDC Only    March, 2015
-## 11 HPVSWR_G Data [XPT - 661.1 KB]    March, 2015</code></pre>
+## 11 HPVSWR_G Data [XPT - 661.1 KB]    March, 2015
+## 12 HPVSWR_H Data [XPT - 716.6 KB] December, 2016
+## 13                       RDC Only December, 2016</code></pre>
 <div id="please-send-any-feedback-or-requests-to-cjendres1gmail.com.-hope-you-enjoy-your-experience-with-nhanesa" class="section level4">
 <h4>Please send any feedback or requests to <a href="mailto:cjendres1@gmail.com">cjendres1@gmail.com</a>. Hope you enjoy your experience with nhanesA!</h4>
 <p>Sincerely,<br />
-Christopher Endres</p>
+Christopher J. Endres</p>
 </div>
 </div>
 </div>

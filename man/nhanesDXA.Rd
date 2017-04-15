@@ -30,4 +30,3 @@ the data will be imported into the R environment.
 \donttest{dxa_c_s <- nhanesDXA(2003, suppl=TRUE)}
 \donttest{nhanesDXA(1999, destfile="dxx.xpt")}
 }
-

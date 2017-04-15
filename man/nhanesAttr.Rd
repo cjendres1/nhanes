@@ -32,4 +32,3 @@ characteristics are determined, then the table is deleted.
 nhanesAttr('BPX_E')
 nhanesAttr('FOLATE_F')
 }
-

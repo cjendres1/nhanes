@@ -48,4 +48,3 @@ If no arguments are given, then nhanesSearch returns the complete variable list.
  \donttest{nhanesSearch("urin", exclude_terms="During", ystart=2009)}
  \donttest{nhanesSearch(c("urine", "urinary"), ignore.case=TRUE, ystop=2006, namesonly=TRUE)}
 }
-

@@ -32,4 +32,3 @@ exact matches will be found.
 \donttest{nhanesSearchVarName('BMXLEG')}
 \donttest{nhanesSearchVarName('BMXHEAD', ystart=2003)}
 }
-
