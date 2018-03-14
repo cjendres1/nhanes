@@ -41,6 +41,8 @@ nh_years['2013'] <- "2013-2014"
 nh_years['2014'] <- "2013-2014"
 nh_years['2015'] <- "2015-2016"
 nh_years['2016'] <- "2015-2016"
+nh_years['2017'] <- "2017-2018"
+nh_years['2018'] <- "2017-2018"
 
 # Continuous NHANES table names have a letter suffix that indicates the collection interval
 data_idx <- list()
@@ -56,6 +58,7 @@ data_idx["F"] <- '2009-2010'
 data_idx["G"] <- '2011-2012'
 data_idx["H"] <- '2013-2014'
 data_idx["I"] <- '2015-2016'
+data_idx["J"] <- '2017-2018'
 
 anomalytables2005 <- c('CHLMD_DR', 'SSUECD_R', 'HSV_DR')
 
