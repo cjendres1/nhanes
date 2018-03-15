@@ -2,6 +2,7 @@
 nhanesURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/'
 varURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/variablelist.aspx'
 dataURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx'
+dxaURL <- "https://wwwn.cdc.gov/nchs/data/nhanes/dxa/"
 
 # Create a list of nhanes groups
 # Include convenient aliases
@@ -303,7 +304,6 @@ nhanes <- function(nh_table) {
 #' @export
 nhanesDXA <- function(year, suppl=FALSE, destfile=NULL) {
   #  dxaURL <- "ftp://ftp.cdc.gov/pub/health_Statistics/nchs/nhanes/dxx/"
-  dxaURL <- "https://wwwn.cdc.gov/Nchs/Nhanes/Dxx/"
   
   dxa_fname <- function(year, suppl) {
     if(year == 1999 | year == 2000) {fname = 'dxx'}
