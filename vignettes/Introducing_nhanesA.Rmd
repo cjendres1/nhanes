@@ -1,6 +1,6 @@
 ---
 title: "Introducing nhanesA"
-author: "Christopher Endres"
+author: "Christopher J. Endres"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -108,7 +108,7 @@ names(q2007tables) <- q2007names
 ```
 
 ### Import Dual X-Ray Absorptiometry Data
-Dual X-Ray Absorptiometry (DXA) data were acquired from 1999-2006. More information may be found at https://wwwn.cdc.gov/Nchs/Nhanes/Dxx/dxa.aspx. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. When nhanesTranslate is applied to DXA data, only the 2005-2006 translation tables are used as those are the only DXA codes that are currently available in html format.
+Dual X-Ray Absorptiometry (DXA) data were acquired from 1999-2006. More information may be found at https://wwwn.cdc.gov/nchs/nhanes/dxa/dxa.aspx. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. When nhanesTranslate is applied to DXA data, only the 2005-2006 translation tables are used as those are the only DXA codes that are currently available in html format.
 
 ```{r nhanesdxa, eval=FALSE}
 #Import into R

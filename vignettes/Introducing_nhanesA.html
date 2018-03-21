@@ -10,9 +10,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="Christopher Endres" />
+<meta name="author" content="Christopher J. Endres" />
 
-<meta name="date" content="2017-04-15" />
+<meta name="date" content="2018-03-21" />
 
 <title>Introducing nhanesA</title>
 
@@ -69,8 +69,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 <h1 class="title toc-ignore">Introducing nhanesA</h1>
-<h4 class="author"><em>Christopher Endres</em></h4>
-<h4 class="date"><em>2017-04-15</em></h4>
+<h4 class="author"><em>Christopher J. Endres</em></h4>
+<h4 class="date"><em>2018-03-21</em></h4>
 
 
 
@@ -99,11 +99,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## 6   DXXAG_D Dual Energy X-ray Absorptiometry - Android/Gynoid
 ## 7  DXXFEM_D          Dual Energy X-ray Absorptiometry - Femur
 ## 8  DXXSPN_D          Dual Energy X-ray Absorptiometry - Spine
-## 9  OPXFDT_D     Ophthalmology - Frequency Doubling Technology
-## 10 OPXRET_D                   Ophthalmology - Retinal Imaging
-## 11    OHX_D                                       Oral Health
-## 12 PAXRAW_D                         Physical Activity Monitor
-## 13    VIX_D                                            Vision</code></pre>
+## 9     DXX_D     Dual-Energy X-ray Absorptiometry - Whole Body
+## 10 OPXFDT_D     Ophthalmology - Frequency Doubling Technology
+## 11 OPXRET_D                   Ophthalmology - Retinal Imaging
+## 12    OHX_D                                       Oral Health
+## 13 PAXRAW_D                         Physical Activity Monitor
+## 14    VIX_D                                            Vision</code></pre>
 <p>Note that the two-year survey intervals begin with the odd year. For convenience, only a single 4-digit year is entered such that <code>nhanesTables('EXAM', 2005)</code> and <code>nhanesTables('EXAM', 2006)</code> yield identical output.</p>
 </div>
 <div id="list-variables-in-an-nhanes-table" class="section level3">
@@ -213,7 +214,7 @@ q2007tables &lt;-<span class="st"> </span><span class="kw">lapply</span>(q2007na
 </div>
 <div id="import-dual-x-ray-absorptiometry-data" class="section level3">
 <h3>Import Dual X-Ray Absorptiometry Data</h3>
-<p>Dual X-Ray Absorptiometry (DXA) data were acquired from 1999-2006. More information may be found at <a href="https://wwwn.cdc.gov/Nchs/Nhanes/Dxx/dxa.aspx" class="uri">https://wwwn.cdc.gov/Nchs/Nhanes/Dxx/dxa.aspx</a>. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. When nhanesTranslate is applied to DXA data, only the 2005-2006 translation tables are used as those are the only DXA codes that are currently available in html format.</p>
+<p>Dual X-Ray Absorptiometry (DXA) data were acquired from 1999-2006. More information may be found at <a href="https://wwwn.cdc.gov/nchs/nhanes/dxa/dxa.aspx" class="uri">https://wwwn.cdc.gov/nchs/nhanes/dxa/dxa.aspx</a>. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. When nhanesTranslate is applied to DXA data, only the 2005-2006 translation tables are used as those are the only DXA codes that are currently available in html format.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Import into R</span>
 dxx_b &lt;-<span class="st"> </span><span class="kw">nhanesDXA</span>(<span class="dv">2001</span>)
 <span class="co">#Save to file</span>
@@ -255,7 +256,7 @@ dxx_b &lt;-<span class="st"> </span><span class="kw">nhanesTranslate</span>(<spa
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#nhanesSearchVarName use examples</span>
 
 <span class="kw">nhanesSearchVarName</span>(<span class="st">'BPXPULS'</span>)</code></pre></div>
-<pre><code>## [1] &quot;BPX&quot;   &quot;BPX_B&quot; &quot;BPX_C&quot; &quot;BPX_D&quot; &quot;BPX_E&quot; &quot;BPX_F&quot; &quot;BPX_G&quot; &quot;BPX_H&quot;</code></pre>
+<pre><code>## [1] &quot;BPX&quot;   &quot;BPX_B&quot; &quot;BPX_C&quot; &quot;BPX_D&quot; &quot;BPX_E&quot; &quot;BPX_F&quot; &quot;BPX_G&quot; &quot;BPX_H&quot; &quot;BPX_I&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">nhanesSearchVarName</span>(<span class="st">'CSQ260i'</span>, <span class="dt">includerdc=</span><span class="ot">TRUE</span>, <span class="dt">nchar=</span><span class="dv">38</span>, <span class="dt">namesonly=</span><span class="ot">FALSE</span>)</code></pre></div>
 <pre><code>##   Variable.Name                   Variable.Description Data.File.Name
 ## 1       CSQ260i Do you now have any of the following p        CSX_G_R
@@ -269,7 +270,7 @@ dxx_b &lt;-<span class="st"> </span><span class="kw">nhanesTranslate</span>(<spa
 <p>In order to group data across surveys, it is useful to list all available tables that follow a given naming pattern. Function nhanesSearchTableNames is used for such pattern matching. For example, if we want to work with all available body measures data we can retrieve the full list of available tables with nhanesSearchTableNames(‘BMX’). The search is conducted over the comprehensive table list, which is much smaller than the comprehensive variable list, such that a call to nhanesSearchTableNames takes only a few seconds.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># nhanesSearchTableNames use examples</span>
 <span class="kw">nhanesSearchTableNames</span>(<span class="st">'BMX'</span>)</code></pre></div>
-<pre><code>## [1] &quot;BMX&quot;   &quot;BMX_B&quot; &quot;BMX_C&quot; &quot;BMX_D&quot; &quot;BMX_E&quot; &quot;BMX_F&quot; &quot;BMX_G&quot; &quot;BMX_H&quot;</code></pre>
+<pre><code>## [1] &quot;BMX&quot;   &quot;BMX_B&quot; &quot;BMX_C&quot; &quot;BMX_D&quot; &quot;BMX_E&quot; &quot;BMX_F&quot; &quot;BMX_G&quot; &quot;BMX_H&quot; &quot;BMX_I&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">nhanesSearchTableNames</span>(<span class="st">'HPVS'</span>, <span class="dt">includerdc=</span><span class="ot">TRUE</span>, <span class="dt">nchar=</span><span class="dv">42</span>, <span class="dt">details=</span><span class="ot">TRUE</span>)</code></pre></div>
 <pre><code>##        Years                             Data.File.Name     Doc.File
 ## 1  2005-2006 Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVSER_D Doc
@@ -283,8 +284,8 @@ dxx_b &lt;-<span class="st"> </span><span class="kw">nhanesTranslate</span>(<spa
 ## 9  2009-2010 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_F_R Doc
 ## 10 2011-2012 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_G_R Doc
 ## 11 2011-2012 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_G Doc
-## 12 2013-2014 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_H Doc
-## 13 2013-2014 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_H_R Doc
+## 12 2013-2014 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_H_R Doc
+## 13 2013-2014 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_H Doc
 ##                         Data.File Date.Published
 ## 1  HPVSER_D Data [XPT - 151.6 KB]     July, 2013
 ## 2  HPVSER_E Data [XPT - 155.7 KB] November, 2013
@@ -297,8 +298,8 @@ dxx_b &lt;-<span class="st"> </span><span class="kw">nhanesTranslate</span>(<spa
 ## 9                        RDC Only   August, 2012
 ## 10                       RDC Only    March, 2015
 ## 11 HPVSWR_G Data [XPT - 661.1 KB]    March, 2015
-## 12 HPVSWR_H Data [XPT - 716.6 KB] December, 2016
-## 13                       RDC Only December, 2016</code></pre>
+## 12                       RDC Only December, 2016
+## 13 HPVSWR_H Data [XPT - 716.6 KB] December, 2016</code></pre>
 <div id="please-send-any-feedback-or-requests-to-cjendres1gmail.com.-hope-you-enjoy-your-experience-with-nhanesa" class="section level4">
 <h4>Please send any feedback or requests to <a href="mailto:cjendres1@gmail.com">cjendres1@gmail.com</a>. Hope you enjoy your experience with nhanesA!</h4>
 <p>Sincerely,<br />
@@ -314,7 +315,7 @@ Christopher J. Endres</p>
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>

@@ -14,8 +14,8 @@ Imports:
     magrittr,
     xml2,
     plyr
-Description: Utility to retrieve data from the National Health and Nutrition
-    Examination Survey (NHANES).
+Description: Utility to retrieve data from the National Health and Nutrition 
+	Examination Survey (NHANES) website <https://www.cdc.gov/nchs/nhanes/index.htm>.
 License: GPL (>= 2)
 URL: https://cran.r-project.org/package=nhanesA
 Packaged: 2015-10-07 18:15:14 UTC; Endres
