@@ -133,7 +133,7 @@ xpath <- '//*[@id="GridView1"]'
 #' is a convenient way to browse the available NHANES tables.
 #' @examples
 #' nhanesTables('EXAM', 2007)
-#' nhanesTables('LAB', 2009, details=TRUE, includerdc=TRUE)
+#' \donttest{nhanesTables('LAB', 2009, details=TRUE, includerdc=TRUE)}
 #' \donttest{nhanesTables('Q', 2005, namesonly=TRUE)}
 #' @export
 #'
@@ -205,7 +205,7 @@ nhanesTables <- function(data_group, year, nchar=100, details = FALSE, namesonly
 #' descriptions to ascertain quickly if a data table is of interest.
 #' @examples
 #' nhanesTableVars('LAB', 'CBC_E')
-#' nhanesTableVars('EXAM', 'OHX_E', details=TRUE, nchar=50)
+#' \donttest{nhanesTableVars('EXAM', 'OHX_E', details=TRUE, nchar=50)}
 #' \donttest{nhanesTableVars('DEMO', 'DEMO_F', namesonly = TRUE)}
 #' @export
 #' 
@@ -303,8 +303,7 @@ nhanes <- function(nh_table) {
 #' \donttest{nhanesDXA(1999, destfile="dxx.xpt")}
 #' @export
 nhanesDXA <- function(year, suppl=FALSE, destfile=NULL) {
-  #  dxaURL <- "ftp://ftp.cdc.gov/pub/health_Statistics/nchs/nhanes/dxx/"
-  
+
   dxa_fname <- function(year, suppl) {
     if(year == 1999 | year == 2000) {fname = 'dxx'}
     else if(year == 2001 | year == 2002) {fname = 'dxx_b'}
@@ -841,7 +840,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
 browseNHANES <- function(year=NULL, data_group=NULL, nh_table=NULL) {
   if(!is.null(nh_table)){ # Specific table name was given
     if('DXA'==toupper(nh_table)) { # Special case for DXA
-      browseURL("https://wwwn.cdc.gov/Nchs/Nhanes/Dxx/dxa.aspx")
+      browseURL("https://wwwn.cdc.gov/nchs/nhanes/dxa/dxa.aspx")
     } else {
       nh_year <- .get_year_from_nh_table(nh_table)
       url <- str_c(nhanesURL, nh_year, '/', nh_table, '.htm', sep='')

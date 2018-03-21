@@ -33,6 +33,6 @@ descriptions to ascertain quickly if a data table is of interest.
 }
 \examples{
 nhanesTableVars('LAB', 'CBC_E')
-nhanesTableVars('EXAM', 'OHX_E', details=TRUE, nchar=50)
+\donttest{nhanesTableVars('EXAM', 'OHX_E', details=TRUE, nchar=50)}
 \donttest{nhanesTableVars('DEMO', 'DEMO_F', namesonly = TRUE)}
 }
