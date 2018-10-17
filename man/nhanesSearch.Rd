@@ -4,9 +4,9 @@
 \alias{nhanesSearch}
 \title{Perform a search over the comprehensive NHANES variable list.}
 \usage{
-nhanesSearch(search_terms = NULL, exclude_terms = NULL, data_group = NULL,
-  ignore.case = FALSE, ystart = NULL, ystop = NULL, includerdc = FALSE,
-  nchar = 100, namesonly = FALSE)
+nhanesSearch(search_terms = NULL, exclude_terms = NULL,
+  data_group = NULL, ignore.case = FALSE, ystart = NULL,
+  ystop = NULL, includerdc = FALSE, nchar = 100, namesonly = FALSE)
 }
 \arguments{
 \item{search_terms}{List of terms or keywords.}
@@ -38,7 +38,7 @@ The search can be restricted to specific survey years by specifying ystart and/o
 \details{
 nhanesSearch is useful to obtain a comprehensive list of relevant tables.
 Search terms will be matched against the variable descriptions in the NHANES Comprehensive
-Variable List (see https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx).
+Variable Lists.
 Matching variables must have at least one of the search_terms and not have any exclude_terms.
 The search may be restricted to specific surveys using ystart and ystop.
 If no arguments are given, then nhanesSearch returns the complete variable list.

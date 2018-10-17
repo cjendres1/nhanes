@@ -125,7 +125,7 @@ dxx_b <- nhanesTranslate(colnames=dxalist, data=dxx_b, dxa=TRUE)
 If you are interested in working with accelerometer data from 2003-2006 then please see packages nhanesaccel https://r-forge.r-project.org/R/?group_id=1733 and accelerometry https://cran.r-project.org/package=accelerometry.
 
 ### Searching across the comprehensive list of NHANES variables
-The NHANES repository is extensive, thus it is helpful to perform a targeted search to identify relevant tables and variables. A comprehensive list of NHANES variables is maintained at https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx
+The NHANES repository is extensive, thus it is helpful to perform a targeted search to identify relevant tables and variables. Comprehensive lists of NHANES variables are maintained for each data group. For example, the demographics variables are available at https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Demographics.
 The nhanesSearch function allows the investigator to input search terms, match against the comprehensive variable descriptions, and retrieve the list of matching variables. Matching search terms (variable descriptions must contain one of the terms) and exclusive search terms (variable descriptions must NOT contain any exclusive terms) may be provided.  The search can be restricted to a specific survey range as well as specific data groups.
 ```{r nhanessearch, eval=FALSE}
 # nhanesSearch use examples
@@ -150,7 +150,7 @@ nhanesSearch(c("tooth", "teeth"), ignore.case=TRUE)
 nhanesSearch("^Tooth")
 ```
 ### Searching for tables that contain a specific variable
-nhanesSearch is a versatile search function as it imports the entire comprehensive variable list to a data frame. That allows for detailed conditional extraction of the variables. However, each call to nhanesSearch takes up to a minute or more to process.  Faster processing can be achieved when we know the name of a specific variable of interest and we look only for exact matches to the variable name. Function nhanesSearchVarName matches a given variable name in the html directly, then only the matching elements are converted to a data frame. Consequently, a call to nhanesSearchVarName executes much faster than nhanesSearch; typically under 30s. nhanesSearchVarName is useful for finding all data tables that contain a given variable.
+nhanesSearch is a versatile search function as it imports the comprehensive variable lists to a data frame. That allows for detailed conditional extraction of the variables. However, each call to nhanesSearch takes up to a minute or more to process.  Faster processing can be achieved when we know the name of a specific variable of interest and we look only for exact matches to the variable name. Function nhanesSearchVarName matches a given variable name in the html directly, then only the matching elements are converted to a data frame. Consequently, a call to nhanesSearchVarName executes much faster than nhanesSearch; typically under 30s. nhanesSearchVarName is useful for finding all data tables that contain a given variable.
 
 ```{r nhanessearchvarname}
 #nhanesSearchVarName use examples

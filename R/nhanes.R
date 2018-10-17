@@ -1,8 +1,18 @@
 #nhanesA - retrieve data from the CDC NHANES repository
+# Christopher J. Endres 10/13/2018
+#
 nhanesURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/'
-varURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/variablelist.aspx'
 dataURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx'
-dxaURL <- "https://wwwn.cdc.gov/nchs/data/nhanes/dxa/"
+dxaURL  <- "https://wwwn.cdc.gov/nchs/data/nhanes/dxa/"
+
+demoURL <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Demographics"
+dietURL <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Dietary"
+examURL <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Examination"
+labURL  <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Laboratory"
+qURL    <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Questionnaire"
+#ladURL  <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=LimitedAccess"
+varURLs <- c(demoURL, dietURL, examURL, labURL, qURL) #, ladURL)
+
 
 # Create a list of nhanes groups
 # Include convenient aliases
@@ -416,7 +426,7 @@ nhanesAttr <- function(nh_table) {
 #' @return A list of tables that match the search terms. 
 #' @details nhanesSearch is useful to obtain a comprehensive list of relevant tables.
 #' Search terms will be matched against the variable descriptions in the NHANES Comprehensive
-#' Variable List (see https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx).
+#' Variable Lists.
 #' Matching variables must have at least one of the search_terms and not have any exclude_terms.
 #' The search may be restricted to specific surveys using ystart and ystop.
 #' If no arguments are given, then nhanesSearch returns the complete variable list.
@@ -429,16 +439,34 @@ nhanesAttr <- function(nh_table) {
 nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL, ignore.case=FALSE, 
                          ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=100, namesonly=FALSE) {
   
-  vlhtml <- read_html(varURL)
+# Need to loop over url's
+
+  df_initialized = FALSE
+  for(i in 1:length(varURLs)) {  
+    vlhtml <- read_html(varURLs[i])
+    
+    xpathh <- '//*[@id="GridView1"]/thead/tr'
+    hnodes <- xml_nodes(vlhtml, xpath=xpathh)
+    vmcols <- sapply(xml_children(hnodes),xml_text)
+    vmcols <- unlist(lapply(str_split(vmcols, " "), paste0, collapse='.'))
+    
+    xpathv <- '//*[@id="GridView1"]/tbody/tr'
+    vnodes <- xml_nodes(vlhtml, xpath=xpathv)
+    if(length(vnodes) > 0){
+      if(!df_initialized) {
+        df <- t(sapply(lapply(vnodes,xml_children),xml_text)) %>% as.data.frame(stringsAsFactors=FALSE)
+        df_intialized = TRUE
+      } else {
+        dfadd <- t(sapply(lapply(vnodes,xml_children),xml_text)) %>% as.data.frame(stringsAsFactors=FALSE)
+        df <- rbind(df, dfadd)
+      }
+    }
+  }
   
-  xpathh <- '//*[@id="GridView1"]/thead/tr'
-  hnodes <- xml_nodes(vlhtml, xpath=xpathh)
-  vmcols <- sapply(xml_children(hnodes),xml_text)
-  vmcols <- unlist(lapply(str_split(vmcols, " "), paste0, collapse='.'))
-  
-  xpathv <- '//*[@id="GridView1"]/tbody/tr'
-  vnodes <- xml_nodes(vlhtml, xpath=xpathv)
-  df <- t(sapply(lapply(vnodes,xml_children),xml_text)) %>% as.data.frame(stringsAsFactors=FALSE)
+  if(is.null(df)) {
+    stop("No data was found. Perhaps the NHANES url has changed")
+    return(NULL)
+  }
   names(df) <- vmcols
   
   if(!is.null(search_terms)) {
@@ -620,10 +648,30 @@ nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerd
   
   #  xpt <- str_c('//*[@id="ContentPlaceHolder1_GridView1"]/*[td[1]="', varname, '"]', sep='')
   xpt <- str_c('//*[@id="GridView1"]/tbody/*[td[1]="', varname, '"]', sep='')
-  tabletree <- varURL %>% read_html() %>% xml_nodes(xpath=xpt)
-  ttlist <- lapply(lapply(tabletree, xml_children), xml_text)
-  # Convert the list to a data frame
-  df <- unique(data.frame(matrix(unlist(ttlist), nrow=length(ttlist), byrow=TRUE), stringsAsFactors = FALSE))
+  df_initialized = FALSE
+  
+  for(i in 1:length(varURLs)) {
+    tabletree <- varURLs[i] %>% read_html() %>% xml_nodes(xpath=xpt)
+    ttlist <- lapply(lapply(tabletree, xml_children), xml_text)
+    # Convert the list to a data frame
+    
+    if(length(ttlist) > 0) { # Determine if there was a successful match
+      if(!df_initialized) {
+        df <- unique(data.frame(matrix(unlist(ttlist), nrow=length(ttlist), byrow=TRUE), stringsAsFactors = FALSE))
+        df_initialized = TRUE
+      } else { # End up here if df is already initialized
+        dfadd <- unique(data.frame(matrix(unlist(ttlist), nrow=length(ttlist), byrow=TRUE), stringsAsFactors = FALSE))
+        if(nrow(dfadd) > 0) {
+          df <- rbind(df,dfadd)
+        }
+      }
+    }
+  }
+  
+  if(!df_initialized) { # There was no successful match
+    return(NULL)
+  }
+  
   names(df) <- c('Variable.Name', 'Variable.Description', 'Data.File.Name', 'Data.File.Description', 
                  'Begin.Year', 'EndYear', 'Component', 'Use.Constraints')
   
@@ -853,14 +901,15 @@ browseNHANES <- function(year=NULL, data_group=NULL, nh_table=NULL) {
                    str_to_title(as.character(nhanes_group[data_group])), 
                    '&CycleBeginYear=', unlist(str_split(as.character(nh_year), '-'))[[1]] , sep='')
       browseURL(url)
-    } else {
+    } else { # Go to the two year survey page 
       nh_year <- .get_nh_survey_years(year)
-      nh_year <- str_c(str_sub(unlist(str_extract_all(nh_year,"[[:digit:]]{4}")),3,4),collapse='_')
-      url <- str_c(nhanesURL, 'search/nhanes', nh_year, '.aspx', sep='')
+#      nh_year <- str_c(str_sub(unlist(str_extract_all(nh_year,"[[:digit:]]{4}")),3,4),collapse='_')
+      nh_year <- unlist(str_extract_all(nh_year,"[[:digit:]]{4}"))[1]
+      url <- str_c(nhanesURL, 'continuousnhanes/default.aspx?BeginYear=', nh_year, sep='')
       browseURL(url)
     }
   } else {
-    browseURL("https://www.cdc.gov/nchs/nhanes/nhanes_questionnaires.htm")
+    browseURL("https://wwwn.cdc.gov/nchs/nhanes/Default.aspx")
   }
 }
 #------------------------------------------------------------------------------
