@@ -24,11 +24,11 @@ The five publicly available data categories are:
 - Laboratory    (LAB)
 - Questionnaire (Q)
 
+The abbreviated forms in parentheses may be substituted for the long form in nhanesA commands.
+
 For limited access data, the available tables and variable names can be listed, but the data cannot be downloaded directly.
 To indicate limited access data in nhanesA functions, use:
 - Limited       (LTD)
-
-The abbreviated forms in parentheses may be substituted for the long form in nhanesA commands.
 
 ### List NHANES Tables
 To quickly get familiar with NHANES data, it is helpful to display a listing of tables.
@@ -49,7 +49,7 @@ To better determine if that table is of interest, we can display detailed inform
 nhanesTableVars('EXAM', 'BMX_D')
 ```
 
-We see that there are 27 columns in table BMX_D. The first column (SEQN) is the respondent sequence number and is included in every NHANES table. Effectively, SEQN is a subject identifier that is used to join information across tables.
+We see that there are `r nrow(nhanesTableVars('EXAM', 'BMX_D'))` columns in table BMX_D. The column SEQN is the respondent sequence number and is included in every NHANES table. Effectively, SEQN is a subject identifier that is used to join information across tables.
 
 ### Import NHANES Tables
 

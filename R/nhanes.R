@@ -54,6 +54,8 @@ nh_years['2015'] <- "2015-2016"
 nh_years['2016'] <- "2015-2016"
 nh_years['2017'] <- "2017-2018"
 nh_years['2018'] <- "2017-2018"
+#nh_years['2019'] <- "2019-2020"
+#nh_years['2020'] <- "2019-2020"
 
 # Continuous NHANES table names have a letter suffix that indicates the collection interval
 data_idx <- list()
@@ -70,6 +72,7 @@ data_idx["G"] <- '2011-2012'
 data_idx["H"] <- '2013-2014'
 data_idx["I"] <- '2015-2016'
 data_idx["J"] <- '2017-2018'
+#data_idx["K"] <- '2019-2020'
 
 anomalytables2005 <- c('CHLMD_DR', 'SSUECD_R', 'HSV_DR')
 
@@ -129,7 +132,6 @@ xpath <- '//*[@id="GridView1"]'
 #' @importFrom rvest xml_nodes html_table
 #' @importFrom xml2 read_html
 #' @importFrom magrittr %>%
-#' @importFrom plyr rename
 #' @param data_group The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
 #' Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).
 #' @param year The year in yyyy format where 1999 <= yyyy <= 2014.
@@ -174,7 +176,7 @@ nhanesTables <- function(data_group, year, nchar=100, details = FALSE, namesonly
   } else {
     df <- unique(df[,c('Data.File.Name', 'Data.File.Description')])
   }
-  df <- rename(df, c("Data.File.Name"="FileName","Data.File.Description"="Description"))
+#  df <- rename(df, c("Data.File.Name"="FileName","Data.File.Description"="Description"))
   
   #Here we exclude tables that overlap from earlier surveys
   # Get possible table suffixes for the specified year
@@ -182,13 +184,13 @@ nhanesTables <- function(data_group, year, nchar=100, details = FALSE, namesonly
     suffix <- names(data_idx[which(data_idx == nh_year)])
     suffix <- unlist(lapply(suffix, function(x) {str_c('_', x, sep='')}))
     if(nh_year == '2005-2006') {suffix <- c(suffix, anomalytables2005)}
-    matches <- unique(grep(paste(suffix,collapse="|"), df[['FileName']], value=TRUE))  
-    df <- df[(df$FileName %in% matches),]
+    matches <- unique(grep(paste(suffix,collapse="|"), df[['Data.File.Name']], value=TRUE))  
+    df <- df[(df$Data.File.Name %in% matches),]
   }
   if(namesonly) {
     return(as.character(df[[1]]))
   }
-  df$Description <- str_sub(df$Description, 1, nchar)
+  df$Data.File.Description <- str_sub(df$Data.File.Description, 1, nchar)
   row.names(df) <- NULL
   return(df)  
 }
