@@ -729,10 +729,10 @@ nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerd
 }
 
 #------------------------------------------------------------------------------
-#' Display code translation information for the specified table.
+#' Display code translation information.
 #' 
-#' Returns code translations which is especially useful for categorical tables, 
-#' which includes most NHANES tables. 
+#' Returns code translations for categorical variables, 
+#' which appear in most NHANES tables.
 #' 
 #' @importFrom stringr str_c str_locate str_sub 
 #' @importFrom rvest xml_nodes html_table
