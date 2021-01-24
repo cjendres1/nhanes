@@ -4,8 +4,14 @@
 \alias{nhanesSearchVarName}
 \title{Search for tables that contain a specified variable.}
 \usage{
-nhanesSearchVarName(varname = NULL, ystart = NULL, ystop = NULL,
-  includerdc = FALSE, nchar = 100, namesonly = TRUE)
+nhanesSearchVarName(
+  varname = NULL,
+  ystart = NULL,
+  ystop = NULL,
+  includerdc = FALSE,
+  nchar = 100,
+  namesonly = TRUE
+)
 }
 \arguments{
 \item{varname}{Name of variable to match.}

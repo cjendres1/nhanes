@@ -4,8 +4,14 @@
 \alias{nhanesSearchTableNames}
 \title{Search for matching table names}
 \usage{
-nhanesSearchTableNames(pattern = NULL, ystart = NULL, ystop = NULL,
-  includerdc = FALSE, nchar = 100, details = FALSE)
+nhanesSearchTableNames(
+  pattern = NULL,
+  ystart = NULL,
+  ystop = NULL,
+  includerdc = FALSE,
+  nchar = 100,
+  details = FALSE
+)
 }
 \arguments{
 \item{pattern}{Pattern of table names to match}

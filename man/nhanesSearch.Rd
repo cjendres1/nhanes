@@ -4,9 +4,17 @@
 \alias{nhanesSearch}
 \title{Perform a search over the comprehensive NHANES variable list.}
 \usage{
-nhanesSearch(search_terms = NULL, exclude_terms = NULL,
-  data_group = NULL, ignore.case = FALSE, ystart = NULL,
-  ystop = NULL, includerdc = FALSE, nchar = 100, namesonly = FALSE)
+nhanesSearch(
+  search_terms = NULL,
+  exclude_terms = NULL,
+  data_group = NULL,
+  ignore.case = FALSE,
+  ystart = NULL,
+  ystop = NULL,
+  includerdc = FALSE,
+  nchar = 100,
+  namesonly = FALSE
+)
 }
 \arguments{
 \item{search_terms}{List of terms or keywords.}

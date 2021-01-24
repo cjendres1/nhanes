@@ -4,8 +4,13 @@
 \alias{nhanesTableVars}
 \title{Displays a list of variables in the specified NHANES table.}
 \usage{
-nhanesTableVars(data_group, nh_table, details = FALSE, nchar = 100,
-  namesonly = FALSE)
+nhanesTableVars(
+  data_group,
+  nh_table,
+  details = FALSE,
+  nchar = 100,
+  namesonly = FALSE
+)
 }
 \arguments{
 \item{data_group}{The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).

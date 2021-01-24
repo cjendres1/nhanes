@@ -2,10 +2,17 @@
 % Please edit documentation in R/nhanes.R
 \name{nhanesTranslate}
 \alias{nhanesTranslate}
-\title{Display code translation information for the specified table.}
+\title{Display code translation information.}
 \usage{
-nhanesTranslate(nh_table, colnames = NULL, data = NULL, nchar = 32,
-  mincategories = 2, details = FALSE, dxa = FALSE)
+nhanesTranslate(
+  nh_table,
+  colnames = NULL,
+  data = NULL,
+  nchar = 32,
+  mincategories = 2,
+  details = FALSE,
+  dxa = FALSE
+)
 }
 \arguments{
 \item{nh_table}{The name of the NHANES table to retrieve.}
@@ -28,8 +35,8 @@ Truncate the length by setting nchar (default = 32).}
 The code translation table (or translated data frame when data is defined).
 }
 \description{
-Returns code translations which is especially useful for categorical tables, 
-which includes most NHANES tables.
+Returns code translations for categorical variables, 
+which appear in most NHANES tables.
 }
 \details{
 Code translation tables are retrieved via webscraping using rvest. 
