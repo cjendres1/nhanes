@@ -1,45 +1,56 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Christopher J. Endres" />
 
-<meta name="date" content="2019-06-21" />
+<meta name="date" content="2021-01-30" />
 
 <title>Introducing nhanesA</title>
 
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(title);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -48,9 +59,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -96,7 +107,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -107,189 +118,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<style type="text/css">body {
-background-color: #fff;
-margin: 1em auto;
-max-width: 700px;
-overflow: visible;
-padding-left: 2em;
-padding-right: 2em;
-font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-font-size: 14px;
-line-height: 1.35;
-}
-#header {
-text-align: center;
-}
-#TOC {
-clear: both;
-margin: 0 0 10px 10px;
-padding: 4px;
-width: 400px;
-border: 1px solid #CCCCCC;
-border-radius: 5px;
-background-color: #f6f6f6;
-font-size: 13px;
-line-height: 1.3;
-}
-#TOC .toctitle {
-font-weight: bold;
-font-size: 15px;
-margin-left: 5px;
-}
-#TOC ul {
-padding-left: 40px;
-margin-left: -1.5em;
-margin-top: 5px;
-margin-bottom: 5px;
-}
-#TOC ul ul {
-margin-left: -2em;
-}
-#TOC li {
-line-height: 16px;
-}
-table {
-margin: 1em auto;
-border-width: 1px;
-border-color: #DDDDDD;
-border-style: outset;
-border-collapse: collapse;
-}
-table th {
-border-width: 2px;
-padding: 5px;
-border-style: inset;
-}
-table td {
-border-width: 1px;
-border-style: inset;
-line-height: 18px;
-padding: 5px 5px;
-}
-table, table th, table td {
-border-left-style: none;
-border-right-style: none;
-}
-table thead, table tr.even {
-background-color: #f7f7f7;
-}
-p {
-margin: 0.5em 0;
-}
-blockquote {
-background-color: #f6f6f6;
-padding: 0.25em 0.75em;
-}
-hr {
-border-style: solid;
-border: none;
-border-top: 1px solid #777;
-margin: 28px 0;
-}
-dl {
-margin-left: 0;
-}
-dl dd {
-margin-bottom: 13px;
-margin-left: 13px;
-}
-dl dt {
-font-weight: bold;
-}
-ul {
-margin-top: 0;
-}
-ul li {
-list-style: circle outside;
-}
-ul ul {
-margin-bottom: 0;
-}
-pre, code {
-background-color: #f7f7f7;
-border-radius: 3px;
-color: #333;
-white-space: pre-wrap; 
-}
-pre {
-border-radius: 3px;
-margin: 5px 0px 10px 0px;
-padding: 10px;
-}
-pre:not([class]) {
-background-color: #f7f7f7;
-}
-code {
-font-family: Consolas, Monaco, 'Courier New', monospace;
-font-size: 85%;
-}
-p > code, li > code {
-padding: 2px 0px;
-}
-div.figure {
-text-align: center;
-}
-img {
-background-color: #FFFFFF;
-padding: 2px;
-border: 1px solid #DDDDDD;
-border-radius: 3px;
-border: 1px solid #CCCCCC;
-margin: 0 5px;
-}
-h1 {
-margin-top: 0;
-font-size: 35px;
-line-height: 40px;
-}
-h2 {
-border-bottom: 4px solid #f7f7f7;
-padding-top: 10px;
-padding-bottom: 2px;
-font-size: 145%;
-}
-h3 {
-border-bottom: 2px solid #f7f7f7;
-padding-top: 10px;
-font-size: 120%;
-}
-h4 {
-border-bottom: 1px solid #f7f7f7;
-margin-left: 8px;
-font-size: 105%;
-}
-h5, h6 {
-border-bottom: 1px solid #ccc;
-font-size: 105%;
-}
-a {
-color: #0033dd;
-text-decoration: none;
-}
-a:hover {
-color: #6666ff; }
-a:visited {
-color: #800080; }
-a:visited:hover {
-color: #BB00BB; }
-a[href^="http:"] {
-text-decoration: underline; }
-a[href^="https:"] {
-text-decoration: underline; }
 
-code > span.kw { color: #555; font-weight: bold; } 
-code > span.dt { color: #902000; } 
-code > span.dv { color: #40a070; } 
-code > span.bn { color: #d14; } 
-code > span.fl { color: #d14; } 
-code > span.ch { color: #d14; } 
-code > span.st { color: #d14; } 
-code > span.co { color: #888888; font-style: italic; } 
-code > span.ot { color: #007020; } 
-code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
-</style>
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
 
 
 
@@ -303,7 +133,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">Introducing nhanesA</h1>
 <h4 class="author">Christopher J. Endres</h4>
-<h4 class="date">2019-06-21</h4>
+<h4 class="date">2021-01-30</h4>
 
 
 
@@ -321,8 +151,8 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div id="list-nhanes-tables" class="section level3">
 <h3>List NHANES Tables</h3>
 <p>To quickly get familiar with NHANES data, it is helpful to display a listing of tables. Use nhanesTables to get information on tables that are available for a given category for a given year.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(nhanesA)</a>
-<a class="sourceLine" id="cb1-2" title="2"><span class="kw">nhanesTables</span>(<span class="st">&#39;EXAM&#39;</span>, <span class="dv">2005</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nhanesA)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesTables</span>(<span class="st">&#39;EXAM&#39;</span>, <span class="dv">2005</span>)</span></code></pre></div>
 <pre><code>##    Data.File.Name                             Data.File.Description
 ## 1           BPX_D                                    Blood Pressure
 ## 2           BMX_D                                     Body Measures
@@ -336,14 +166,13 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 ## 10        DXXAG_D Dual Energy X-ray Absorptiometry - Android/Gynoid
 ## 11        AUXAR_D                      Audiometry - Acoustic Reflex
 ## 12       OPXRET_D                   Ophthalmology - Retinal Imaging
-## 13       DXXSPN_D          Dual Energy X-ray Absorptiometry - Spine
-## 14          DXX_D     Dual-Energy X-ray Absorptiometry - Whole Body</code></pre>
+## 13       DXXSPN_D          Dual Energy X-ray Absorptiometry - Spine</code></pre>
 <p>Note that the two-year survey intervals begin with the odd year. For convenience, only a single 4-digit year is entered such that <code>nhanesTables(&#39;EXAM&#39;, 2005)</code> and <code>nhanesTables(&#39;EXAM&#39;, 2006)</code> yield identical output.</p>
 </div>
 <div id="list-variables-in-an-nhanes-table" class="section level3">
 <h3>List Variables in an NHANES Table</h3>
 <p>After viewing the output, we decide we are interested in table ‘BMX_D’ that contains body measures data. To better determine if that table is of interest, we can display detailed information on the table contents using nhanesTableVars.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">nhanesTableVars</span>(<span class="st">&#39;EXAM&#39;</span>, <span class="st">&#39;BMX_D&#39;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesTableVars</span>(<span class="st">&#39;EXAM&#39;</span>, <span class="st">&#39;BMX_D&#39;</span>)</span></code></pre></div>
 <pre><code>##    Variable.Name                Variable.Description
 ## 1       BMDSTATS Body Measures Component status Code
 ## 2        BMIARMC           Arm Circumference Comment
@@ -377,46 +206,48 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div id="import-nhanes-tables" class="section level3">
 <h3>Import NHANES Tables</h3>
 <p>We now import BMX_D along with the demographics table DEMO_D.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">bmx_d  &lt;-<span class="st"> </span><span class="kw">nhanes</span>(<span class="st">&#39;BMX_D&#39;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>bmx_d  <span class="ot">&lt;-</span> <span class="fu">nhanes</span>(<span class="st">&#39;BMX_D&#39;</span>)</span></code></pre></div>
 <pre><code>## Processing SAS dataset BMX_D      ..</code></pre>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">demo_d &lt;-<span class="st"> </span><span class="kw">nhanes</span>(<span class="st">&#39;DEMO_D&#39;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>demo_d <span class="ot">&lt;-</span> <span class="fu">nhanes</span>(<span class="st">&#39;DEMO_D&#39;</span>)</span></code></pre></div>
 <pre><code>## Processing SAS dataset DEMO_D     ..</code></pre>
-<p>We then merge the tables and compute average values by gender for several variables:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">bmx_demo &lt;-<span class="st"> </span><span class="kw">merge</span>(demo_d, bmx_d)</a>
-<a class="sourceLine" id="cb9-2" title="2"><span class="kw">options</span>(<span class="dt">digits=</span><span class="dv">4</span>)</a>
-<a class="sourceLine" id="cb9-3" title="3"><span class="kw">aggregate</span>(<span class="kw">cbind</span>(BMXHT, BMXWT, BMXLEG, BMXCALF, BMXTHICR) <span class="op">~</span><span class="st"> </span>RIAGENDR, bmx_demo,mean)</a></code></pre></div>
-<pre><code>##   RIAGENDR BMXHT BMXWT BMXLEG BMXCALF BMXTHICR
-## 1        1 170.0 76.91  40.50   37.48    51.46
-## 2        2 158.9 68.18  37.19   36.89    51.09</code></pre>
+<p>We merge the tables and display several variables:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>bmx_demo <span class="ot">&lt;-</span> <span class="fu">merge</span>(demo_d, bmx_d)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">digits=</span><span class="dv">4</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>select_cols <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;RIAGENDR&#39;</span>, <span class="st">&#39;BMXHT&#39;</span>, <span class="st">&#39;BMXWT&#39;</span>, <span class="st">&#39;BMXLEG&#39;</span>, <span class="st">&#39;BMXCALF&#39;</span>, <span class="st">&#39;BMXTHICR&#39;</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(bmx_demo[<span class="dv">5</span><span class="sc">:</span><span class="dv">8</span>,select_cols], <span class="at">row.names=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<pre><code>##  RIAGENDR BMXHT BMXWT BMXLEG BMXCALF BMXTHICR
+##         2 156.0  75.2   38.0    36.6     53.7
+##         1 167.6  69.5   40.4    35.6     48.0
+##         2 163.7  45.0   39.2    31.7     41.3
+##         1 182.4 101.9   41.5    42.6     50.5</code></pre>
 </div>
 <div id="translation-of-coded-values" class="section level3">
 <h3>Translation of Coded Values</h3>
 <p>NHANES uses coded values for many fields. In the preceding example, gender is coded as 1 or 2. To determine what the values mean, we can list the code translations for the gender field RIAGENDR in table DEMO_D</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw">nhanesTranslate</span>(<span class="st">&#39;DEMO_D&#39;</span>, <span class="st">&#39;RIAGENDR&#39;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesTranslate</span>(<span class="st">&#39;DEMO_D&#39;</span>, <span class="st">&#39;RIAGENDR&#39;</span>)</span></code></pre></div>
 <pre><code>## $RIAGENDR
 ##   Code.or.Value Value.Description
 ## 1             1              Male
 ## 2             2            Female
 ## 3             .           Missing</code></pre>
-<p>If desired, we can use nhanesTranslate to apply the code translation to demo_d directly by assigning data=demo_d. </p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="kw">levels</span>(<span class="kw">as.factor</span>(demo_d<span class="op">$</span>RIAGENDR))</a></code></pre></div>
-<pre><code>## [1] &quot;1&quot; &quot;2&quot;</code></pre>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1">demo_d &lt;-<span class="st"> </span><span class="kw">nhanesTranslate</span>(<span class="st">&#39;DEMO_D&#39;</span>, <span class="st">&#39;RIAGENDR&#39;</span>, <span class="dt">data=</span>demo_d)</a></code></pre></div>
+<p>If desired, we can use nhanesTranslate to apply the code translation to demo_d directly by assigning data=demo_d.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>demo_d <span class="ot">&lt;-</span> <span class="fu">nhanesTranslate</span>(<span class="st">&#39;DEMO_D&#39;</span>, <span class="st">&#39;RIAGENDR&#39;</span>, <span class="at">data=</span>demo_d)</span></code></pre></div>
 <pre><code>## Translated columns: RIAGENDR</code></pre>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1"><span class="kw">levels</span>(demo_d<span class="op">$</span>RIAGENDR)</a></code></pre></div>
-<pre><code>## [1] &quot;Male&quot;   &quot;Female&quot;</code></pre>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1">bmx_demo &lt;-<span class="st"> </span><span class="kw">merge</span>(demo_d, bmx_d)</a>
-<a class="sourceLine" id="cb19-2" title="2"><span class="kw">aggregate</span>(<span class="kw">cbind</span>(BMXHT, BMXWT, BMXLEG, BMXCALF, BMXTHICR)<span class="op">~</span>RIAGENDR, bmx_demo, mean)</a></code></pre></div>
-<pre><code>##   RIAGENDR BMXHT BMXWT BMXLEG BMXCALF BMXTHICR
-## 1     Male 170.0 76.91  40.50   37.48    51.46
-## 2   Female 158.9 68.18  37.19   36.89    51.09</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>bmx_demo <span class="ot">&lt;-</span> <span class="fu">merge</span>(demo_d, bmx_d)</span></code></pre></div>
+<p>The RIAGENDR field is now recoded as Male, Female instead of 1,2.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(bmx_demo[<span class="dv">5</span><span class="sc">:</span><span class="dv">8</span>,select_cols], <span class="at">row.names=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<pre><code>##  RIAGENDR BMXHT BMXWT BMXLEG BMXCALF BMXTHICR
+##    Female 156.0  75.2   38.0    36.6     53.7
+##      Male 167.6  69.5   40.4    35.6     48.0
+##    Female 163.7  45.0   39.2    31.7     41.3
+##      Male 182.4 101.9   41.5    42.6     50.5</code></pre>
 </div>
 <div id="apply-all-possible-code-translations-to-a-table" class="section level3">
 <h3>Apply All Possible Code Translations to a Table</h3>
 <p>An NHANES table may have dozens of columns with coded values. Translating all possible columns is a three step process. 1: Download the table 2: Save a list of table variables 3: Pass the table and variable list to nhanesTranslate</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1">bpx_d &lt;-<span class="st"> </span><span class="kw">nhanes</span>(<span class="st">&#39;BPX_D&#39;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>bpx_d <span class="ot">&lt;-</span> <span class="fu">nhanes</span>(<span class="st">&#39;BPX_D&#39;</span>)</span></code></pre></div>
 <pre><code>## Processing SAS dataset BPX_D      ..</code></pre>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1"><span class="kw">head</span>(bpx_d[,<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>])</a></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(bpx_d[,<span class="dv">6</span><span class="sc">:</span><span class="dv">11</span>])</span></code></pre></div>
 <pre><code>##   BPQ150A BPQ150B BPQ150C BPQ150D BPAARM BPACSZ
 ## 1      NA      NA      NA      NA     NA     NA
 ## 2       2       2       2       2      1      3
@@ -424,11 +255,11 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 ## 4       2       2       2       2      1      3
 ## 5       2       2       2       2      1      4
 ## 6       2       2       2       2      1      4</code></pre>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" title="1">bpx_d_vars  &lt;-<span class="st"> </span><span class="kw">nhanesTableVars</span>(<span class="st">&#39;EXAM&#39;</span>, <span class="st">&#39;BPX_D&#39;</span>, <span class="dt">namesonly=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb25-2" title="2"><span class="co">#Alternatively may use bpx_d_vars = names(bpx_d)</span></a>
-<a class="sourceLine" id="cb25-3" title="3">bpx_d &lt;-<span class="st"> </span><span class="kw">suppressWarnings</span>(<span class="kw">nhanesTranslate</span>(<span class="st">&#39;BPX_D&#39;</span>, bpx_d_vars, <span class="dt">data=</span>bpx_d))</a></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>bpx_d_vars  <span class="ot">&lt;-</span> <span class="fu">nhanesTableVars</span>(<span class="st">&#39;EXAM&#39;</span>, <span class="st">&#39;BPX_D&#39;</span>, <span class="at">namesonly=</span><span class="cn">TRUE</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Alternatively may use bpx_d_vars = names(bpx_d)</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>bpx_d <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(<span class="fu">nhanesTranslate</span>(<span class="st">&#39;BPX_D&#39;</span>, bpx_d_vars, <span class="at">data=</span>bpx_d))</span></code></pre></div>
 <pre><code>## Translated columns: BPAARM BPACSZ BPAEN2 BPAEN3 BPAEN4 BPQ150A BPQ150B BPQ150C BPQ150D BPXPTY BPXPULS PEASCCT1 PEASCST1</code></pre>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1"><span class="kw">head</span>(bpx_d[,<span class="dv">6</span><span class="op">:</span><span class="dv">11</span>])</a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(bpx_d[,<span class="dv">6</span><span class="sc">:</span><span class="dv">11</span>])</span></code></pre></div>
 <pre><code>##   BPQ150A BPQ150B BPQ150C BPQ150D BPAARM        BPACSZ
 ## 1    &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;   &lt;NA&gt;          &lt;NA&gt;
 ## 2      No      No      No      No  Right Adult (12X22)
@@ -441,56 +272,57 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div id="downloading-a-complete-survey" class="section level3">
 <h3>Downloading a Complete Survey</h3>
 <p>The primary goal of nhanesA is to enable fully customizable processing of select NHANES tables. However, it is quite easy to download entire surveys using nhanesA functions. Say we want to download every questionnaire in the 2007-2008 survey. We first get a list of the table names by using nhanesTables with namesonly = TRUE. The tables can then be downloaded using nhanes with lapply.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" title="1">q2007names  &lt;-<span class="st"> </span><span class="kw">nhanesTables</span>(<span class="st">&#39;Q&#39;</span>, <span class="dv">2007</span>, <span class="dt">namesonly=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb29-2" title="2">q2007tables &lt;-<span class="st"> </span><span class="kw">lapply</span>(q2007names, nhanes)</a>
-<a class="sourceLine" id="cb29-3" title="3"><span class="kw">names</span>(q2007tables) &lt;-<span class="st"> </span>q2007names</a></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>q2007names  <span class="ot">&lt;-</span> <span class="fu">nhanesTables</span>(<span class="st">&#39;Q&#39;</span>, <span class="dv">2007</span>, <span class="at">namesonly=</span><span class="cn">TRUE</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>q2007tables <span class="ot">&lt;-</span> <span class="fu">lapply</span>(q2007names, nhanes)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(q2007tables) <span class="ot">&lt;-</span> q2007names</span></code></pre></div>
 </div>
 <div id="import-dual-x-ray-absorptiometry-data" class="section level3">
 <h3>Import Dual X-Ray Absorptiometry Data</h3>
 <p>Dual X-Ray Absorptiometry (DXA) data were acquired from 1999-2006. More information may be found at <a href="https://wwwn.cdc.gov/nchs/nhanes/dxa/dxa.aspx" class="uri">https://wwwn.cdc.gov/nchs/nhanes/dxa/dxa.aspx</a>. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. When nhanesTranslate is applied to DXA data, only the 2005-2006 translation tables are used as those are the only DXA codes that are currently available in html format.</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1"><span class="co">#Import into R</span></a>
-<a class="sourceLine" id="cb30-2" title="2">dxx_b &lt;-<span class="st"> </span><span class="kw">nhanesDXA</span>(<span class="dv">2001</span>)</a>
-<a class="sourceLine" id="cb30-3" title="3"><span class="co">#Save to file</span></a>
-<a class="sourceLine" id="cb30-4" title="4"><span class="kw">nhanesDXA</span>(<span class="dv">2001</span>, <span class="dt">destfile=</span><span class="st">&quot;dxx_b.xpt&quot;</span>)</a>
-<a class="sourceLine" id="cb30-5" title="5"><span class="co">#Import supplemental data</span></a>
-<a class="sourceLine" id="cb30-6" title="6">dxx_c_s &lt;-<span class="st"> </span><span class="kw">nhanesDXA</span>(<span class="dv">2003</span>, <span class="dt">suppl=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb30-7" title="7"><span class="co">#Apply code translations</span></a>
-<a class="sourceLine" id="cb30-8" title="8">dxalist &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;DXAEXSTS&#39;</span>, <span class="st">&#39;DXITOT&#39;</span>, <span class="st">&#39;DXIHE&#39;</span>)</a>
-<a class="sourceLine" id="cb30-9" title="9">dxx_b &lt;-<span class="st"> </span><span class="kw">nhanesTranslate</span>(<span class="dt">colnames=</span>dxalist, <span class="dt">data=</span>dxx_b, <span class="dt">dxa=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Import into R</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>dxx_b <span class="ot">&lt;-</span> <span class="fu">nhanesDXA</span>(<span class="dv">2001</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Save to file</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesDXA</span>(<span class="dv">2001</span>, <span class="at">destfile=</span><span class="st">&quot;dxx_b.xpt&quot;</span>)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Import supplemental data</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>dxx_c_s <span class="ot">&lt;-</span> <span class="fu">nhanesDXA</span>(<span class="dv">2003</span>, <span class="at">suppl=</span><span class="cn">TRUE</span>)</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Apply code translations</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>dxalist <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;DXAEXSTS&#39;</span>, <span class="st">&#39;DXITOT&#39;</span>, <span class="st">&#39;DXIHE&#39;</span>)</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>dxx_b <span class="ot">&lt;-</span> <span class="fu">nhanesTranslate</span>(<span class="at">colnames=</span>dxalist, <span class="at">data=</span>dxx_b, <span class="at">dxa=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <p>If you are interested in working with accelerometer data from 2003-2006 then please see packages nhanesaccel <a href="https://r-forge.r-project.org/R/?group_id=1733" class="uri">https://r-forge.r-project.org/R/?group_id=1733</a> and accelerometry <a href="https://cran.r-project.org/package=accelerometry" class="uri">https://cran.r-project.org/package=accelerometry</a>.</p>
 </div>
 <div id="searching-across-the-comprehensive-list-of-nhanes-variables" class="section level3">
 <h3>Searching across the comprehensive list of NHANES variables</h3>
 <p>The NHANES repository is extensive, thus it is helpful to perform a targeted search to identify relevant tables and variables. Comprehensive lists of NHANES variables are maintained for each data group. For example, the demographics variables are available at <a href="https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Demographics" class="uri">https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Demographics</a>. The nhanesSearch function allows the investigator to input search terms, match against the comprehensive variable descriptions, and retrieve the list of matching variables. Matching search terms (variable descriptions must contain one of the terms) and exclusive search terms (variable descriptions must NOT contain any exclusive terms) may be provided. The search can be restricted to a specific survey range as well as specific data groups.</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" title="1"><span class="co"># nhanesSearch use examples</span></a>
-<a class="sourceLine" id="cb31-2" title="2"><span class="co">#</span></a>
-<a class="sourceLine" id="cb31-3" title="3"><span class="co"># Search on the word bladder, restrict to the 2001-2008 surveys, </span></a>
-<a class="sourceLine" id="cb31-4" title="4"><span class="co"># print out 50 characters of the variable description</span></a>
-<a class="sourceLine" id="cb31-5" title="5"><span class="kw">nhanesSearch</span>(<span class="st">&quot;bladder&quot;</span>, <span class="dt">ystart=</span><span class="dv">2001</span>, <span class="dt">ystop=</span><span class="dv">2008</span>, <span class="dt">nchar=</span><span class="dv">50</span>)</a>
-<a class="sourceLine" id="cb31-6" title="6"><span class="co">#</span></a>
-<a class="sourceLine" id="cb31-7" title="7"><span class="co"># Search on &quot;urin&quot; (will match urine, urinary, etc), from 1999-2010, return table names only</span></a>
-<a class="sourceLine" id="cb31-8" title="8"><span class="kw">nhanesSearch</span>(<span class="st">&quot;urin&quot;</span>, <span class="dt">ignore.case=</span><span class="ot">TRUE</span>, <span class="dt">ystop=</span><span class="dv">2010</span>, <span class="dt">namesonly=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb31-9" title="9"><span class="co">#</span></a>
-<a class="sourceLine" id="cb31-10" title="10"><span class="co"># Search on &quot;urin&quot;, exclude &quot;During&quot;, search surveys from 1999-2010, return table names only</span></a>
-<a class="sourceLine" id="cb31-11" title="11"><span class="kw">nhanesSearch</span>(<span class="st">&quot;urin&quot;</span>, <span class="dt">exclude_terms=</span><span class="st">&quot;during&quot;</span>, <span class="dt">ignore.case=</span><span class="ot">TRUE</span>, <span class="dt">ystop=</span><span class="dv">2010</span>, <span class="dt">namesonly=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb31-12" title="12"><span class="co">#</span></a>
-<a class="sourceLine" id="cb31-13" title="13"><span class="co"># Restrict search to &#39;EXAM&#39; and &#39;LAB&#39; data groups. Explicitly list matching and exclude terms, leave ignore.case set to default value of FALSE. Search surveys from 2009 to present.</span></a>
-<a class="sourceLine" id="cb31-14" title="14"><span class="kw">nhanesSearch</span>(<span class="kw">c</span>(<span class="st">&quot;urin&quot;</span>, <span class="st">&quot;Urin&quot;</span>), <span class="dt">exclude_terms=</span><span class="kw">c</span>(<span class="st">&quot;During&quot;</span>, <span class="st">&quot;eaten during&quot;</span>, <span class="st">&quot;do during&quot;</span>), <span class="dt">data_group=</span><span class="kw">c</span>(<span class="st">&#39;EXAM&#39;</span>, <span class="st">&#39;LAB&#39;</span>), <span class="dt">ystart=</span><span class="dv">2009</span>)</a>
-<a class="sourceLine" id="cb31-15" title="15"><span class="co">#</span></a>
-<a class="sourceLine" id="cb31-16" title="16"><span class="co"># Search on &quot;tooth&quot; or &quot;teeth&quot;, all years</span></a>
-<a class="sourceLine" id="cb31-17" title="17"><span class="kw">nhanesSearch</span>(<span class="kw">c</span>(<span class="st">&quot;tooth&quot;</span>, <span class="st">&quot;teeth&quot;</span>), <span class="dt">ignore.case=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb31-18" title="18"><span class="co">#</span></a>
-<a class="sourceLine" id="cb31-19" title="19"><span class="co"># Search for variables where the variable description begins with &quot;Tooth&quot;</span></a>
-<a class="sourceLine" id="cb31-20" title="20"><span class="kw">nhanesSearch</span>(<span class="st">&quot;^Tooth&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># nhanesSearch use examples</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Search on the word bladder, restrict to the 2001-2008 surveys, </span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co"># print out 50 characters of the variable description</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearch</span>(<span class="st">&quot;bladder&quot;</span>, <span class="at">ystart=</span><span class="dv">2001</span>, <span class="at">ystop=</span><span class="dv">2008</span>, <span class="at">nchar=</span><span class="dv">50</span>)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Search on &quot;urin&quot; (will match urine, urinary, etc), from 1999-2010, return table names only</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearch</span>(<span class="st">&quot;urin&quot;</span>, <span class="at">ignore.case=</span><span class="cn">TRUE</span>, <span class="at">ystop=</span><span class="dv">2010</span>, <span class="at">namesonly=</span><span class="cn">TRUE</span>)</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Search on &quot;urin&quot;, exclude &quot;During&quot;, search surveys from 1999-2010, return table names only</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearch</span>(<span class="st">&quot;urin&quot;</span>, <span class="at">exclude_terms=</span><span class="st">&quot;during&quot;</span>, <span class="at">ignore.case=</span><span class="cn">TRUE</span>, <span class="at">ystop=</span><span class="dv">2010</span>, <span class="at">namesonly=</span><span class="cn">TRUE</span>)</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Restrict search to &#39;EXAM&#39; and &#39;LAB&#39; data groups. Explicitly list matching and exclude terms, leave ignore.case set to default value of FALSE. Search surveys from 2009 to present.</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearch</span>(<span class="fu">c</span>(<span class="st">&quot;urin&quot;</span>, <span class="st">&quot;Urin&quot;</span>), <span class="at">exclude_terms=</span><span class="fu">c</span>(<span class="st">&quot;During&quot;</span>, <span class="st">&quot;eaten during&quot;</span>, <span class="st">&quot;do during&quot;</span>), <span class="at">data_group=</span><span class="fu">c</span>(<span class="st">&#39;EXAM&#39;</span>, <span class="st">&#39;LAB&#39;</span>), <span class="at">ystart=</span><span class="dv">2009</span>)</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Search on &quot;tooth&quot; or &quot;teeth&quot;, all years</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearch</span>(<span class="fu">c</span>(<span class="st">&quot;tooth&quot;</span>, <span class="st">&quot;teeth&quot;</span>), <span class="at">ignore.case=</span><span class="cn">TRUE</span>)</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Search for variables where the variable description begins with &quot;Tooth&quot;</span></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearch</span>(<span class="st">&quot;^Tooth&quot;</span>)</span></code></pre></div>
 </div>
 <div id="searching-for-tables-that-contain-a-specific-variable" class="section level3">
 <h3>Searching for tables that contain a specific variable</h3>
 <p>nhanesSearch is a versatile search function as it imports the comprehensive variable lists to a data frame. That allows for detailed conditional extraction of the variables. However, each call to nhanesSearch takes up to a minute or more to process. Faster processing can be achieved when we know the name of a specific variable of interest and we look only for exact matches to the variable name. Function nhanesSearchVarName matches a given variable name in the html directly, then only the matching elements are converted to a data frame. Consequently, a call to nhanesSearchVarName executes much faster than nhanesSearch; typically under 30s. nhanesSearchVarName is useful for finding all data tables that contain a given variable.</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" title="1"><span class="co">#nhanesSearchVarName use examples</span></a>
-<a class="sourceLine" id="cb32-2" title="2"></a>
-<a class="sourceLine" id="cb32-3" title="3"><span class="kw">nhanesSearchVarName</span>(<span class="st">&#39;BPXPULS&#39;</span>)</a></code></pre></div>
-<pre><code>## [1] &quot;BPX_D&quot; &quot;BPX_E&quot; &quot;BPX&quot;   &quot;BPX_C&quot; &quot;BPX_B&quot; &quot;BPX_F&quot; &quot;BPX_G&quot; &quot;BPX_H&quot; &quot;BPX_I&quot;</code></pre>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" title="1"><span class="kw">nhanesSearchVarName</span>(<span class="st">&#39;CSQ260i&#39;</span>, <span class="dt">includerdc=</span><span class="ot">TRUE</span>, <span class="dt">nchar=</span><span class="dv">38</span>, <span class="dt">namesonly=</span><span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#nhanesSearchVarName use examples</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearchVarName</span>(<span class="st">&#39;BPXPULS&#39;</span>)</span></code></pre></div>
+<pre><code>##  [1] &quot;BPX_D&quot; &quot;BPX_E&quot; &quot;BPX&quot;   &quot;BPX_C&quot; &quot;BPX_B&quot; &quot;BPX_F&quot; &quot;BPX_G&quot; &quot;BPX_H&quot; &quot;BPX_I&quot;
+## [10] &quot;BPX_J&quot;</code></pre>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearchVarName</span>(<span class="st">&#39;CSQ260i&#39;</span>, <span class="at">includerdc=</span><span class="cn">TRUE</span>, <span class="at">nchar=</span><span class="dv">38</span>, <span class="at">namesonly=</span><span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>##   Variable.Name                   Variable.Description Data.File.Name
 ## 1       CSQ260i Do you now have any of the following p        CSX_G_R
 ## 2       CSQ260i Do you now have any of the following p          CSX_H
@@ -501,48 +333,49 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div id="searching-for-tables-by-name-pattern" class="section level3">
 <h3>Searching for tables by name pattern</h3>
 <p>In order to group data across surveys, it is useful to list all available tables that follow a given naming pattern. Function nhanesSearchTableNames is used for such pattern matching. For example, if we want to work with all available body measures data we can retrieve the full list of available tables with nhanesSearchTableNames(‘BMX’). The search is conducted over the comprehensive table list, which is much smaller than the comprehensive variable list, such that a call to nhanesSearchTableNames takes only a few seconds.</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" title="1"><span class="co"># nhanesSearchTableNames use examples</span></a>
-<a class="sourceLine" id="cb36-2" title="2"><span class="kw">nhanesSearchTableNames</span>(<span class="st">&#39;BMX&#39;</span>)</a></code></pre></div>
-<pre><code>## [1] &quot;BMX_D&quot; &quot;BMX&quot;   &quot;BMX_E&quot; &quot;BMX_C&quot; &quot;BMX_B&quot; &quot;BMX_F&quot; &quot;BMX_H&quot; &quot;BMX_G&quot; &quot;BMX_I&quot;</code></pre>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" title="1"><span class="kw">nhanesSearchTableNames</span>(<span class="st">&#39;HPVS&#39;</span>, <span class="dt">includerdc=</span><span class="ot">TRUE</span>, <span class="dt">nchar=</span><span class="dv">42</span>, <span class="dt">details=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># nhanesSearchTableNames use examples</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearchTableNames</span>(<span class="st">&#39;BMX&#39;</span>)</span></code></pre></div>
+<pre><code>##  [1] &quot;BMX_D&quot; &quot;BMX&quot;   &quot;BMX_E&quot; &quot;BMX_C&quot; &quot;BMX_B&quot; &quot;BMX_F&quot; &quot;BMX_H&quot; &quot;BMX_G&quot; &quot;BMX_I&quot;
+## [10] &quot;BMX_J&quot;</code></pre>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearchTableNames</span>(<span class="st">&#39;HPVS&#39;</span>, <span class="at">includerdc=</span><span class="cn">TRUE</span>, <span class="at">nchar=</span><span class="dv">42</span>, <span class="at">details=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>##        Years                             Data.File.Name     Doc.File
-## 1  2005-2006 Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVSER_D Doc
-## 2  2009-2010 Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVSER_F Doc
-## 3  2005-2006 Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVS_D_R Doc
-## 4  2007-2008 Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVSER_E Doc
-## 5  2005-2006 Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVSER_D Doc
-## 6  2005-2006 Human Papillomavirus (HPV) - Multiplexed 6 HPVSRM_D Doc
-## 7  2005-2006 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_D Doc
-## 8  2007-2008 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_E Doc
-## 9  2009-2010 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_F Doc
-## 10 2009-2010 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_F_R Doc
-## 11 2011-2012 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_G_R Doc
-## 12 2011-2012 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_G Doc
-## 13 2005-2006 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_D Doc
-## 14 2013-2014 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_H Doc
-## 15 2013-2014 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_H_R Doc
-## 16 2015-2016 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWC_I Doc
-## 17 2015-2016 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_I Doc
-## 18 2015-2016 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_I_R Doc
+## 1  2009-2010 Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVSER_F Doc
+## 2  2005-2006 Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVS_D_R Doc
+## 3  2007-2008 Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVSER_E Doc
+## 4  2005-2006 Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVSER_D Doc
+## 5  2005-2006 Human Papillomavirus (HPV) - Multiplexed 6 HPVSRM_D Doc
+## 6  2005-2006 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_D Doc
+## 7  2007-2008 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_E Doc
+## 8  2009-2010 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_F Doc
+## 9  2011-2012 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_G Doc
+## 10 2005-2006 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_D Doc
+## 11 2009-2010 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_F_R Doc
+## 12 2011-2012 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_G_R Doc
+## 13 2013-2014 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_H Doc
+## 14 2013-2014 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_H_R Doc
+## 15 2015-2016 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWC_I Doc
+## 16 2015-2016 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_I Doc
+## 17 2015-2016 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_I_R Doc
+## 18 2017-2018 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_J_R Doc
 ##                         Data.File        Date.Published
-## 1  HPVSER_D Data [XPT - 151.6 KB]             July 2013
-## 2  HPVSER_F Data [XPT - 171.6 KB]         November 2013
-## 3                        RDC Only             July 2013
-## 4  HPVSER_E Data [XPT - 155.7 KB]         November 2013
-## 5  HPVSER_D Data [XPT - 151.6 KB]             July 2013
-## 6  HPVSRM_D Data [XPT - 302.6 KB]          January 2015
-## 7    HPVSWR_D Data [XPT - 662 KB]         November 2010
-## 8  HPVSWR_E Data [XPT - 677.9 KB]           August 2012
-## 9  HPVSWR_F Data [XPT - 725.2 KB]           August 2012
-## 10                       RDC Only           August 2012
-## 11                       RDC Only            March 2015
-## 12 HPVSWR_G Data [XPT - 661.1 KB]            March 2015
-## 13 HPVSWR_D Data [XPT - 694.4 KB] Updated November 2018
-## 14 HPVSWR_H Data [XPT - 716.6 KB]         December 2016
-## 15                       RDC Only         December 2016
-## 16  HPVSWC_I Data [XPT - 33.3 KB]         November 2018
-## 17 HPVSWR_I Data [XPT - 667.5 KB]         November 2018
-## 18                       RDC Only         November 2018</code></pre>
+## 1  HPVSER_F Data [XPT - 171.6 KB]         November 2013
+## 2                        RDC Only             July 2013
+## 3  HPVSER_E Data [XPT - 155.7 KB]         November 2013
+## 4  HPVSER_D Data [XPT - 151.6 KB]             July 2013
+## 5  HPVSRM_D Data [XPT - 302.6 KB]          January 2015
+## 6  HPVSWR_D Data [XPT - 694.4 KB]         November 2010
+## 7  HPVSWR_E Data [XPT - 677.9 KB]           August 2012
+## 8  HPVSWR_F Data [XPT - 725.2 KB]           August 2012
+## 9  HPVSWR_G Data [XPT - 661.1 KB]            March 2015
+## 10 HPVSWR_D Data [XPT - 694.4 KB] Updated November 2018
+## 11                       RDC Only           August 2012
+## 12                       RDC Only            March 2015
+## 13 HPVSWR_H Data [XPT - 716.6 KB]         December 2016
+## 14                       RDC Only         December 2016
+## 15  HPVSWC_I Data [XPT - 33.3 KB]         November 2018
+## 16 HPVSWR_I Data [XPT - 667.5 KB]         November 2018
+## 17                       RDC Only         November 2018
+## 18                       RDC Only         December 2020</code></pre>
 <div id="please-send-any-feedback-or-requests-to-cjendres1gmail.com.-hope-you-enjoy-your-experience-with-nhanesa" class="section level4">
 <h4>Please send any feedback or requests to <a href="mailto:cjendres1@gmail.com" class="email">cjendres1@gmail.com</a>. Hope you enjoy your experience with nhanesA!</h4>
 <p>Sincerely,<br />
@@ -551,6 +384,9 @@ Christopher J. Endres</p>
 </div>
 </div>
 
+
+
+<!-- code folding -->
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

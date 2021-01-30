@@ -56,6 +56,8 @@ nh_years['2017'] <- "2017-2018"
 nh_years['2018'] <- "2017-2018"
 nh_years['2019'] <- "2019-2020"
 nh_years['2020'] <- "2019-2020"
+nh_years['2021'] <- "2021-2022"
+nh_years['2022'] <- "2021-2022"
 
 # Continuous NHANES table names have a letter suffix that indicates the collection interval
 data_idx <- list()
@@ -73,6 +75,7 @@ data_idx["H"] <- '2013-2014'
 data_idx["I"] <- '2015-2016'
 data_idx["J"] <- '2017-2018'
 data_idx["K"] <- '2019-2020'
+data_idx["L"] <- '2021-2022'
 
 anomalytables2005 <- c('CHLMD_DR', 'SSUECD_R', 'HSV_DR')
 
@@ -441,6 +444,10 @@ nhanesAttr <- function(nh_table) {
 nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL, ignore.case=FALSE, 
                          ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=100, namesonly=FALSE) {
   
+  if(is.null(search_terms)) {
+    stop("Search term is missing")
+  }
+
 # Need to loop over url's
 
   df_initialized = FALSE
@@ -457,7 +464,7 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
     if(length(vnodes) > 0){
       if(!df_initialized) {
         df <- t(sapply(lapply(vnodes,xml_children),xml_text)) %>% as.data.frame(stringsAsFactors=FALSE)
-        df_intialized = TRUE
+        df_initialized = TRUE
       } else {
         dfadd <- t(sapply(lapply(vnodes,xml_children),xml_text)) %>% as.data.frame(stringsAsFactors=FALSE)
         df <- rbind(df, dfadd)
@@ -471,13 +478,18 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
   }
   names(df) <- vmcols
   
-  if(!is.null(search_terms)) {
-    idx <- grep(paste(search_terms,collapse="|"), df[['Variable.Description']], ignore.case=ignore.case, value=FALSE)
-    if(length(idx) > 0) {df <- df[idx,]}
-  }
-  
+  # Remove rdc tables if desired
   if(includerdc == FALSE){
     df <- df[(df$Use.Constraints != "RDC Only"),]
+  }
+
+  # 
+  if(!is.null(search_terms)) {
+    idx <- grep(paste(search_terms,collapse="|"), df[['Variable.Description']], ignore.case=ignore.case, value=FALSE)
+    if(length(idx) > 0) {df <- df[idx,]} else {
+      message("No matches found")
+      return(NULL)
+    }
   }
   
   if(!is.null(data_group)){ # Restrict search to specific data group(s) e.g. 'EXAM' or 'LAB'

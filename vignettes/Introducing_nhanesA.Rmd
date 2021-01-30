@@ -59,11 +59,12 @@ bmx_d  <- nhanes('BMX_D')
 demo_d <- nhanes('DEMO_D')
 ```
 
-We then merge the tables and compute average values by gender for several variables: 
+We merge the tables and display several variables: 
 ```{r bmx1}
 bmx_demo <- merge(demo_d, bmx_d)
 options(digits=4)
-aggregate(cbind(BMXHT, BMXWT, BMXLEG, BMXCALF, BMXTHICR) ~ RIAGENDR, bmx_demo,mean)
+select_cols <- c('RIAGENDR', 'BMXHT', 'BMXWT', 'BMXLEG', 'BMXCALF', 'BMXTHICR')
+print(bmx_demo[5:8,select_cols], row.names=FALSE)
 ```
 
 ### Translation of Coded Values
@@ -73,13 +74,15 @@ NHANES uses coded values for many fields. In the preceding example, gender is co
 nhanesTranslate('DEMO_D', 'RIAGENDR')
 ```
 
-If desired, we can use nhanesTranslate to apply the code translation to demo\_d directly by assigning data=demo\_d. 
+If desired, we can use nhanesTranslate to apply the code translation to demo\_d directly by assigning data=demo\_d.
 ```{r bmx2}
-levels(as.factor(demo_d$RIAGENDR))
 demo_d <- nhanesTranslate('DEMO_D', 'RIAGENDR', data=demo_d)
-levels(demo_d$RIAGENDR)
 bmx_demo <- merge(demo_d, bmx_d)
-aggregate(cbind(BMXHT, BMXWT, BMXLEG, BMXCALF, BMXTHICR)~RIAGENDR, bmx_demo, mean)
+```
+
+The RIAGENDR field is now recoded as Male, Female instead of 1,2.
+```{r bmx_final_result}
+print(bmx_demo[5:8,select_cols], row.names=FALSE)
 ```
 
 ### Apply All Possible Code Translations to a Table
