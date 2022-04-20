@@ -1,5 +1,5 @@
 #nhanesA - retrieve data from the CDC NHANES repository
-# Christopher J. Endres 10/13/2018
+# Christopher J. Endres 04/19/2022
 #
 nhanesURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/'
 dataURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx'
@@ -58,6 +58,8 @@ nh_years['2019'] <- "2019-2020"
 nh_years['2020'] <- "2019-2020"
 nh_years['2021'] <- "2021-2022"
 nh_years['2022'] <- "2021-2022"
+nh_years['2023'] <- "2023-2024"
+nh_years['2024'] <- "2023-2024"
 
 # Continuous NHANES table names have a letter suffix that indicates the collection interval
 data_idx <- list()
@@ -76,6 +78,7 @@ data_idx["I"] <- '2015-2016'
 data_idx["J"] <- '2017-2018'
 data_idx["K"] <- '2019-2020'
 data_idx["L"] <- '2021-2022'
+data_idx["M"] <- '2023-2024'
 
 anomalytables2005 <- c('CHLMD_DR', 'SSUECD_R', 'HSV_DR')
 
@@ -86,6 +89,7 @@ anomalytables2005 <- c('CHLMD_DR', 'SSUECD_R', 'HSV_DR')
 # If there is no suffix, then we are likely dealing with data from 1999-2000.
 .get_year_from_nh_table <- function(nh_table) {
   if(nh_table %in% anomalytables2005) {return('2005-2006')}
+  if(length(grep('^P_', nh_table))>0) {return('2017-2018')} # Pre-pandemic
   nhloc <- data.frame(stringr::str_locate_all(nh_table, '_'))
   nn <- nrow(nhloc)
   if(nn!=0){ #Underscores were found
@@ -131,8 +135,8 @@ xpath <- '//*[@id="GridView1"]'
 #' 
 #' Enables quick display of all available tables in the survey group.
 #' 
-#' @importFrom stringr str_replace str_c str_match str_to_title str_sub str_split
-#' @importFrom rvest xml_nodes html_table
+#' @importFrom stringr str_replace str_c str_match str_to_title str_sub str_split str_remove
+#' @importFrom rvest html_elements html_table
 #' @importFrom xml2 read_html
 #' @importFrom magrittr %>%
 #' @param data_group The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
@@ -159,14 +163,33 @@ nhanesTables <- function(data_group, year, nchar=100, details = FALSE, namesonly
     return(NULL)
   }
   
+  if(year == 'P') {
+    turl <- str_c(nhanesURL, 'search/datapage.aspx?Component=', 
+                  str_to_title(as.character(nhanes_group[data_group])), 
+                  '&CycleBeginYear=', '2017-2020', sep='')
+  } else {
   nh_year <- .get_nh_survey_years(year)
-  
   turl <- str_c(nhanesURL, 'search/variablelist.aspx?Component=', 
                 str_to_title(as.character(nhanes_group[data_group])), 
                 '&CycleBeginYear=', unlist(str_split(as.character(nh_year), '-'))[[1]] , sep='')
+  }
   # At this point df contains every table
-  df <- as.data.frame(turl %>% read_html() %>% xml_nodes(xpath=xpath) %>% html_table())
+  df <- as.data.frame(turl %>% read_html() %>% html_elements(xpath=xpath) %>% html_table())
   # By default we exclude RDC Only tables as those cannot be downloaded
+  
+  if(year=='P' | year=='p'){
+    if(details) {
+      df <- unique(df) 
+    } else {
+      df <- unique(df[,c('Doc.File', 'Data.File.Name')])
+    }
+    df$Doc.File <- str_remove(df$Doc.File, ' Doc')
+    if(namesonly == TRUE) {
+      return(as.character(df$Doc.File))
+    } else {
+      return(df)
+    }
+  }
   
   if(!(nhanes_group[data_group]=='NON-PUBLIC')){
     if(!includerdc) {
@@ -204,7 +227,7 @@ nhanesTables <- function(data_group, year, nchar=100, details = FALSE, namesonly
 #' Enables quick display of table variables and their definitions.
 #' 
 #' @importFrom stringr str_replace str_c str_sub str_split
-#' @importFrom rvest xml_nodes html_table
+#' @importFrom rvest html_elements html_table
 #' @importFrom xml2 read_html
 #' @importFrom magrittr %>%
 #' @param data_group The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
@@ -234,7 +257,7 @@ nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=100, na
   turl <- str_c(nhanesURL, 'search/variablelist.aspx?Component=', 
                 str_to_title(as.character(nhanes_group[data_group])), 
                 '&CycleBeginYear=', unlist(str_split(as.character(nh_year), '-'))[[1]] , sep='')
-  df <- as.data.frame(turl %>% read_html() %>% xml_nodes(xpath=xpath) %>% html_table())
+  df <- as.data.frame(turl %>% read_html() %>% html_elements(xpath=xpath) %>% html_table())
   
   if(!(nh_table %in% df$Data.File.Name)) {
     stop('Table ', nh_table, ' not present in the ', data_group, ' survey' )
@@ -455,12 +478,12 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
     vlhtml <- read_html(varURLs[i])
     
     xpathh <- '//*[@id="GridView1"]/thead/tr'
-    hnodes <- xml_nodes(vlhtml, xpath=xpathh)
+    hnodes <- html_elements(vlhtml, xpath=xpathh)
     vmcols <- sapply(xml_children(hnodes),xml_text)
     vmcols <- unlist(lapply(str_split(vmcols, " "), paste0, collapse='.'))
     
     xpathv <- '//*[@id="GridView1"]/tbody/tr'
-    vnodes <- xml_nodes(vlhtml, xpath=xpathv)
+    vnodes <- html_elements(vlhtml, xpath=xpathv)
     if(length(vnodes) > 0){
       if(!df_initialized) {
         df <- t(sapply(lapply(vnodes,xml_children),xml_text)) %>% as.data.frame(stringsAsFactors=FALSE)
@@ -584,7 +607,7 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
     warning("Multiple patterns entered. Only the first will be matched.")
   }
   
-  df <- data.frame(read_html(dataURL) %>% xml_nodes(xpath=xpath) %>% html_table())
+  df <- data.frame(read_html(dataURL) %>% html_elements(xpath=xpath) %>% html_table())
   df <- df[grep(paste(pattern,collapse="|"), df$Doc.File),]
   if(nrow(df)==0) {return(NULL)}
   if(!includerdc) {
@@ -636,7 +659,7 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
 #' Search for tables that contain a specified variable.
 #' 
 #' Returns a list of table names that contain the variable
-#' @importFrom rvest xml_nodes html_table
+#' @importFrom rvest html_elements html_table
 #' @importFrom xml2 xml_children xml_text read_html
 #' @importFrom magrittr %>%
 #' @param varname Name of variable to match.
@@ -665,7 +688,7 @@ nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerd
   df_initialized = FALSE
   
   for(i in 1:length(varURLs)) {
-    tabletree <- varURLs[i] %>% read_html() %>% xml_nodes(xpath=xpt)
+    tabletree <- varURLs[i] %>% read_html() %>% html_elements(xpath=xpt)
     ttlist <- lapply(lapply(tabletree, xml_children), xml_text)
     # Convert the list to a data frame
     
@@ -747,7 +770,7 @@ nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerd
 #' which appear in most NHANES tables.
 #' 
 #' @importFrom stringr str_c str_locate str_sub 
-#' @importFrom rvest xml_nodes html_table
+#' @importFrom rvest html_elements html_table
 #' @importFrom xml2 read_html
 #' @importFrom plyr mapvalues
 #' @param nh_table The name of the NHANES table to retrieve.
@@ -781,27 +804,27 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
   
   get_translation_table <- function(colname, url, details) {
     xpt <- str_c('//*[h3[a[@name="', colname, '"]]]', sep='')
-    tabletree <- url %>% read_html() %>% xml_nodes(xpath=xpt)
+    tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
     if(length(tabletree)==0) { # If not found then try 'id' instead of 'name'
       xpt <- str_c('//*[h3[@id="', colname, '"]]', sep='')
-      tabletree <- url %>% read_html() %>% xml_nodes(xpath=xpt)
+      tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
     }
     if(length(tabletree)>0) {
-      tabletrans <- as.data.frame(xml_nodes(tabletree, 'table') %>% html_table())
+      tabletrans <- as.data.frame(html_elements(tabletree, 'table') %>% html_table())
     } else { # Code table not found so let's see if last letter should be lowercase
       nc <- nchar(colname)
       if(length(grep("[[:upper:]]", stringr::str_sub(colname, start=nc, end=nc)))>0){
         lcnm <- colname
         stringr::str_sub(lcnm, start=nc, end=nc) <- tolower(stringr::str_sub(lcnm, start=nc, end=nc))
         xpt <- str_c('//*[h3[a[@name="', lcnm, '"]]]', sep='')
-        tabletree <- url %>% read_html() %>% xml_nodes(xpath=xpt)
+        tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
         if(length(tabletree)==0) { # If not found then try 'id' instead of 'name'
           xpt <- str_c('//*[h3[@id="', lcnm, '"]]', sep='')
-          tabletree <- url %>% read_html() %>% xml_nodes(xpath=xpt)
+          tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
         }
         
         if(length(tabletree)>0) {
-          tabletrans <- as.data.frame(xml_nodes(tabletree, 'table') %>% html_table())
+          tabletrans <- as.data.frame(html_elements(tabletree, 'table') %>% html_table())
         } else { # Still not found even after converting to lowercase
           warning(c('Column "', colname, '" not found'), collapse='')
           return(NULL)
