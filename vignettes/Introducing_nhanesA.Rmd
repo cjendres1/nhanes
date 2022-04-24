@@ -9,10 +9,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, echo = FALSE, message = FALSE}
-library(nhanesA)
-```
-
 ## Background
 nhanesA was developed to enable fully customizable retrieval of data from the National Health and Nutrition Examination Survey (NHANES). The survey is conducted by the National Center for Health Statistics (NCHS), and data are publicly available at: https://www.cdc.gov/nchs/nhanes.htm. NHANES data are reported in well over one thousand peer-reviewed journal publications every year. 
 
@@ -26,8 +22,7 @@ The five publicly available data categories are:
 - Dietary       (DIET)
 - Examination   (EXAM)
 - Laboratory    (LAB)
-- Questionnaire (Q)
-
+- Questionnaire (Q).
 The abbreviated forms in parentheses may be substituted for the long form in nhanesA commands.
 
 For limited access data, the available tables and variable names can be listed, but the data cannot be downloaded directly.
@@ -39,6 +34,7 @@ To quickly get familiar with NHANES data, it is helpful to display a listing of 
 Use nhanesTables to get information on tables that are available for a given category for a given year.
 
 ```{r nhanestables}
+library(nhanesA)
 nhanesTables('EXAM', 2005)
 ```
 
@@ -114,9 +110,9 @@ names(q2007tables) <- q2007names
 ```
 
 ## Special Cases
-Some NHANES measurements require special handling due to excessive
-statistical anomalies. There are additional surveys conducted that are
-beyond the scope of the continuous survey, but are provided in a similar
+Some NHANES measurements require special handling, e.g. due to statistical considerations. 
+Furthermore, there are surveys conducted
+outside the scope of the continuous survey, but that are provided in a similar
 format such that nhanesA can be readily adapted to retrieve their data. Note 
 that nhanesA cannot be used to handle accelerometer data from 2003-2006. For
 those data, please see packages nhanesaccel https://r-forge.r-project.org/R/?group_id=1733 and 
@@ -124,11 +120,13 @@ accelerometry https://cran.r-project.org/package=accelerometry.
 
 ### Pre-pandemic data
 Due to COVID, data collection for the 2019-2020 cycle was not completed. In order to make 
-better use of data that was collected, data from the 2017-2018 survey were included to form a 
+better use of data that were collected, data from the 2017-2018 survey were included to form a 
 representative sample of 2017-March 2020 pre-pandemic data. The table structure and variable format of pre-pandemic tables is essentially identical to standard continuous NHANES. The table names include the prefix "P_". To list pre-pandemic tables, use 'P' or 'p' as the year.
 
 ```{r prepan, eval=FALSE}
-#List pre-pandemic tables
+#List all pre-pandemic tables
+nhanesSearchTableNames('^P_')
+#List pre-pandemic EXAM tables
 nhanesTables('EXAM', 'P')
 #Table import and variable translation operate as usual
 p_dxxfem <- nhanes('P_DXXFEM')
@@ -158,7 +156,7 @@ measurements. There are no LAB tables. NNYFS table names include the prefix "Y_"
 To list tables, use 'Y' or 'y' as the year.
 
 ```{r nnyfs, eval=FALSE}
-#List NNYFS tables
+#List NNYFS EXAM tables
 nhanesTables('EXAM', 'Y')
 #Table import and variable translation operate as usual
 y_cvx <- nhanes('Y_CVX')
