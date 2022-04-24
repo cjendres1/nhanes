@@ -9,6 +9,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r, echo = FALSE, message = FALSE}
+library(nhanesA)
+```
+
 ## Background
 nhanesA was developed to enable fully customizable retrieval of data from the National Health and Nutrition Examination Survey (NHANES). The survey is conducted by the National Center for Health Statistics (NCHS), and data are publicly available at: https://www.cdc.gov/nchs/nhanes.htm. NHANES data are reported in well over one thousand peer-reviewed journal publications every year. 
 
@@ -35,7 +39,6 @@ To quickly get familiar with NHANES data, it is helpful to display a listing of 
 Use nhanesTables to get information on tables that are available for a given category for a given year.
 
 ```{r nhanestables}
-library(nhanesA)
 nhanesTables('EXAM', 2005)
 ```
 
@@ -67,7 +70,7 @@ select_cols <- c('RIAGENDR', 'BMXHT', 'BMXWT', 'BMXLEG', 'BMXCALF', 'BMXTHICR')
 print(bmx_demo[5:8,select_cols], row.names=FALSE)
 ```
 
-### Translation of Coded Values
+### Translate Coded Values
 
 NHANES uses coded values for many fields. In the preceding example, gender is coded as 1 or 2. To determine what the values mean, we can list the code translations for the gender field RIAGENDR in table DEMO_D
 ```{r nhanestranslate}
@@ -101,7 +104,7 @@ head(bpx_d[,6:11])
 ```
 Some discretion should be applied when translating coded columns as code translations can be quite long. To improve readability the translation string is restricted to a default length of 32 but can be set as high as 128. Also, columns that have at least two categories (e.g. Male, Female) will be translated, but mincategories can be set to 1 to perform the translation even if only a single category is present.
 
-### Downloading a Complete Survey
+### Download a Complete Survey
 The primary goal of nhanesA is to enable fully customizable processing of select NHANES tables. However, it is quite easy to download entire surveys using nhanesA functions.
 Say we want to download every questionnaire in the 2007-2008 survey.  We first get a list of the table names by using nhanesTables with namesonly = TRUE. The tables can then be downloaded using nhanes with lapply.
 ```{r nhaneslapplytables, eval=FALSE}
@@ -110,8 +113,30 @@ q2007tables <- lapply(q2007names, nhanes)
 names(q2007tables) <- q2007names
 ```
 
-### Import Dual X-Ray Absorptiometry Data
-Dual X-Ray Absorptiometry (DXA) data were acquired from 1999-2006. More information may be found at https://wwwn.cdc.gov/nchs/nhanes/dxa/dxa.aspx. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. When nhanesTranslate is applied to DXA data, only the 2005-2006 translation tables are used as those are the only DXA codes that are currently available in html format.
+## Special Cases
+Some NHANES measurements require special handling due to excessive
+statistical anomalies. There are additional surveys conducted that are
+beyond the scope of the continuous survey, but are provided in a similar
+format such that nhanesA can be readily adapted to retrieve their data. Note 
+that nhanesA cannot be used to handle accelerometer data from 2003-2006. For
+those data, please see packages nhanesaccel https://r-forge.r-project.org/R/?group_id=1733 and 
+accelerometry https://cran.r-project.org/package=accelerometry.
+
+### Pre-pandemic data
+Due to COVID, data collection for the 2019-2020 cycle was not completed. In order to make 
+better use of data that was collected, data from the 2017-2018 survey were included to form a 
+representative sample of 2017-March 2020 pre-pandemic data. The table structure and variable format of pre-pandemic tables is essentially identical to standard continuous NHANES. The table names include the prefix "P_". To list pre-pandemic tables, use 'P' or 'p' as the year.
+
+```{r prepan, eval=FALSE}
+#List pre-pandemic tables
+nhanesTables('EXAM', 'P')
+#Table import and variable translation operate as usual
+p_dxxfem <- nhanes('P_DXXFEM')
+nhanesTranslate('P_BMX', 'BMDSTATS')
+```
+
+### Dual Energy X-Ray Absorptiometry
+Dual Energy X-Ray Absorptiometry (DXA) data were acquired from 1999-2006. These data were found to contain a higher amount of missing values than usual, and a multiple imputation process was applied to fill in missing and invalid values. More information may be found at https://wwwn.cdc.gov/nchs/nhanes/dxa/dxa.aspx. By default the DXA data are imported into the R environment, however, because the tables are quite large it may be desirable to save the data to a local file then import to R as needed. When nhanesTranslate is applied to DXA data, only the 2005-2006 translation tables are used as those are the only DXA codes that are currently available in html format.
 
 ```{r nhanesdxa, eval=FALSE}
 #Import into R
@@ -125,10 +150,27 @@ dxalist <- c('DXAEXSTS', 'DXITOT', 'DXIHE')
 dxx_b <- nhanesTranslate(colnames=dxalist, data=dxx_b, dxa=TRUE)
 ```
 
-If you are interested in working with accelerometer data from 2003-2006 then please see packages nhanesaccel https://r-forge.r-project.org/R/?group_id=1733 and accelerometry https://cran.r-project.org/package=accelerometry.
+
+### NHANES National Youth Fitness Survey (NNYFS)
+NNYFS is a 2012 ancillary study conducted to assess physical activity and fitness levels
+of children and teens from ages 3-15. This study consists of questionnaires and basic
+measurements. There are no LAB tables. NNYFS table names include the prefix "Y_". 
+To list tables, use 'Y' or 'y' as the year.
+
+```{r nnyfs, eval=FALSE}
+#List NNYFS tables
+nhanesTables('EXAM', 'Y')
+#Table import and variable translation operate as usual
+y_cvx <- nhanes('Y_CVX')
+nhanesTranslate('Y_CVX','CVXPARC')
+```
+
+## Searching for tables and variables
+The NHANES repository is extensive, thus it is helpful to perform a targeted search to identify relevant tables and variables. There are several nhanesA functions that allow the user to
+search using different criteria including the variable description, variable name, and table name pattern.
 
 ### Searching across the comprehensive list of NHANES variables
-The NHANES repository is extensive, thus it is helpful to perform a targeted search to identify relevant tables and variables. Comprehensive lists of NHANES variables are maintained for each data group. For example, the demographics variables are available at https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Demographics.
+ Comprehensive lists of NHANES variables are maintained for each data group. For example, the demographics variables are available at https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Demographics.
 The nhanesSearch function allows the investigator to input search terms, match against the comprehensive variable descriptions, and retrieve the list of matching variables. Matching search terms (variable descriptions must contain one of the terms) and exclusive search terms (variable descriptions must NOT contain any exclusive terms) may be provided.  The search can be restricted to a specific survey range as well as specific data groups.
 ```{r nhanessearch, eval=FALSE}
 # nhanesSearch use examples

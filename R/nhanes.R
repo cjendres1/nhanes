@@ -90,6 +90,7 @@ anomalytables2005 <- c('CHLMD_DR', 'SSUECD_R', 'HSV_DR')
 .get_year_from_nh_table <- function(nh_table) {
   if(nh_table %in% anomalytables2005) {return('2005-2006')}
   if(length(grep('^P_', nh_table))>0) {return('2017-2018')} # Pre-pandemic
+  if(length(grep('^Y_', nh_table))>0) {return('Nnyfs')} # Youth survey 
   nhloc <- data.frame(stringr::str_locate_all(nh_table, '_'))
   nn <- nrow(nhloc)
   if(nn!=0){ #Underscores were found
@@ -135,7 +136,7 @@ xpath <- '//*[@id="GridView1"]'
 #' 
 #' Enables quick display of all available tables in the survey group.
 #' 
-#' @importFrom stringr str_replace str_c str_match str_to_title str_sub str_split str_remove
+#' @importFrom stringr str_replace str_c str_match str_to_title str_sub str_split str_remove str_detect
 #' @importFrom rvest html_elements html_table
 #' @importFrom xml2 read_html
 #' @importFrom magrittr %>%
@@ -154,6 +155,8 @@ xpath <- '//*[@id="GridView1"]'
 #' nhanesTables('EXAM', 2007)
 #' \donttest{nhanesTables('LAB', 2009, details=TRUE, includerdc=TRUE)}
 #' \donttest{nhanesTables('Q', 2005, namesonly=TRUE)}
+#' \donttest{nhanesTables('DIET', 'P')}
+#' \donttest{nhanesTables('EXAM', 'Y')}
 #' @export
 #'
 
@@ -163,10 +166,14 @@ nhanesTables <- function(data_group, year, nchar=100, details = FALSE, namesonly
     return(NULL)
   }
   
-  if(year == 'P') {
+  if(year == 'P' | year == 'p') {
     turl <- str_c(nhanesURL, 'search/datapage.aspx?Component=', 
                   str_to_title(as.character(nhanes_group[data_group])), 
                   '&CycleBeginYear=', '2017-2020', sep='')
+  } else if(year == 'Y' | year == 'y') {
+    turl <- str_c(nhanesURL, 'search/NnyfsData.aspx?Component=', 
+                  str_to_title(as.character(nhanes_group[data_group])), 
+                  '&CycleBeginYear=', '2012', sep='')
   } else {
   nh_year <- .get_nh_survey_years(year)
   turl <- str_c(nhanesURL, 'search/variablelist.aspx?Component=', 
@@ -177,16 +184,27 @@ nhanesTables <- function(data_group, year, nchar=100, details = FALSE, namesonly
   df <- as.data.frame(turl %>% read_html() %>% html_elements(xpath=xpath) %>% html_table())
   # By default we exclude RDC Only tables as those cannot be downloaded
   
-  if(year=='P' | year=='p'){
+  if(year %in% c('P', 'p', 'Y', 'y')) {
+    if(nrow(df)==0) {
+      message("No tables found")
+      return(NULL)
+    }
+    if(year %in% c('P','p')) {
+      df <- df[str_detect(df$Data.File,'^P_'),]
+    }
     if(details) {
       df <- unique(df) 
     } else {
       df <- unique(df[,c('Doc.File', 'Data.File.Name')])
     }
-    df$Doc.File <- str_remove(df$Doc.File, ' Doc')
+#    if(!includerdc) {
+#      df <- df[(df$Data.File != "RDC Only"),]
+#    }
     if(namesonly == TRUE) {
+      df$Doc.File <- str_remove(df$Doc.File, ' Doc')
       return(as.character(df$Doc.File))
     } else {
+      row.names(df) <- NULL
       return(df)
     }
   }
@@ -301,7 +319,12 @@ nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=100, na
 nhanes <- function(nh_table) {
   nht <- tryCatch({    
     nh_year <- .get_year_from_nh_table(nh_table)
-    url <- str_c(nhanesURL, nh_year, '/', nh_table, '.XPT', collapse='')
+    
+    if(length(grep('^Y_', nh_table))>0) {
+      url <- str_c('https://wwwn.cdc.gov/Nchs/', nh_year, '/', nh_table, '.XPT', collapse='')
+    } else {
+      url <- str_c(nhanesURL, nh_year, '/', nh_table, '.XPT', collapse='')
+    }
     
     tf <- tempfile()
     download.file(url, tf, mode = "wb", quiet = TRUE)
@@ -852,8 +875,12 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
     nh_year <- .get_year_from_nh_table(nh_table)
     if(is.null(nh_year)) {
       return(NULL)
-    }  
+    }
+    if(nh_year == "Nnyfs"){
+      code_translation_url <- str_c("https://wwwn.cdc.gov/Nchs/", nh_year, '/', nh_table, '.htm', sep='')
+    } else {
     code_translation_url <- str_c(nhanesURL, nh_year, '/', nh_table, '.htm', sep='')
+    }
   }
   translations <- lapply(colnames, get_translation_table, code_translation_url, details)
   names(translations) <- colnames

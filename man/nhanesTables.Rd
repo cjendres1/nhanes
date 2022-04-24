@@ -42,4 +42,6 @@ is a convenient way to browse the available NHANES tables.
 nhanesTables('EXAM', 2007)
 \donttest{nhanesTables('LAB', 2009, details=TRUE, includerdc=TRUE)}
 \donttest{nhanesTables('Q', 2005, namesonly=TRUE)}
+\donttest{nhanesTables('DIET', 'P')}
+\donttest{nhanesTables('EXAM', 'Y')}
 }
