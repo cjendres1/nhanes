@@ -12,7 +12,7 @@
 
 <meta name="author" content="Christopher J. Endres" />
 
-<meta name="date" content="2022-04-19" />
+<meta name="date" content="2022-04-26" />
 
 <title>Introducing nhanesA</title>
 
@@ -334,7 +334,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Introducing nhanesA</h1>
 <h4 class="author">Christopher J. Endres</h4>
-<h4 class="date">2022-04-19</h4>
+<h4 class="date">2022-04-26</h4>
 
 
 
@@ -363,9 +363,8 @@ information pertaining to the limited access data can also be
 retrieved.</p>
 <p>The five publicly available data categories are: - Demographics
 (DEMO) - Dietary (DIET) - Examination (EXAM) - Laboratory (LAB) -
-Questionnaire (Q)</p>
-<p>The abbreviated forms in parentheses may be substituted for the long
-form in nhanesA commands.</p>
+Questionnaire (Q). The abbreviated forms in parentheses may be
+substituted for the long form in nhanesA commands.</p>
 <p>For limited access data, the available tables and variable names can
 be listed, but the data cannot be downloaded directly. To indicate
 limited access data in nhanesA functions, use: - Limited (LTD)</p>
@@ -453,8 +452,8 @@ information across tables.</p>
 ##         2 163.7  45.0   39.2    31.7     41.3
 ##         1 182.4 101.9   41.5    42.6     50.5</code></pre>
 </div>
-<div id="translation-of-coded-values" class="section level3">
-<h3>Translation of Coded Values</h3>
+<div id="translate-coded-values" class="section level3">
+<h3>Translate Coded Values</h3>
 <p>NHANES uses coded values for many fields. In the preceding example,
 gender is coded as 1 or 2. To determine what the values mean, we can
 list the code translations for the gender field RIAGENDR in table
@@ -514,8 +513,8 @@ set as high as 128. Also, columns that have at least two categories
 1 to perform the translation even if only a single category is
 present.</p>
 </div>
-<div id="downloading-a-complete-survey" class="section level3">
-<h3>Downloading a Complete Survey</h3>
+<div id="download-a-complete-survey" class="section level3">
+<h3>Download a Complete Survey</h3>
 <p>The primary goal of nhanesA is to enable fully customizable
 processing of select NHANES tables. However, it is quite easy to
 download entire surveys using nhanesA functions. Say we want to download
@@ -526,35 +525,80 @@ then be downloaded using nhanes with lapply.</p>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>q2007tables <span class="ot">&lt;-</span> <span class="fu">lapply</span>(q2007names, nhanes)</span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(q2007tables) <span class="ot">&lt;-</span> q2007names</span></code></pre></div>
 </div>
-<div id="import-dual-x-ray-absorptiometry-data" class="section level3">
-<h3>Import Dual X-Ray Absorptiometry Data</h3>
-<p>Dual X-Ray Absorptiometry (DXA) data were acquired from 1999-2006.
-More information may be found at <a href="https://wwwn.cdc.gov/nchs/nhanes/dxa/dxa.aspx" class="uri">https://wwwn.cdc.gov/nchs/nhanes/dxa/dxa.aspx</a>. By
+</div>
+<div id="special-cases" class="section level2">
+<h2>Special Cases</h2>
+<p>Some NHANES measurements require special handling, e.g. due to
+statistical considerations. Furthermore, there are surveys conducted
+outside the scope of the continuous survey, but that are provided in a
+similar format such that nhanesA can be readily adapted to retrieve
+their data. Note that nhanesA cannot be used to handle accelerometer
+data from 2003-2006. For those data, please see packages nhanesaccel <a href="https://r-forge.r-project.org/R/?group_id=1733" class="uri">https://r-forge.r-project.org/R/?group_id=1733</a> and
+accelerometry <a href="https://cran.r-project.org/package=accelerometry" class="uri">https://cran.r-project.org/package=accelerometry</a>.</p>
+<div id="pre-pandemic-data" class="section level3">
+<h3>Pre-pandemic data</h3>
+<p>Due to COVID, data collection for the 2019-2020 cycle was not
+completed. In order to make better use of data that were collected, data
+from the 2017-2018 survey were included to form a representative sample
+of 2017-March 2020 pre-pandemic data. The table structure and variable
+format of pre-pandemic tables is essentially identical to standard
+continuous NHANES. The table names include the prefix “P_”. To list
+pre-pandemic tables, use ‘P’ or ‘p’ as the year.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#List all pre-pandemic tables</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearchTableNames</span>(<span class="st">&#39;^P_&#39;</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="co">#List pre-pandemic EXAM tables</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesTables</span>(<span class="st">&#39;EXAM&#39;</span>, <span class="st">&#39;P&#39;</span>)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Table import and variable translation operate as usual</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>p_dxxfem <span class="ot">&lt;-</span> <span class="fu">nhanes</span>(<span class="st">&#39;P_DXXFEM&#39;</span>)</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesTranslate</span>(<span class="st">&#39;P_BMX&#39;</span>, <span class="st">&#39;BMDSTATS&#39;</span>)</span></code></pre></div>
+</div>
+<div id="dual-energy-x-ray-absorptiometry" class="section level3">
+<h3>Dual Energy X-Ray Absorptiometry</h3>
+<p>Dual Energy X-Ray Absorptiometry (DXA) data were acquired from
+1999-2006. These data were found to contain a higher amount of missing
+values than usual, and a multiple imputation process was applied to fill
+in missing and invalid values. More information may be found at <a href="https://wwwn.cdc.gov/nchs/nhanes/dxa/dxa.aspx" class="uri">https://wwwn.cdc.gov/nchs/nhanes/dxa/dxa.aspx</a>. By
 default the DXA data are imported into the R environment, however,
 because the tables are quite large it may be desirable to save the data
 to a local file then import to R as needed. When nhanesTranslate is
 applied to DXA data, only the 2005-2006 translation tables are used as
 those are the only DXA codes that are currently available in html
 format.</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Import into R</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>dxx_b <span class="ot">&lt;-</span> <span class="fu">nhanesDXA</span>(<span class="dv">2001</span>)</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Save to file</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesDXA</span>(<span class="dv">2001</span>, <span class="at">destfile=</span><span class="st">&quot;dxx_b.xpt&quot;</span>)</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Import supplemental data</span></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>dxx_c_s <span class="ot">&lt;-</span> <span class="fu">nhanesDXA</span>(<span class="dv">2003</span>, <span class="at">suppl=</span><span class="cn">TRUE</span>)</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Apply code translations</span></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>dxalist <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;DXAEXSTS&#39;</span>, <span class="st">&#39;DXITOT&#39;</span>, <span class="st">&#39;DXIHE&#39;</span>)</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>dxx_b <span class="ot">&lt;-</span> <span class="fu">nhanesTranslate</span>(<span class="at">colnames=</span>dxalist, <span class="at">data=</span>dxx_b, <span class="at">dxa=</span><span class="cn">TRUE</span>)</span></code></pre></div>
-<p>If you are interested in working with accelerometer data from
-2003-2006 then please see packages nhanesaccel <a href="https://r-forge.r-project.org/R/?group_id=1733" class="uri">https://r-forge.r-project.org/R/?group_id=1733</a> and
-accelerometry <a href="https://cran.r-project.org/package=accelerometry" class="uri">https://cran.r-project.org/package=accelerometry</a>.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Import into R</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>dxx_b <span class="ot">&lt;-</span> <span class="fu">nhanesDXA</span>(<span class="dv">2001</span>)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Save to file</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesDXA</span>(<span class="dv">2001</span>, <span class="at">destfile=</span><span class="st">&quot;dxx_b.xpt&quot;</span>)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Import supplemental data</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>dxx_c_s <span class="ot">&lt;-</span> <span class="fu">nhanesDXA</span>(<span class="dv">2003</span>, <span class="at">suppl=</span><span class="cn">TRUE</span>)</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Apply code translations</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>dxalist <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;DXAEXSTS&#39;</span>, <span class="st">&#39;DXITOT&#39;</span>, <span class="st">&#39;DXIHE&#39;</span>)</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>dxx_b <span class="ot">&lt;-</span> <span class="fu">nhanesTranslate</span>(<span class="at">colnames=</span>dxalist, <span class="at">data=</span>dxx_b, <span class="at">dxa=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
+<div id="nhanes-national-youth-fitness-survey-nnyfs" class="section level3">
+<h3>NHANES National Youth Fitness Survey (NNYFS)</h3>
+<p>NNYFS is a 2012 ancillary study conducted to assess physical activity
+and fitness levels of children and teens from ages 3-15. This study
+consists of questionnaires and basic measurements. There are no LAB
+tables. NNYFS table names include the prefix “Y_”. To list tables, use
+‘Y’ or ‘y’ as the year.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#List NNYFS EXAM tables</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesTables</span>(<span class="st">&#39;EXAM&#39;</span>, <span class="st">&#39;Y&#39;</span>)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Table import and variable translation operate as usual</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>y_cvx <span class="ot">&lt;-</span> <span class="fu">nhanes</span>(<span class="st">&#39;Y_CVX&#39;</span>)</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesTranslate</span>(<span class="st">&#39;Y_CVX&#39;</span>,<span class="st">&#39;CVXPARC&#39;</span>)</span></code></pre></div>
+</div>
+</div>
+<div id="searching-for-tables-and-variables" class="section level2">
+<h2>Searching for tables and variables</h2>
+<p>The NHANES repository is extensive, thus it is helpful to perform a
+targeted search to identify relevant tables and variables. There are
+several nhanesA functions that allow the user to search using different
+criteria including the variable description, variable name, and table
+name pattern.</p>
 <div id="searching-across-the-comprehensive-list-of-nhanes-variables" class="section level3">
 <h3>Searching across the comprehensive list of NHANES variables</h3>
-<p>The NHANES repository is extensive, thus it is helpful to perform a
-targeted search to identify relevant tables and variables. Comprehensive
-lists of NHANES variables are maintained for each data group. For
-example, the demographics variables are available at <a href="https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Demographics" class="uri">https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Demographics</a>.
+<p>Comprehensive lists of NHANES variables are maintained for each data
+group. For example, the demographics variables are available at <a href="https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Demographics" class="uri">https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Demographics</a>.
 The nhanesSearch function allows the investigator to input search terms,
 match against the comprehensive variable descriptions, and retrieve the
 list of matching variables. Matching search terms (variable descriptions
@@ -562,26 +606,26 @@ must contain one of the terms) and exclusive search terms (variable
 descriptions must NOT contain any exclusive terms) may be provided. The
 search can be restricted to a specific survey range as well as specific
 data groups.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># nhanesSearch use examples</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Search on the word bladder, restrict to the 2001-2008 surveys, </span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co"># print out 50 characters of the variable description</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearch</span>(<span class="st">&quot;bladder&quot;</span>, <span class="at">ystart=</span><span class="dv">2001</span>, <span class="at">ystop=</span><span class="dv">2008</span>, <span class="at">nchar=</span><span class="dv">50</span>)</span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Search on &quot;urin&quot; (will match urine, urinary, etc), from 1999-2010, return table names only</span></span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearch</span>(<span class="st">&quot;urin&quot;</span>, <span class="at">ignore.case=</span><span class="cn">TRUE</span>, <span class="at">ystop=</span><span class="dv">2010</span>, <span class="at">namesonly=</span><span class="cn">TRUE</span>)</span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Search on &quot;urin&quot;, exclude &quot;During&quot;, search surveys from 1999-2010, return table names only</span></span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearch</span>(<span class="st">&quot;urin&quot;</span>, <span class="at">exclude_terms=</span><span class="st">&quot;during&quot;</span>, <span class="at">ignore.case=</span><span class="cn">TRUE</span>, <span class="at">ystop=</span><span class="dv">2010</span>, <span class="at">namesonly=</span><span class="cn">TRUE</span>)</span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Restrict search to &#39;EXAM&#39; and &#39;LAB&#39; data groups. Explicitly list matching and exclude terms, leave ignore.case set to default value of FALSE. Search surveys from 2009 to present.</span></span>
-<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearch</span>(<span class="fu">c</span>(<span class="st">&quot;urin&quot;</span>, <span class="st">&quot;Urin&quot;</span>), <span class="at">exclude_terms=</span><span class="fu">c</span>(<span class="st">&quot;During&quot;</span>, <span class="st">&quot;eaten during&quot;</span>, <span class="st">&quot;do during&quot;</span>), <span class="at">data_group=</span><span class="fu">c</span>(<span class="st">&#39;EXAM&#39;</span>, <span class="st">&#39;LAB&#39;</span>), <span class="at">ystart=</span><span class="dv">2009</span>)</span>
-<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Search on &quot;tooth&quot; or &quot;teeth&quot;, all years</span></span>
-<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearch</span>(<span class="fu">c</span>(<span class="st">&quot;tooth&quot;</span>, <span class="st">&quot;teeth&quot;</span>), <span class="at">ignore.case=</span><span class="cn">TRUE</span>)</span>
-<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Search for variables where the variable description begins with &quot;Tooth&quot;</span></span>
-<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearch</span>(<span class="st">&quot;^Tooth&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># nhanesSearch use examples</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Search on the word bladder, restrict to the 2001-2008 surveys, </span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="co"># print out 50 characters of the variable description</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearch</span>(<span class="st">&quot;bladder&quot;</span>, <span class="at">ystart=</span><span class="dv">2001</span>, <span class="at">ystop=</span><span class="dv">2008</span>, <span class="at">nchar=</span><span class="dv">50</span>)</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Search on &quot;urin&quot; (will match urine, urinary, etc), from 1999-2010, return table names only</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearch</span>(<span class="st">&quot;urin&quot;</span>, <span class="at">ignore.case=</span><span class="cn">TRUE</span>, <span class="at">ystop=</span><span class="dv">2010</span>, <span class="at">namesonly=</span><span class="cn">TRUE</span>)</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Search on &quot;urin&quot;, exclude &quot;During&quot;, search surveys from 1999-2010, return table names only</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearch</span>(<span class="st">&quot;urin&quot;</span>, <span class="at">exclude_terms=</span><span class="st">&quot;during&quot;</span>, <span class="at">ignore.case=</span><span class="cn">TRUE</span>, <span class="at">ystop=</span><span class="dv">2010</span>, <span class="at">namesonly=</span><span class="cn">TRUE</span>)</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Restrict search to &#39;EXAM&#39; and &#39;LAB&#39; data groups. Explicitly list matching and exclude terms, leave ignore.case set to default value of FALSE. Search surveys from 2009 to present.</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearch</span>(<span class="fu">c</span>(<span class="st">&quot;urin&quot;</span>, <span class="st">&quot;Urin&quot;</span>), <span class="at">exclude_terms=</span><span class="fu">c</span>(<span class="st">&quot;During&quot;</span>, <span class="st">&quot;eaten during&quot;</span>, <span class="st">&quot;do during&quot;</span>), <span class="at">data_group=</span><span class="fu">c</span>(<span class="st">&#39;EXAM&#39;</span>, <span class="st">&#39;LAB&#39;</span>), <span class="at">ystart=</span><span class="dv">2009</span>)</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Search on &quot;tooth&quot; or &quot;teeth&quot;, all years</span></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearch</span>(<span class="fu">c</span>(<span class="st">&quot;tooth&quot;</span>, <span class="st">&quot;teeth&quot;</span>), <span class="at">ignore.case=</span><span class="cn">TRUE</span>)</span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Search for variables where the variable description begins with &quot;Tooth&quot;</span></span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearch</span>(<span class="st">&quot;^Tooth&quot;</span>)</span></code></pre></div>
 </div>
 <div id="searching-for-tables-that-contain-a-specific-variable" class="section level3">
 <h3>Searching for tables that contain a specific variable</h3>
@@ -596,12 +640,12 @@ then only the matching elements are converted to a data frame.
 Consequently, a call to nhanesSearchVarName executes much faster than
 nhanesSearch; typically under 30s. nhanesSearchVarName is useful for
 finding all data tables that contain a given variable.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#nhanesSearchVarName use examples</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearchVarName</span>(<span class="st">&#39;BPXPULS&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co">#nhanesSearchVarName use examples</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearchVarName</span>(<span class="st">&#39;BPXPULS&#39;</span>)</span></code></pre></div>
 <pre><code>##  [1] &quot;BPX_D&quot; &quot;BPX_E&quot; &quot;BPX&quot;   &quot;BPX_C&quot; &quot;BPX_B&quot; &quot;BPX_F&quot; &quot;BPX_G&quot; &quot;BPX_H&quot; &quot;BPX_I&quot;
 ## [10] &quot;BPX_J&quot;</code></pre>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearchVarName</span>(<span class="st">&#39;CSQ260i&#39;</span>, <span class="at">includerdc=</span><span class="cn">TRUE</span>, <span class="at">nchar=</span><span class="dv">38</span>, <span class="at">namesonly=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearchVarName</span>(<span class="st">&#39;CSQ260i&#39;</span>, <span class="at">includerdc=</span><span class="cn">TRUE</span>, <span class="at">nchar=</span><span class="dv">38</span>, <span class="at">namesonly=</span><span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>##   Variable.Name                   Variable.Description Data.File.Name
 ## 1       CSQ260i Do you now have any of the following p        CSX_G_R
 ## 2       CSQ260i Do you now have any of the following p          CSX_H
@@ -619,11 +663,11 @@ the full list of available tables with nhanesSearchTableNames(‘BMX’).
 The search is conducted over the comprehensive table list, which is much
 smaller than the comprehensive variable list, such that a call to
 nhanesSearchTableNames takes only a few seconds.</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># nhanesSearchTableNames use examples</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearchTableNames</span>(<span class="st">&#39;BMX&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># nhanesSearchTableNames use examples</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearchTableNames</span>(<span class="st">&#39;BMX&#39;</span>)</span></code></pre></div>
 <pre><code>##  [1] &quot;BMX_D&quot; &quot;BMX&quot;   &quot;BMX_E&quot; &quot;BMX_C&quot; &quot;BMX_B&quot; &quot;BMX_F&quot; &quot;BMX_H&quot; &quot;BMX_G&quot; &quot;BMX_I&quot;
 ## [10] &quot;BMX_J&quot; &quot;P_BMX&quot;</code></pre>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearchTableNames</span>(<span class="st">&#39;HPVS&#39;</span>, <span class="at">includerdc=</span><span class="cn">TRUE</span>, <span class="at">nchar=</span><span class="dv">42</span>, <span class="at">details=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesSearchTableNames</span>(<span class="st">&#39;HPVS&#39;</span>, <span class="at">includerdc=</span><span class="cn">TRUE</span>, <span class="at">nchar=</span><span class="dv">42</span>, <span class="at">details=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>##        Years                             Data.File.Name     Doc.File
 ## 1  2009-2010 Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVSER_F Doc
 ## 2  2005-2006 Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVS_D_R Doc

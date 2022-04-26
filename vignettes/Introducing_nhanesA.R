@@ -38,6 +38,15 @@ head(bpx_d[,6:11])
 #  q2007tables <- lapply(q2007names, nhanes)
 #  names(q2007tables) <- q2007names
 
+## ----prepan, eval=FALSE-------------------------------------------------------
+#  #List all pre-pandemic tables
+#  nhanesSearchTableNames('^P_')
+#  #List pre-pandemic EXAM tables
+#  nhanesTables('EXAM', 'P')
+#  #Table import and variable translation operate as usual
+#  p_dxxfem <- nhanes('P_DXXFEM')
+#  nhanesTranslate('P_BMX', 'BMDSTATS')
+
 ## ----nhanesdxa, eval=FALSE----------------------------------------------------
 #  #Import into R
 #  dxx_b <- nhanesDXA(2001)
@@ -48,6 +57,13 @@ head(bpx_d[,6:11])
 #  #Apply code translations
 #  dxalist <- c('DXAEXSTS', 'DXITOT', 'DXIHE')
 #  dxx_b <- nhanesTranslate(colnames=dxalist, data=dxx_b, dxa=TRUE)
+
+## ----nnyfs, eval=FALSE--------------------------------------------------------
+#  #List NNYFS EXAM tables
+#  nhanesTables('EXAM', 'Y')
+#  #Table import and variable translation operate as usual
+#  y_cvx <- nhanes('Y_CVX')
+#  nhanesTranslate('Y_CVX','CVXPARC')
 
 ## ----nhanessearch, eval=FALSE-------------------------------------------------
 #  # nhanesSearch use examples
