@@ -1,5 +1,5 @@
 #nhanesA - retrieve data from the CDC NHANES repository
-# Christopher J. Endres 04/19/2022
+# Christopher J. Endres 05/02/2022
 #
 nhanesURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/'
 dataURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx'
@@ -304,7 +304,7 @@ nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=100, na
 #' 
 #' Use to download NHANES data tables that are in SAS format.
 #' 
-#' @importFrom Hmisc sasxport.get
+#' @importFrom foreign read.xport
 #' @importFrom stringr str_c
 #' @param nh_table The name of the specific table to retrieve.
 #' @return The table is returned as a data frame.
@@ -328,7 +328,7 @@ nhanes <- function(nh_table) {
     
     tf <- tempfile()
     download.file(url, tf, mode = "wb", quiet = TRUE)
-    return(sasxport.get(tf, lowernames=FALSE))
+    return(read.xport(tf))
   },
   error = function(cond) {
     message(paste("Data set ", nh_table,  " is not available"), collapse='')
@@ -348,7 +348,7 @@ nhanes <- function(nh_table) {
 #' DXA data were acquired from 1999-2006. 
 #' 
 #' @importFrom stringr str_c
-#' @importFrom Hmisc sasxport.get
+#' @importFrom foreign read.xport
 #' @importFrom utils download.file
 #' @param year The year of the data to import, where 1999<=year<=2006. 
 #' @param suppl If TRUE then retrieve the supplemental data (default=FALSE).
@@ -393,7 +393,7 @@ nhanesDXA <- function(year, suppl=FALSE, destfile=NULL) {
         ok <- suppressWarnings(tryCatch({download.file(url, tf, mode="wb", quiet=TRUE)},
                                         error=function(cond){message(cond); return(NULL)}))
         if(!is.null(ok)) {
-          return(sasxport.get(tf,lowernames=FALSE))
+          return(read.xport(tf))
         } else { return(NULL) }
       }
     }
@@ -408,7 +408,7 @@ nhanesDXA <- function(year, suppl=FALSE, destfile=NULL) {
 #' Returns attributes such as number of rows, columns, and memory size,
 #' but does not return the table itself.
 #' 
-#' @importFrom Hmisc sasxport.get
+#' @importFrom foreign read.xport
 #' @importFrom stringr str_c
 #' @importFrom utils object.size
 #' @param nh_table The name of the specific table to retrieve
@@ -432,7 +432,7 @@ nhanesAttr <- function(nh_table) {
   nht <- tryCatch({    
     nh_year <- .get_year_from_nh_table(nh_table)
     url <- str_c(nhanesURL, nh_year, '/', nh_table, '.XPT', collapse='')
-    tmp <- sasxport.get(url,lowernames=FALSE)
+    tmp <- read.xport(url)
     nhtatt <- attributes(tmp)
     nhtatt$row.names <- NULL
     nhtatt$nrow <- nrow(tmp)
@@ -809,9 +809,7 @@ nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerd
 #' @details Code translation tables are retrieved via webscraping using rvest. 
 #' Many of the NHANES data tables have encoded values. E.g. 1 = 'Male', 2 = 'Female'.
 #' Thus it is often helpful to view the code translations and perhaps insert the translated values
-#' in a data frame. Note that Hmisc supports "labelled" fields. When a translation is applied directly
-#' to a column in a data frame, the column class is first converted to 'factor' and then the coded
-#' values are replaced with the code translations.
+#' in a data frame.
 #' @examples
 #' nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN'))
 #' nhanesTranslate('BPX_F', 'BPACSZ', details=TRUE)

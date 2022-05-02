@@ -42,9 +42,7 @@ which appear in most NHANES tables.
 Code translation tables are retrieved via webscraping using rvest. 
 Many of the NHANES data tables have encoded values. E.g. 1 = 'Male', 2 = 'Female'.
 Thus it is often helpful to view the code translations and perhaps insert the translated values
-in a data frame. Note that Hmisc supports "labelled" fields. When a translation is applied directly
-to a column in a data frame, the column class is first converted to 'factor' and then the coded
-values are replaced with the code translations.
+in a data frame.
 }
 \examples{
 nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN'))

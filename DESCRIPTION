@@ -1,6 +1,6 @@
 Package: nhanesA
 Version: 0.6.7
-Date: 2022-04-27
+Date: 2022-05-02
 Title: NHANES Data Retrieval
 Author: Christopher J. Endres
 Maintainer: Christopher J. Endres <cjendres1@gmail.com>
@@ -9,7 +9,7 @@ Depends:
     R (>= 3.0.0)
 Imports:
     stringr,
-    Hmisc (>= 3.17-1),
+    foreign,
     rvest,
     magrittr,
     xml2,
