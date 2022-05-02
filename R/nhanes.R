@@ -313,7 +313,7 @@ nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=100, na
 #' access data.
 #' @examples 
 #' nhanes('BPX_E')
-#' nhanes('FOLATE_F')
+#' \donttest{nhanes('FOLATE_F')}
 #' @export
 #' 
 nhanes <- function(nh_table) {
@@ -868,7 +868,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
   }
   
   if(dxa) {
-    code_translation_url <- "https://wwwn.cdc.gov/Nchs/Nhanes/2005-2006/DXX_D.htm"
+    code_translation_url <- "https://wwwn.cdc.gov/nchs/data/nhanes/dxa/dxx_d.htm"
   } else {
     nh_year <- .get_year_from_nh_table(nh_table)
     if(is.null(nh_year)) {
