@@ -14,5 +14,6 @@ Install from the dev repo: install_github("cjendres1/nhanes")
 
 [Vignette: Introducing nhanesA](https://cran.r-project.org/package=nhanesA/vignettes/Introducing_nhanesA.html)
 
-<img src="nhanesAsticker.png" alt="drawing" width="400"/>
+<br />
+<img src="man/figures/nhanesAsticker.png" alt="drawing" width="400"/>
 

@@ -1,6 +1,6 @@
 Package: nhanesA
-Version: 0.6.7
-Date: 2022-05-02
+Version: 0.6.7.1
+Date: 2022-06-01
 Title: NHANES Data Retrieval
 Author: Christopher J. Endres
 Maintainer: Christopher J. Endres <cjendres1@gmail.com>
@@ -24,4 +24,4 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0

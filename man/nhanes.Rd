@@ -22,5 +22,5 @@ access data.
 }
 \examples{
 nhanes('BPX_E')
-nhanes('FOLATE_F')
+\donttest{nhanes('FOLATE_F')}
 }
