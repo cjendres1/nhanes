@@ -21,6 +21,6 @@ are stored in SAS '.XPT' format. Function nhanes cannot be used to import limite
 access data.
 }
 \examples{
-nhanes('BPX_E')
+\donttest{nhanes('BPX_E')}
 \donttest{nhanes('FOLATE_F')}
 }

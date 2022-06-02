@@ -260,7 +260,7 @@ nhanesTables <- function(data_group, year, nchar=100, details = FALSE, namesonly
 #' Each data table contains multiple, sometimes more than 100, fields. It is helpful to list the field
 #' descriptions to ascertain quickly if a data table is of interest.
 #' @examples
-#' nhanesTableVars('LAB', 'CBC_E')
+#' \donttest{nhanesTableVars('LAB', 'CBC_E')}
 #' \donttest{nhanesTableVars('EXAM', 'OHX_E', details=TRUE, nchar=50)}
 #' \donttest{nhanesTableVars('DEMO', 'DEMO_F', namesonly = TRUE)}
 #' @export
@@ -312,7 +312,7 @@ nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=100, na
 #' are stored in SAS '.XPT' format. Function nhanes cannot be used to import limited 
 #' access data.
 #' @examples 
-#' nhanes('BPX_E')
+#' \donttest{nhanes('BPX_E')}
 #' \donttest{nhanes('FOLATE_F')}
 #' @export
 #' 
@@ -620,7 +620,7 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
 #' that match a given name pattern. Only a single pattern may be entered.
 #' @examples
 #' \donttest{nhanesSearchTableNames('BMX')}
-#' nhanesSearchTableNames('HPVS', includerdc=TRUE, details=TRUE)
+#' \donttest{nhanesSearchTableNames('HPVS', includerdc=TRUE, details=TRUE)}
 #' @export
 #' 
 nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=100, details=FALSE) {

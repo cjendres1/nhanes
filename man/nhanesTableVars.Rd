@@ -37,7 +37,7 @@ Each data table contains multiple, sometimes more than 100, fields. It is helpfu
 descriptions to ascertain quickly if a data table is of interest.
 }
 \examples{
-nhanesTableVars('LAB', 'CBC_E')
+\donttest{nhanesTableVars('LAB', 'CBC_E')}
 \donttest{nhanesTableVars('EXAM', 'OHX_E', details=TRUE, nchar=50)}
 \donttest{nhanesTableVars('DEMO', 'DEMO_F', namesonly = TRUE)}
 }
