@@ -1,6 +1,12 @@
 
 # nhanesA
 
+<!-- badges: start -->
+[![CRAN status](https://www.r-pkg.org/badges/version/nhanesA)](https://cran.r-project.org/package=nhanesA)
+[![LICENSE](https://img.shields.io/cran/l/nhanesA)](https://img.shields.io/cran/l/nhanesA)
+<!-- badges: end -->
+
+
 nhanesA is an R package for browsing and retrieving data from the National Health And Nutrition Examination Survey (NHANES).
 This package is designed to be useful for research and instructional purposes.
 
