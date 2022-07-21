@@ -1,3 +1,8 @@
+Version 0.7.0
+================================================================================
+
+- Apply more thorough error checking of read_html. Remove function calls from the vignette.
+
 Version 0.6.7.2
 ================================================================================
 

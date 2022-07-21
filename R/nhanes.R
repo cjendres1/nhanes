@@ -128,6 +128,38 @@ anomalytables2005 <- c('CHLMD_DR', 'SSUECD_R', 'HSV_DR')
 # Internal function to determine if a number is even
 .is.even <- function(x) {x %% 2 == 0}
 
+# Internal function to test for successful html read
+# FUNCTION checkHtml
+# If read_html is successful, then the html is returned.
+# Otherwise return NULL for proper error handling
+.checkHtml <- function(url) {
+  out <- tryCatch(
+    {
+      # when "try" is successful, 'tryCatch()' returns the html 
+      hurl <- xml2::read_html(url)
+      hurl
+    },
+    error=function(cond) {
+      # If there is an error, determine if it's a timeout error or URL error 
+      ccond <- as.character(cond)
+      if(length(grep('imeout',ccond)) > 0) {
+        message("Timeout was reached: No data pulled", "\n")
+      } else if(length(grep('Could not resolve', ccond))>0) {
+        message(cond)
+        #message("Could not resolve host", "\n")
+      } else { message(paste(c("URL ", url, " does not seem to exist"), collapse='')) }   
+      
+      # Return NULL
+      return(NULL)
+    },
+    warning=function(cond) {
+      message(cond)
+      return(NULL)
+    }
+  )
+  return(out)
+}
+
 #xpath <- '//*[@id="ContentPlaceHolder1_GridView1"]'
 xpath <- '//*[@id="GridView1"]'
 
@@ -181,7 +213,13 @@ nhanesTables <- function(data_group, year, nchar=100, details = FALSE, namesonly
                 '&CycleBeginYear=', unlist(str_split(as.character(nh_year), '-'))[[1]] , sep='')
   }
   # At this point df contains every table
-  df <- as.data.frame(turl %>% read_html() %>% html_elements(xpath=xpath) %>% html_table())
+  hurl <- .checkHtml(turl)
+  if(is.null(hurl)) {
+    message("Error occurred during read. No tables returned")
+    return(NULL)
+  }
+  df <- as.data.frame(hurl %>% html_elements(xpath=xpath) %>% html_table())
+#  df <- as.data.frame(turl %>% read_html() %>% html_elements(xpath=xpath) %>% html_table())
   # By default we exclude RDC Only tables as those cannot be downloaded
   
   if(year %in% c('P', 'p', 'Y', 'y')) {
@@ -275,7 +313,13 @@ nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=100, na
   turl <- str_c(nhanesURL, 'search/variablelist.aspx?Component=', 
                 str_to_title(as.character(nhanes_group[data_group])), 
                 '&CycleBeginYear=', unlist(str_split(as.character(nh_year), '-'))[[1]] , sep='')
-  df <- as.data.frame(turl %>% read_html() %>% html_elements(xpath=xpath) %>% html_table())
+  hurl <- .checkHtml(turl) 
+  if(is.null(hurl)) {
+    message("Error occurred during read. No table variables returned")
+    return(NULL)
+  }
+  df <- as.data.frame(hurl %>% html_elements(xpath=xpath) %>% html_table())
+#  df <- as.data.frame(turl %>% read_html() %>% html_elements(xpath=xpath) %>% html_table())
   
   if(!(nh_table %in% df$Data.File.Name)) {
     stop('Table ', nh_table, ' not present in the ', data_group, ' survey' )
@@ -498,8 +542,10 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
 
   df_initialized = FALSE
   for(i in 1:length(varURLs)) {  
-    vlhtml <- read_html(varURLs[i])
+#    vlhtml <- read_html(varURLs[i])
+    vlhtml <- .checkHtml(varURLs[i])
     
+    if(!is.null(vlhtml)) {
     xpathh <- '//*[@id="GridView1"]/thead/tr'
     hnodes <- html_elements(vlhtml, xpath=xpathh)
     vmcols <- sapply(xml_children(hnodes),xml_text)
@@ -516,10 +562,11 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
         df <- rbind(df, dfadd)
       }
     }
+    }
   }
   
-  if(is.null(df)) {
-    stop("No data was found. Perhaps the NHANES url has changed")
+  if(!df_initialized) { # There was no successful match
+    message("Empty result set")
     return(NULL)
   }
   names(df) <- vmcols
@@ -630,8 +677,15 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
     warning("Multiple patterns entered. Only the first will be matched.")
   }
   
-  df <- data.frame(read_html(dataURL) %>% html_elements(xpath=xpath) %>% html_table())
-  df <- df[grep(paste(pattern,collapse="|"), df$Doc.File),]
+  hurl <- .checkHtml(dataURL)
+  if(is.null(hurl)) {
+    message("Error occurred during read. No table names returned")
+    return(NULL)
+  }
+  df <- data.frame(hurl %>% html_elements(xpath=xpath) %>% html_table())
+#  df <- data.frame(read_html(dataURL) %>% html_elements(xpath=xpath) %>% html_table())
+
+    df <- df[grep(paste(pattern,collapse="|"), df$Doc.File),]
   if(nrow(df)==0) {return(NULL)}
   if(!includerdc) {
     df <- df[!(df$Data.File=='RDC Only'),]
@@ -711,7 +765,13 @@ nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerd
   df_initialized = FALSE
   
   for(i in 1:length(varURLs)) {
-    tabletree <- varURLs[i] %>% read_html() %>% html_elements(xpath=xpt)
+    
+    hurl <- .checkHtml(varURLs[i])
+    
+    if(!is.null(hurl)) {
+    tabletree <- hurl %>% html_elements(xpath=xpt)    
+#    tabletree <- varURLs[i] %>% read_html() %>% html_elements(xpath=xpt)
+    
     ttlist <- lapply(lapply(tabletree, xml_children), xml_text)
     # Convert the list to a data frame
     
@@ -726,9 +786,11 @@ nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerd
         }
       }
     }
+    }
   }
   
   if(!df_initialized) { # There was no successful match
+    message("Empty result set")
     return(NULL)
   }
   
@@ -825,10 +887,16 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
   
   get_translation_table <- function(colname, url, details) {
     xpt <- str_c('//*[h3[a[@name="', colname, '"]]]', sep='')
-    tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
+    
+    hurl <- .checkHtml(url)
+    tabletree <- hurl %>% html_elements(xpath=xpt)
+#    tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
     if(length(tabletree)==0) { # If not found then try 'id' instead of 'name'
       xpt <- str_c('//*[h3[@id="', colname, '"]]', sep='')
-      tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
+      
+      hurl <- .checkHtml(url)
+      tabletree <- hurl %>% html_elements(xpath=xpt)
+#      tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
     }
     if(length(tabletree)>0) {
       tabletrans <- as.data.frame(html_elements(tabletree, 'table') %>% html_table())
@@ -838,10 +906,16 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
         lcnm <- colname
         stringr::str_sub(lcnm, start=nc, end=nc) <- tolower(stringr::str_sub(lcnm, start=nc, end=nc))
         xpt <- str_c('//*[h3[a[@name="', lcnm, '"]]]', sep='')
-        tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
+        
+        hurl <- .checkHtml(url)
+        tabletree <- hurl %>% html_elements(xpath=xpt)
+#        tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
         if(length(tabletree)==0) { # If not found then try 'id' instead of 'name'
           xpt <- str_c('//*[h3[@id="', lcnm, '"]]', sep='')
-          tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
+          
+          hurl <- .checkHtml(url)
+          tabletree <- hurl %>% html_elements(xpath=xpt)
+#          tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
         }
         
         if(length(tabletree)>0) {
@@ -862,7 +936,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
       }
       return(tabletrans)
     } else { 
-      warning(c('No translation table is available for ', colname), collapse='')
+      message(paste(c('No translation table is available for ', colname), collapse=''))
       return(NULL)
     }
   }
@@ -877,7 +951,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
     if(nh_year == "Nnyfs"){
       code_translation_url <- str_c("https://wwwn.cdc.gov/Nchs/", nh_year, '/', nh_table, '.htm', sep='')
     } else {
-    code_translation_url <- str_c(nhanesURL, nh_year, '/', nh_table, '.htm', sep='')
+      code_translation_url <- str_c(nhanesURL, nh_year, '/', nh_table, '.htm', sep='')
     }
   }
   translations <- lapply(colnames, get_translation_table, code_translation_url, details)
