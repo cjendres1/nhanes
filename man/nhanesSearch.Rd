@@ -36,7 +36,8 @@ nhanesSearch(
 \item{namesonly}{If TRUE then only the table names are returned (default=FALSE).}
 }
 \value{
-A list of tables that match the search terms.
+Returns a data frame that describes variables that matched the search terms. If namesonly=TRUE,
+then a character vector of table names that contain matched variables is returned.
 }
 \description{
 The descriptions in the master variable list will be filtered by the

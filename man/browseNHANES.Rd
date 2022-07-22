@@ -14,6 +14,9 @@ Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).}
 
 \item{nh_table}{The name of an NHANES table.}
 }
+\value{
+No return value
+}
 \description{
 The browser may be directed to a specific year, survey, or table.
 }

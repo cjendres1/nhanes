@@ -16,8 +16,10 @@ The table is returned as a data frame.
 Use to download NHANES data tables that are in SAS format.
 }
 \details{
-Downloads a table from the NHANES website in its entirety. NHANES tables 
-are stored in SAS '.XPT' format. Function nhanes cannot be used to import limited 
+Downloads a table from the NHANES website as is, i.e. in its entirety
+with no modification or cleansing. NHANES tables 
+are stored in SAS '.XPT' format but are imported as a data frame.
+Function nhanes cannot be used to import limited 
 access data.
 }
 \examples{

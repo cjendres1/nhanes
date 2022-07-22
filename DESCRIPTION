@@ -1,9 +1,12 @@
 Package: nhanesA
 Version: 0.7.0
-Date: 2022-07-21
+Date: 2022-07-22
 Title: NHANES Data Retrieval
-Author: Christopher J. Endres
-Maintainer: Christopher J. Endres <cjendres1@gmail.com>
+Authors@R:
+    person(given = "Christopher",
+             family = "Endres",
+             role = c("aut", "cre"),
+             email = "cjendres1@gmail.com")
 BugReports: https://github.com/cjendres1/nhanes/issues
 Depends:
     R (>= 3.0.0)

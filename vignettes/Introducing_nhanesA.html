@@ -12,7 +12,7 @@
 
 <meta name="author" content="Christopher J. Endres" />
 
-<meta name="date" content="2022-07-11" />
+<meta name="date" content="2022-07-20" />
 
 <title>Introducing nhanesA</title>
 
@@ -334,7 +334,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Introducing nhanesA</h1>
 <h4 class="author">Christopher J. Endres</h4>
-<h4 class="date">2022-07-11</h4>
+<h4 class="date">2022-07-20</h4>
 
 
 
@@ -429,10 +429,8 @@ contents using nhanesTableVars.</p>
 ## 25      BMXWAIST            Waist Circumference (cm)
 ## 26         BMXWT                         Weight (kg)
 ## 27          SEQN         Respondent sequence number.</code></pre>
-<p>We see that there are 27 columns in table BMX_D. The column SEQN is
-the respondent sequence number and is included in every NHANES table.
-Effectively, SEQN is a subject identifier that is used to join
-information across tables.</p>
+<p>We see that there are 27 columns in table BMX_D. SEQN is a subject
+identifier that is used to join information across tables.</p>
 </div>
 <div id="import-nhanes-tables" class="section level3">
 <h3>Import NHANES Tables</h3>
@@ -492,7 +490,7 @@ variable list to nhanesTranslate</p>
 ## 6       2       2       2       2      1      4</code></pre>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>bpx_d_vars  <span class="ot">&lt;-</span> <span class="fu">nhanesTableVars</span>(<span class="st">&#39;EXAM&#39;</span>, <span class="st">&#39;BPX_D&#39;</span>, <span class="at">namesonly=</span><span class="cn">TRUE</span>)</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Alternatively may use bpx_d_vars = names(bpx_d)</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>bpx_d <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(<span class="fu">nhanesTranslate</span>(<span class="st">&#39;BPX_D&#39;</span>, bpx_d_vars, <span class="at">data=</span>bpx_d))</span></code></pre></div>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>bpx_d <span class="ot">&lt;-</span> <span class="fu">suppressMessages</span>(<span class="fu">nhanesTranslate</span>(<span class="st">&#39;BPX_D&#39;</span>, bpx_d_vars, <span class="at">data=</span>bpx_d))</span></code></pre></div>
 <pre><code>## Translated columns: BPAARM BPACSZ BPAEN2 BPAEN3 BPAEN4 BPQ150A BPQ150B BPQ150C BPQ150D BPXPTY BPXPULS PEASCCT1 PEASCST1</code></pre>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(bpx_d[,<span class="dv">6</span><span class="sc">:</span><span class="dv">11</span>])</span></code></pre></div>
 <pre><code>##   BPQ150A BPQ150B BPQ150C BPQ150D BPAARM        BPACSZ

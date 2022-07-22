@@ -1,5 +1,5 @@
 #nhanesA - retrieve data from the CDC NHANES repository
-# Christopher J. Endres 05/02/2022
+# Christopher J. Endres 07/22/2022
 #
 nhanesURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/'
 dataURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx'
@@ -179,10 +179,12 @@ xpath <- '//*[@id="GridView1"]'
 #' @param details If TRUE then a more detailed description of the tables is returned (default=FALSE).
 #' @param namesonly If TRUE then only the table names are returned (default=FALSE).
 #' @param includerdc If TRUE then RDC only tables are included in list (default=FALSE).
-#' @return The names of the tables in the specified survey group.
-#' @details Data are retrieved via web scraping using html wrappers from package rvest.
-#' It is often useful to display the table names in an NHANES survey. In effect this
-#' is a convenient way to browse the available NHANES tables.
+#' @return Returns a data frame that contains table attributes. If namesonly=TRUE,
+#' then a character vector of table names is returned.
+#' @details Function nhanesTables retrieves a list of tables and a 
+#' description of their contents from the NHANES website. This provides
+#' a convenient way to browse the available tables. NULL is returned when an
+#' HTML read error is encountered.
 #' @examples
 #' nhanesTables('EXAM', 2007)
 #' \donttest{nhanesTables('LAB', 2009, details=TRUE, includerdc=TRUE)}
@@ -293,10 +295,11 @@ nhanesTables <- function(data_group, year, nchar=100, details = FALSE, namesonly
 #' @param nchar The number of characters in the Variable Description to print. Values are limited to 0<=nchar<=128.
 #' This is used to enhance readability, cause variable descriptions can be very long.
 #' @param namesonly If TRUE then only the variable names are returned (default=FALSE).
-#' @return The names of the tables in the specified survey group
-#' @details Data are retrieved via web scraping using html wrappers from package rvest.
-#' Each data table contains multiple, sometimes more than 100, fields. It is helpful to list the field
-#' descriptions to ascertain quickly if a data table is of interest.
+#' @return Returns a data frame that describes variable attributes for the specified table. If namesonly=TRUE,
+#' then a character vector of the variable names is returned.
+#' @details NHANES tables may contain more than 100 variables. Function nhanesTableVars provides a concise display
+#' of variables for a specified table, which helps to ascertain quickly if the table is of interest. 
+#' NULL is returned when an HTML read error is encountered.
 #' @examples
 #' \donttest{nhanesTableVars('LAB', 'CBC_E')}
 #' \donttest{nhanesTableVars('EXAM', 'OHX_E', details=TRUE, nchar=50)}
@@ -352,8 +355,10 @@ nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=100, na
 #' @importFrom stringr str_c
 #' @param nh_table The name of the specific table to retrieve.
 #' @return The table is returned as a data frame.
-#' @details Downloads a table from the NHANES website in its entirety. NHANES tables 
-#' are stored in SAS '.XPT' format. Function nhanes cannot be used to import limited 
+#' @details Downloads a table from the NHANES website as is, i.e. in its entirety
+#' with no modification or cleansing. NHANES tables 
+#' are stored in SAS '.XPT' format but are imported as a data frame.
+#' Function nhanes cannot be used to import limited 
 #' access data.
 #' @examples 
 #' \donttest{nhanes('BPX_E')}
@@ -518,7 +523,8 @@ nhanesAttr <- function(nh_table) {
 #' @param includerdc If TRUE then RDC only tables are included in list (default=FALSE).
 #' @param nchar Truncates the variable description to a max length of nchar.
 #' @param namesonly If TRUE then only the table names are returned (default=FALSE).
-#' @return A list of tables that match the search terms. 
+#' @return Returns a data frame that describes variables that matched the search terms. If namesonly=TRUE,
+#' then a character vector of table names that contain matched variables is returned. 
 #' @details nhanesSearch is useful to obtain a comprehensive list of relevant tables.
 #' Search terms will be matched against the variable descriptions in the NHANES Comprehensive
 #' Variable Lists.
@@ -661,7 +667,9 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
 #' @param nchar Truncates the variable description to a max length of nchar.
 #' @param details If TRUE then complete table information from the comprehensive
 #' data list is returned (default=FALSE).
-#' @return A list of table names that match the pattern.
+#' @return Returns a character vector of table names that match the given pattern. If details=TRUE,
+#' then a data frame of table attributes is returned. NULL is returned when an
+#' HTML read error is encountered.
 #' @details Searches the Doc File field in the NHANES Comprehensive Data List 
 #' (see https://wwwn.cdc.gov/nchs/nhanes/search/DataPage.aspx) for tables
 #' that match a given name pattern. Only a single pattern may be entered.
@@ -745,6 +753,8 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
 #' @param includerdc If TRUE then RDC only tables are included in list (default=FALSE).
 #' @param nchar Truncates the variable description to a max length of nchar.
 #' @param namesonly If TRUE then only the table names are returned (default=TRUE).
+#' @return By default, a character vector of table names that include the specified variable 
+#' is returned. If namesonly=FALSE, then a data frame of table attributes is returned. 
 #' @details The NHANES Comprehensive Variable List is scanned to find all data tables that
 #' contain the given variable name. Only a single variable name may be entered, and only
 #' exact matches will be found.
@@ -868,10 +878,10 @@ nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerd
 #' @param details If TRUE then all available table translation information is displayed (default=FALSE).
 #' @param dxa If TRUE then the 2005-2006 DXA translation table will be used (default=FALSE).
 #' @return The code translation table (or translated data frame when data is defined).
-#' @details Code translation tables are retrieved via webscraping using rvest. 
-#' Many of the NHANES data tables have encoded values. E.g. 1 = 'Male', 2 = 'Female'.
+#' @details Most NHANES data tables have encoded values. E.g. 1 = 'Male', 2 = 'Female'.
 #' Thus it is often helpful to view the code translations and perhaps insert the translated values
-#' in a data frame.
+#' in a data frame. Only a single table may be specified, but multiple variables within that table
+#' can be selected. Code translations are retrieved for each variable. 
 #' @examples
 #' nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN'))
 #' nhanesTranslate('BPX_F', 'BPACSZ', details=TRUE)
@@ -1011,6 +1021,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
 #' @param data_group The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
 #' Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).
 #' @param nh_table The name of an NHANES table.
+#' @return No return value
 #' @details browseNHANES will open a web browser to the specified NHANES site.
 #' @examples
 #' browseNHANES()                     # Defaults to the main data sets page

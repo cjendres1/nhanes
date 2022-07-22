@@ -28,7 +28,9 @@ nhanesSearchTableNames(
 data list is returned (default=FALSE).}
 }
 \value{
-A list of table names that match the pattern.
+Returns a character vector of table names that match the given pattern. If details=TRUE,
+then a data frame of table attributes is returned. NULL is returned when an
+HTML read error is encountered.
 }
 \description{
 Returns a list of table names that match a specified pattern.

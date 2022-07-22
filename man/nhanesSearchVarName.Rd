@@ -26,6 +26,10 @@ nhanesSearchVarName(
 
 \item{namesonly}{If TRUE then only the table names are returned (default=TRUE).}
 }
+\value{
+By default, a character vector of table names that include the specified variable 
+is returned. If namesonly=FALSE, then a data frame of table attributes is returned.
+}
 \description{
 Returns a list of table names that contain the variable
 }

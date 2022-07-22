@@ -26,15 +26,16 @@ This is used to enhance readability, cause variable descriptions can be very lon
 \item{namesonly}{If TRUE then only the variable names are returned (default=FALSE).}
 }
 \value{
-The names of the tables in the specified survey group
+Returns a data frame that describes variable attributes for the specified table. If namesonly=TRUE,
+then a character vector of the variable names is returned.
 }
 \description{
 Enables quick display of table variables and their definitions.
 }
 \details{
-Data are retrieved via web scraping using html wrappers from package rvest.
-Each data table contains multiple, sometimes more than 100, fields. It is helpful to list the field
-descriptions to ascertain quickly if a data table is of interest.
+NHANES tables may contain more than 100 variables. Function nhanesTableVars provides a concise display
+of variables for a specified table, which helps to ascertain quickly if the table is of interest. 
+NULL is returned when an HTML read error is encountered.
 }
 \examples{
 \donttest{nhanesTableVars('LAB', 'CBC_E')}

@@ -39,10 +39,10 @@ Returns code translations for categorical variables,
 which appear in most NHANES tables.
 }
 \details{
-Code translation tables are retrieved via webscraping using rvest. 
-Many of the NHANES data tables have encoded values. E.g. 1 = 'Male', 2 = 'Female'.
+Most NHANES data tables have encoded values. E.g. 1 = 'Male', 2 = 'Female'.
 Thus it is often helpful to view the code translations and perhaps insert the translated values
-in a data frame.
+in a data frame. Only a single table may be specified, but multiple variables within that table
+can be selected. Code translations are retrieved for each variable.
 }
 \examples{
 nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN'))
