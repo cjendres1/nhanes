@@ -4,7 +4,7 @@
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/nhanesA)](https://cran.r-project.org/package=nhanesA)
 [![LICENSE](https://img.shields.io/cran/l/nhanesA)](https://www.gnu.org/licenses/gpl-3.0.en.html)
-[![metacran downloads](https://cranlogs.r-pkg.org/badges/nhanesA)](https://cran.rstudio.com/web/packages/nhanesA/index.html)
+[![metacran downloads](https://cranlogs.r-pkg.org/badges/nhanesA)](https://CRAN.R-project.org/package=nhanesA)
 <!-- badges: end -->
 
 
