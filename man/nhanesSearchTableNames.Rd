@@ -9,7 +9,7 @@ nhanesSearchTableNames(
   ystart = NULL,
   ystop = NULL,
   includerdc = FALSE,
-  nchar = 100,
+  nchar = 128,
   details = FALSE
 )
 }

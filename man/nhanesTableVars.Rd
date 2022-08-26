@@ -8,7 +8,7 @@ nhanesTableVars(
   data_group,
   nh_table,
   details = FALSE,
-  nchar = 100,
+  nchar = 128,
   namesonly = FALSE
 )
 }
@@ -20,8 +20,8 @@ Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).}
 
 \item{details}{If TRUE then all columns in the variable description are returned (default=FALSE).}
 
-\item{nchar}{The number of characters in the Variable Description to print. Values are limited to 0<=nchar<=128.
-This is used to enhance readability, cause variable descriptions can be very long.}
+\item{nchar}{The number of characters in the Variable Description to print. Default length is 128,
+which is set to enhance readability cause variable descriptions can be very long.}
 
 \item{namesonly}{If TRUE then only the variable names are returned (default=FALSE).}
 }

@@ -81,6 +81,8 @@ data_idx["L"] <- '2021-2022'
 data_idx["M"] <- '2023-2024'
 
 anomalytables2005 <- c('CHLMD_DR', 'SSUECD_R', 'HSV_DR')
+nchar_max <- 1024
+nchar_default <- 128
 
 #------------------------------------------------------------------------------
 # An internal function that determines which survey year the table belongs to.
@@ -194,7 +196,7 @@ xpath <- '//*[@id="GridView1"]'
 #' @export
 #'
 
-nhanesTables <- function(data_group, year, nchar=100, details = FALSE, namesonly=FALSE, includerdc=FALSE) {
+nhanesTables <- function(data_group, year, nchar=128, details = FALSE, namesonly=FALSE, includerdc=FALSE) {
   if( !(data_group %in% names(nhanes_group)) ) {
     stop("Invalid survey group")
     return(NULL)
@@ -292,8 +294,8 @@ nhanesTables <- function(data_group, year, nchar=100, details = FALSE, namesonly
 #' Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).
 #' @param nh_table The name of the specific table to retrieve.
 #' @param details If TRUE then all columns in the variable description are returned (default=FALSE).
-#' @param nchar The number of characters in the Variable Description to print. Values are limited to 0<=nchar<=128.
-#' This is used to enhance readability, cause variable descriptions can be very long.
+#' @param nchar The number of characters in the Variable Description to print. Default length is 128,
+#' which is set to enhance readability cause variable descriptions can be very long.
 #' @param namesonly If TRUE then only the variable names are returned (default=FALSE).
 #' @return Returns a data frame that describes variable attributes for the specified table. If namesonly=TRUE,
 #' then a character vector of the variable names is returned.
@@ -306,7 +308,7 @@ nhanesTables <- function(data_group, year, nchar=100, details = FALSE, namesonly
 #' \donttest{nhanesTableVars('DEMO', 'DEMO_F', namesonly = TRUE)}
 #' @export
 #' 
-nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=100, namesonly = FALSE) {
+nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=128, namesonly = FALSE) {
   if( !(data_group %in% names(nhanes_group)) ) {
     stop("Invalid survey group")
     return(NULL)
@@ -329,7 +331,7 @@ nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=100, na
     return(NULL)
   }
   
-  nchar_max <- 128
+  #nchar_max <- 128
   if(nchar > nchar_max) {
     nchar <- nchar_max
   }
@@ -538,7 +540,7 @@ nhanesAttr <- function(nh_table) {
 #' @export
 #' 
 nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL, ignore.case=FALSE, 
-                         ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=100, namesonly=FALSE) {
+                         ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=128, namesonly=FALSE) {
   
   if(is.null(search_terms)) {
     stop("Search term is missing")
@@ -678,7 +680,7 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
 #' \donttest{nhanesSearchTableNames('HPVS', includerdc=TRUE, details=TRUE)}
 #' @export
 #' 
-nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=100, details=FALSE) {
+nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=128, details=FALSE) {
   if(is.null(pattern)) {stop('No pattern was entered')}
   if(length(pattern)>1) {
     pattern <- pattern[1]
@@ -763,7 +765,7 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
 #' \donttest{nhanesSearchVarName('BMXHEAD', ystart=2003)}
 #' @export
 #'  
-nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=100, namesonly=TRUE) {
+nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=128, namesonly=TRUE) {
   if(is.null(varname)) {stop('No varname was entered')}
   if(length(varname)>1) {
     varname <- varname[1]
@@ -895,6 +897,11 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
     return(0)
   }
   
+  if(!is.null(data) & details == TRUE) {
+    details = FALSE
+    warning("When a data table is passed to nhanesTranslate, the details variable is ignored")
+  }
+  
   get_translation_table <- function(colname, url, details) {
     xpt <- str_c('//*[h3[a[@name="', colname, '"]]]', sep='')
     
@@ -967,7 +974,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
   translations <- lapply(colnames, get_translation_table, code_translation_url, details)
   names(translations) <- colnames
   
-  nchar_max <- 128
+  #nchar_max <- 128
   if(nchar > nchar_max) {
     nchar <- nchar_max
   }

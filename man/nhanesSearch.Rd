@@ -12,7 +12,7 @@ nhanesSearch(
   ystart = NULL,
   ystop = NULL,
   includerdc = FALSE,
-  nchar = 100,
+  nchar = 128,
   namesonly = FALSE
 )
 }

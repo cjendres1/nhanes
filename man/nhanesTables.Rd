@@ -7,7 +7,7 @@
 nhanesTables(
   data_group,
   year,
-  nchar = 100,
+  nchar = 128,
   details = FALSE,
   namesonly = FALSE,
   includerdc = FALSE
