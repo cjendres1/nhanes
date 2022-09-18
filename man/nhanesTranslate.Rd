@@ -32,7 +32,7 @@ Truncate the length by setting nchar (default = 32).}
 \item{dxa}{If TRUE then the 2005-2006 DXA translation table will be used (default=FALSE).}
 }
 \value{
-The code translation table (or translated data frame when data is defined).
+The code translation table (or translated data frame when data is defined). Returns NULL upon error.
 }
 \description{
 Returns code translations for categorical variables, 
