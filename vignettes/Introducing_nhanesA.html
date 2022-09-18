@@ -12,7 +12,7 @@
 
 <meta name="author" content="Christopher J. Endres" />
 
-<meta name="date" content="2022-07-20" />
+<meta name="date" content="2022-09-18" />
 
 <title>Introducing nhanesA</title>
 
@@ -122,13 +122,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -334,7 +341,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Introducing nhanesA</h1>
 <h4 class="author">Christopher J. Endres</h4>
-<h4 class="date">2022-07-20</h4>
+<h4 class="date">2022-09-18</h4>
 
 
 
@@ -448,20 +455,38 @@ identifier that is used to join information across tables.</p>
 ##         2 163.7  45.0   39.2    31.7     41.3
 ##         1 182.4 101.9   41.5    42.6     50.5</code></pre>
 </div>
+<div id="display-codebook" class="section level3">
+<h3>Display Codebook</h3>
+<p>For each variable, NHANES provides a codebook, which is a basic
+description of the variable and also includes the distribution or range
+of values. We can use nhanesCodebook to list the codebook definition for
+the gender field RIAGENDR in table DEMO_D.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesCodebook</span>(<span class="st">&#39;DEMO_D&#39;</span>, <span class="st">&#39;RIAGENDR&#39;</span>)</span></code></pre></div>
+<pre><code>## $`Variable Name`
+## [1] &quot;RIAGENDR&quot;
+## 
+## $`SAS Label`
+## [1] &quot;Gender&quot;
+## 
+## $`English Text`
+## [1] &quot;Gender of the sample person&quot;
+## 
+## $Target
+## [1] &quot;Both males and females 0 YEARS -\r 150 YEARS&quot;
+## 
+## $RIAGENDR
+##   Code.or.Value Value.Description Count Cumulative Skip to Item
+## 1             1              Male  5080       5080           NA
+## 2             2            Female  5268      10348           NA
+## 3             .           Missing     0      10348           NA</code></pre>
+</div>
 <div id="translate-coded-values" class="section level3">
 <h3>Translate Coded Values</h3>
-<p>NHANES uses coded values for many fields. In the preceding example,
-gender is coded as 1 or 2. To determine what the values mean, we can
-list the code translations for the gender field RIAGENDR in table
-DEMO_D</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nhanesTranslate</span>(<span class="st">&#39;DEMO_D&#39;</span>, <span class="st">&#39;RIAGENDR&#39;</span>)</span></code></pre></div>
-<pre><code>## $RIAGENDR
-##   Code.or.Value Value.Description
-## 1             1              Male
-## 2             2            Female
-## 3             .           Missing</code></pre>
-<p>If desired, we can use nhanesTranslate to apply the code translation
-to demo_d directly by assigning data=demo_d.</p>
+<p>RIAGENDR, like most categorical variables, is a coded field. That is,
+the values 1,2 correspond to coded values (Male, Female). If desired, we
+can use nhanesTranslate to apply a code translation to demo_d directly
+by assigning data=demo_d. That will replace the original values with the
+coded values.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>demo_d <span class="ot">&lt;-</span> <span class="fu">nhanesTranslate</span>(<span class="st">&#39;DEMO_D&#39;</span>, <span class="st">&#39;RIAGENDR&#39;</span>, <span class="at">data=</span>demo_d)</span></code></pre></div>
 <pre><code>## Translated columns: RIAGENDR</code></pre>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>bmx_demo <span class="ot">&lt;-</span> <span class="fu">merge</span>(demo_d, bmx_d)</span></code></pre></div>

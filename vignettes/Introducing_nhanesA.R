@@ -74,20 +74,21 @@ df[3,] <- list(2, 163.7,  45.0,   39.2,    31.7,     41.3)
 df[4,] <- list(1, 182.4, 101.9,   41.5,    42.6,     50.5)
 print(df,row.names=FALSE)
 
-## ----nhanestranslate, eval=FALSE----------------------------------------------
-#  nhanesTranslate('DEMO_D', 'RIAGENDR')
+## ----nhanescodebook, eval=FALSE-----------------------------------------------
+#  nhanesCodebook('DEMO_D', 'RIAGENDR')
 
 ## ----translate1, echo=FALSE---------------------------------------------------
-df <- data.frame(matrix(1,nrow=3,ncol=2))
-names(df) <- c("Code.or.Value", "Value.Description")
-df[1,] <- list(1, 'Male')
-df[2,] <- list(2, 'Female')
-df[3,] <- list('.', 'Missing')
-vn <- 'RIAGENDR'
+df <- data.frame(matrix(1,nrow=3,ncol=5))
+names(df) <- c("Code.or.Value", "Value.Description", "Count", "Cumulative", "Skip to Item")
+df[1,] <- list(1, 'Male', 5080, 5080, NA)
+df[2,] <- list(2, 'Female', 5268, 10348, NA)
+df[3,] <- list('.', 'Missing', 0, 10348, NA)
 
-lst <- list(df)
-names(lst) <- vn
-lst
+codelist <- list("RIAGENDR", "Gender", "Gender of the sample person", 
+                 "Both males and females 0 YEARS -\r 150 YEARS", df)
+names(codelist) <- c('Variable Name', 'SAS Label', 'English Text', 'Target', 'RIAGENDR')
+
+codelist
 
 ## ----bmx1, eval=FALSE---------------------------------------------------------
 #  demo_d <- nhanesTranslate('DEMO_D', 'RIAGENDR', data=demo_d)
