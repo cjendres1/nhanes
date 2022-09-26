@@ -905,13 +905,21 @@ nhanesCodebook <- function(nh_table, colname, dxa=FALSE) {
   xpt <- str_c('//*[h3[a[@name="', colname, '"]]]', sep='')
   
   hurl <- .checkHtml(url)
-  tabletree <- hurl %>% html_elements(xpath=xpt)
+  if(is.null(hurl)) {
+    tabletree <- NULL
+  } else {
+    tabletree <- hurl %>% html_elements(xpath=xpt)
+  }
   #    tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
   if(length(tabletree)==0) { # If not found then try 'id' instead of 'name'
     xpt <- str_c('//*[h3[@id="', colname, '"]]', sep='')
     
     hurl <- .checkHtml(url)
-    tabletree <- hurl %>% html_elements(xpath=xpt)
+    if(is.null(hurl)) {
+      tabletree <- NULL
+    } else {
+      tabletree <- hurl %>% html_elements(xpath=xpt)
+    }
     #      tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
   }
   if(length(tabletree)>0) {
@@ -919,8 +927,12 @@ nhanesCodebook <- function(nh_table, colname, dxa=FALSE) {
     codetext <- html_elements(tabletree, "dd") %>% html_text2()
     names(codetext) <- codetitles
     tabletrans <- html_elements(tabletree, 'table') %>% html_table()
-    names(tabletrans) <- colname
-    codebook <- c(codetext, tabletrans)
+    if(length(tabletrans) > 0) {
+      names(tabletrans) <- colname
+      codebook <- c(codetext, tabletrans)
+    } else {
+      codebook <- codetext
+    }
     return(codebook)
   } else { # Code table not found so let's see if last letter should be lowercase
     nc <- nchar(colname)
@@ -930,13 +942,21 @@ nhanesCodebook <- function(nh_table, colname, dxa=FALSE) {
       xpt <- str_c('//*[h3[a[@name="', lcnm, '"]]]', sep='')
       
       hurl <- .checkHtml(url)
-      tabletree <- hurl %>% html_elements(xpath=xpt)
+      if(is.null(hurl)) {
+        tabletree <- NULL
+      } else {
+        tabletree <- hurl %>% html_elements(xpath=xpt)
+      }
       #        tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
       if(length(tabletree)==0) { # If not found then try 'id' instead of 'name'
         xpt <- str_c('//*[h3[@id="', lcnm, '"]]', sep='')
         
         hurl <- .checkHtml(url)
-        tabletree <- hurl %>% html_elements(xpath=xpt)
+        if(is.null(hurl)) {
+          tabletree <- NULL
+        } else {
+          tabletree <- hurl %>% html_elements(xpath=xpt)
+        }
         #          tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
       }
       
@@ -945,8 +965,12 @@ nhanesCodebook <- function(nh_table, colname, dxa=FALSE) {
         codetext <- html_elements(tabletree, "dd") %>% html_text2()
         names(codetext) <- codetitles
         tabletrans <- html_elements(tabletree, 'table') %>% html_table()
-        names(tabletrans) <- colname
-        codebook <- c(codetext, tabletrans)
+        if(length(tabletrans) > 0) {
+          names(tabletrans) <- colname
+          codebook <- c(codetext, tabletrans)
+        } else {
+          codebook <- codetext
+        }
         return(codebook)
       } else { # Still not found even after converting to lowercase
         warning(c('Column "', colname, '" not found'), collapse='')

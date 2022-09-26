@@ -1,7 +1,8 @@
 Version 0.7.1
 ================================================================================
 
-- Add function nhanesCodebook
+- Add function nhanesCodebook (thanks @paynejason https://github.com/cjendres1/nhanes/issues/9, 
+and @rsgoncalves  https://github.com/cjendres1/nhanes/issues/11)
 
 Version 0.7.0
 ================================================================================
