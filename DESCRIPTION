@@ -1,6 +1,6 @@
 Package: nhanesA
 Version: 0.7.2
-Date: 2022-09-26
+Date: 2022-11-05
 Title: NHANES Data Retrieval
 Authors@R:
     person(given = "Christopher",

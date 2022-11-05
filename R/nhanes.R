@@ -218,7 +218,8 @@ nhanesTables <- function(data_group, year, nchar=128, details = FALSE, namesonly
                 str_to_title(as.character(nhanes_group[data_group])), 
                 '&CycleBeginYear=', unlist(str_split(as.character(nh_year), '-'))[[1]] , sep='')
   }
-  # At this point df contains every table
+  
+  # At this point df contains every table for the specified survey & year
   hurl <- .checkHtml(turl)
   if(is.null(hurl)) {
     message("Error occurred during read. No tables returned")
@@ -228,11 +229,16 @@ nhanesTables <- function(data_group, year, nchar=128, details = FALSE, namesonly
 #  df <- as.data.frame(turl %>% read_html() %>% html_elements(xpath=xpath) %>% html_table())
   # By default we exclude RDC Only tables as those cannot be downloaded
   
-  if(year %in% c('P', 'p', 'Y', 'y')) {
-    if(nrow(df)==0) {
+  if(nrow(df)==0) {
+    if(year %in% c(2019,2020)) {
+      message("No tables found. Please set year='P' for Pre-Pandemic data.")
+    } else {
       message("No tables found")
-      return(NULL)
     }
+    return(NULL)
+  }
+  
+  if(year %in% c('P', 'p', 'Y', 'y')) {
     if(year %in% c('P','p')) {
       df <- df[str_detect(df$Data.File,'^P_'),]
     }
@@ -244,6 +250,7 @@ nhanesTables <- function(data_group, year, nchar=128, details = FALSE, namesonly
 #    if(!includerdc) {
 #      df <- df[(df$Data.File != "RDC Only"),]
 #    }
+    
     if(namesonly == TRUE) {
       df$Doc.File <- str_remove(df$Doc.File, ' Doc')
       return(as.character(df$Doc.File))
