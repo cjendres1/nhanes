@@ -675,6 +675,7 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
 #' @param ystart Four digit year of first survey included in search, where ystart >= 1999.
 #' @param ystop  Four digit year of final survey included in search, where ystop >= ystart.
 #' @param includerdc If TRUE then RDC only tables are included (default=FALSE).
+#' @param includewithdrawn IF TRUE then withdrawn tables are included (default=FALSE).
 #' @param nchar Truncates the variable description to a max length of nchar.
 #' @param details If TRUE then complete table information from the comprehensive
 #' data list is returned (default=FALSE).
@@ -689,7 +690,8 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
 #' \donttest{nhanesSearchTableNames('HPVS', includerdc=TRUE, details=TRUE)}
 #' @export
 #' 
-nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=128, details=FALSE) {
+nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includerdc=FALSE, 
+                                   includewithdrawn=FALSE, nchar=128, details=FALSE) {
   if(is.null(pattern)) {stop('No pattern was entered')}
   if(length(pattern)>1) {
     pattern <- pattern[1]
@@ -709,6 +711,10 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
   if(!includerdc) {
     df <- df[!(df$Data.File=='RDC Only'),]
   }
+  if(!includewithdrawn) {
+    df <- df[!(df$Date.Published=='Withdrawn'),]
+  }
+    
   
   if( !is.null(ystart) || !is.null(ystop) ) {
     # Use the first year of cycle (the odd year) for comparison

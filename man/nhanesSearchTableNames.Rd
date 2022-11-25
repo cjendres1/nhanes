@@ -9,6 +9,7 @@ nhanesSearchTableNames(
   ystart = NULL,
   ystop = NULL,
   includerdc = FALSE,
+  includewithdrawn = FALSE,
   nchar = 128,
   details = FALSE
 )
@@ -21,6 +22,8 @@ nhanesSearchTableNames(
 \item{ystop}{Four digit year of final survey included in search, where ystop >= ystart.}
 
 \item{includerdc}{If TRUE then RDC only tables are included (default=FALSE).}
+
+\item{includewithdrawn}{IF TRUE then withdrawn tables are included (default=FALSE).}
 
 \item{nchar}{Truncates the variable description to a max length of nchar.}
 
