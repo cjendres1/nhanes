@@ -31,7 +31,7 @@ install.packages("nhanesA")
 
 ``` r
 install.packages("devtools")
-devtools::install_github("cjendres1/nhanes")
+install_github("cjendres1/nhanes")
 ```
 
 <br/>
