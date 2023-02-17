@@ -1,6 +1,6 @@
 Package: nhanesA
 Version: 0.7.2
-Date: 2022-11-25
+Date: 2023-02-17
 Title: NHANES Data Retrieval
 Authors@R:
     person(given = "Christopher",
@@ -27,4 +27,4 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3

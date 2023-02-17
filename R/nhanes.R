@@ -1,5 +1,5 @@
 #nhanesA - retrieve data from the CDC NHANES repository
-# Christopher J. Endres 09/18/2022
+# Christopher J. Endres 02/15/2023
 #
 nhanesURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/'
 dataURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx'
@@ -421,7 +421,7 @@ nhanes <- function(nh_table) {
 #' @examples
 #' \donttest{dxa_b <- nhanesDXA(2001)}
 #' \donttest{dxa_c_s <- nhanesDXA(2003, suppl=TRUE)}
-#' \donttest{nhanesDXA(1999, destfile="dxx.xpt")}
+#' \dontrun{nhanesDXA(1999, destfile="dxx.xpt")}
 #' @export
 nhanesDXA <- function(year, suppl=FALSE, destfile=NULL) {
 
@@ -751,7 +751,7 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
   if(nrow(df)==0) {return(NULL)}
   row.names(df) <- NULL
   if(details==TRUE){
-    df$Data.File.Name <- str_sub(df$Data.File.Name, 1, nchar)
+    df$Data.File <- str_sub(df$Data.File, 1, nchar)
     return(df)
   } else {
     return(unlist(strsplit(df$Doc.File, " Doc")))
@@ -892,8 +892,8 @@ nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerd
 #' codebook information for the selected variable.
 #' @return The codebook is returned as a list object. Returns NULL upon error.
 #' @examples
-#' nhanesCodebook('AUX_D', 'AUQ020D')
-#' nhanesCodebook('BPX_J', 'BPACSZ')
+#' \donttest{nhanesCodebook('AUX_D', 'AUQ020D')}
+#' \donttest{nhanesCodebook('BPX_J', 'BPACSZ')}
 #' @export
 #'
 nhanesCodebook <- function(nh_table, colname, dxa=FALSE) {

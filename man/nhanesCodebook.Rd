@@ -26,6 +26,6 @@ as well as the distribution or range of values. This function returns the full
 codebook information for the selected variable.
 }
 \examples{
-nhanesCodebook('AUX_D', 'AUQ020D')
-nhanesCodebook('BPX_J', 'BPACSZ')
+\donttest{nhanesCodebook('AUX_D', 'AUQ020D')}
+\donttest{nhanesCodebook('BPX_J', 'BPACSZ')}
 }
