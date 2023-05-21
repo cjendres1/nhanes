@@ -1,4 +1,9 @@
-Version 0.7.2
+Version 0.7.3
+================================================================================
+
+- Updated nhanesTableVars to be compatible with pre-pandemic tables (thanks @lamisipam https://github.com/cjendres1/nhanes/issues/16).
+
+Version 0.7.2 
 ================================================================================
 
 - Add includewithdrawn flag to nhanesSearchTableNames (thanks @Ifitrains https://github.com/cjendres1/nhanes/issues/15). Updated README. 

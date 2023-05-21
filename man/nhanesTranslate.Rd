@@ -45,7 +45,7 @@ in a data frame. Only a single table may be specified, but multiple variables wi
 can be selected. Code translations are retrieved for each variable.
 }
 \examples{
-nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN'))
-nhanesTranslate('BPX_F', 'BPACSZ', details=TRUE)
+\donttest{nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN'))}
+\donttest{nhanesTranslate('BPX_F', 'BPACSZ', details=TRUE)}
 \donttest{nhanesTranslate('BPX_F', 'BPACSZ', data=nhanes('BPX_F'))}
 }

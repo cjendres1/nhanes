@@ -159,11 +159,14 @@ df
 ## ----prepan, eval=FALSE-------------------------------------------------------
 #  #List all pre-pandemic tables
 #  nhanesSearchTableNames('^P_')
+#  #List table variables
+#  nhanesTableVars('EXAM', 'P_AUX', namesonly=TRUE)
 #  #List pre-pandemic EXAM tables
 #  nhanesTables('EXAM', 'P')
-#  #Table import and variable translation operate as usual
+#  #Table import, variable translation, and codebook display operate as usual
 #  p_dxxfem <- nhanes('P_DXXFEM')
 #  nhanesTranslate('P_BMX', 'BMDSTATS')
+#  nhanesCodebook('P_INS', 'LBDINSI')
 
 ## ----nhanesdxa, eval=FALSE----------------------------------------------------
 #  #Import into R
