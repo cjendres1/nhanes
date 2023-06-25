@@ -1,3 +1,5 @@
+# FUNCTION nhanesTranslate
+#
 #------------------------------------------------------------------------------
 #' Display code translation information.
 #' 

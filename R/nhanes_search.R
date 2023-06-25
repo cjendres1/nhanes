@@ -1,3 +1,8 @@
+# FUNCTIONS
+#  nhanesSearch
+#  nhanesSearchTableNames
+#  nhanesSearchVarName
+#
 #------------------------------------------------------------------------------
 #' Perform a search over the comprehensive NHANES variable list.
 #' 

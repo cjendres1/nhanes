@@ -1,13 +1,17 @@
 #nhanesA - retrieve data from the CDC NHANES repository
 # Christopher J. Endres 06/25/2023
-#
+# FUNCTIONS:
+#   nhanes
+#   nhanesDXA
+#   nhanesAttr
+#   browseNHANES
 
 #------------------------------------------------------------------------------
 #' Download an NHANES table and return as a data frame.
 #' 
 #' Use to download NHANES data tables that are in SAS format.
 #' 
-#' @importFrom foreign read.xport
+#' @importFrom foreign read.xport lookup.xport
 #' @importFrom stringr str_c
 #' @param nh_table The name of the specific table to retrieve.
 #' @param includelabels If TRUE, then include SAS labels as variable attribute (default = FALSE).

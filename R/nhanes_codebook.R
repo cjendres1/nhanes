@@ -1,3 +1,5 @@
+# FUNCTION nhanesCodebook
+#
 #------------------------------------------------------------------------------
 #' Display codebook for selected variable.
 #' 

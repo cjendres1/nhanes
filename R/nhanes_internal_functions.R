@@ -1,3 +1,9 @@
+# FUNCTIONS
+#  .get_year_from_nh_table
+#  .get_nh_survey_years
+#  .is.even
+#  .checkHtml
+#
 #------------------------------------------------------------------------------
 # An internal function that determines which survey year the table belongs to.
 # For most tables the year is indicated by the letter suffix following an underscore.

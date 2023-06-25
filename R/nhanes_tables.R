@@ -1,3 +1,7 @@
+# FUNCTIONS:
+#   nhanesTables
+#   nhanesTableVars
+#
 #------------------------------------------------------------------------------
 #' Returns a list of table names for the specified survey group.
 #' 
