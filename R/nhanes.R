@@ -374,6 +374,7 @@ nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=128, na
 #' @importFrom foreign read.xport
 #' @importFrom stringr str_c
 #' @param nh_table The name of the specific table to retrieve.
+#' @param includelabels If TRUE, then include SAS labels as variable attribute (default = FALSE).
 #' @return The table is returned as a data frame.
 #' @details Downloads a table from the NHANES website as is, i.e. in its entirety
 #' with no modification or cleansing. NHANES tables 
@@ -382,14 +383,14 @@ nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=128, na
 #' access data.
 #' @examples 
 #' \donttest{nhanes('BPX_E')}
-#' \donttest{nhanes('FOLATE_F')}
+#' \donttest{nhanes('FOLATE_F', includelabels = TRUE)}
 #' @export
 #' 
-nhanes <- function(nh_table) {
+nhanes <- function(nh_table, includelabels = FALSE) {
   nht <- tryCatch({    
     nh_year <- .get_year_from_nh_table(nh_table)
     
-    if(length(grep('^Y_', nh_table))>0) {
+    if(length(grep('^Y_', nh_table)) > 0) {
       url <- str_c('https://wwwn.cdc.gov/Nchs/', nh_year, '/', nh_table, '.XPT', collapse='')
     } else {
       url <- str_c(nhanesURL, nh_year, '/', nh_table, '.XPT', collapse='')
@@ -397,6 +398,23 @@ nhanes <- function(nh_table) {
     
     tf <- tempfile()
     download.file(url, tf, mode = "wb", quiet = TRUE)
+    
+    if(includelabels) {
+      xport_struct <- lookup.xport(tf)
+      column_names  <- xport_struct[[1]]$name
+      column_labels <- xport_struct[[1]]$label
+      names(column_labels) <- column_names
+      nh_df <- read.xport(tf)
+      
+      # Ideal case where rows and labels are identical
+      if(identical(names(nh_df), column_names)) {
+        for( name in column_names) {
+          attr(nh_df[[name]],"label") = column_labels[which(names(column_labels)==name)]
+        }
+      }
+      
+      return(nh_df)
+    }
     return(read.xport(tf))
   },
   error = function(cond) {

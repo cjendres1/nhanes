@@ -4,10 +4,12 @@
 \alias{nhanes}
 \title{Download an NHANES table and return as a data frame.}
 \usage{
-nhanes(nh_table)
+nhanes(nh_table, includelabels = FALSE)
 }
 \arguments{
 \item{nh_table}{The name of the specific table to retrieve.}
+
+\item{includelabels}{If TRUE, then include SAS labels as variable attribute (default = FALSE).}
 }
 \value{
 The table is returned as a data frame.
@@ -24,5 +26,5 @@ access data.
 }
 \examples{
 \donttest{nhanes('BPX_E')}
-\donttest{nhanes('FOLATE_F')}
+\donttest{nhanes('FOLATE_F', includelabels = TRUE)}
 }
