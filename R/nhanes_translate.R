@@ -136,9 +136,15 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
         idx <- grep(sstr, names(data)) 
         if(length(idx)>0) { ## The column is present. Next we need to decide if it should be translated.
           if(length(levels(as.factor(data[[idx]]))) >= mincategories) {
+               # If we reached this point then yes we are translating
+               # Check for label attribute
+            idx_label <- attr(data[[idx]],"label")
             data[[idx]] <- as.factor(data[[idx]])
             data[[idx]] <- suppressMessages(plyr::mapvalues(data[[idx]], from = translations[[cname]][['Code.or.Value']], 
                                                             to = str_sub(translations[[cname]][['Value.Description']], 1, nchar)))
+            if(!is.null(idx_label)) {
+              attr(data[[idx]],"label") <- idx_label
+              }
             translated <- c(translated, cname) }
         } else {
           notfound <- c(notfound, cname)
