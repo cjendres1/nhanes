@@ -93,7 +93,9 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
       }
       return(tabletrans)
     } else { 
-      message(paste(c('No translation table is available for ', colname), collapse=''))
+      if(!(colname=='SEQN')) {
+        message(paste(c('No translation table is available for ', colname), collapse=''))
+      }
       return(NULL)
     }
   }

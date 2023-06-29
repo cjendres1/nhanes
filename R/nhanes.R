@@ -56,8 +56,9 @@ nhanes <- function(nh_table, includelabels = FALSE) {
       }
       
       return(nh_df)
+    } else {
+      return(read.xport(tf))
     }
-    return(read.xport(tf))
   },
   error = function(cond) {
     message(paste("Data set ", nh_table,  " is not available"), collapse='')
