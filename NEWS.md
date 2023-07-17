@@ -1,3 +1,8 @@
+Version 0.7.4
+================================================================================
+
+- Add option includelabels to nhanes, which keeps the SAS label attribute (thanks @bashiruda https://github.com/cjendres1/nhanes/issues/17).
+
 Version 0.7.3
 ================================================================================
 

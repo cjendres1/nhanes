@@ -134,7 +134,7 @@ df
 ## ----nhanestranslate2, eval=FALSE---------------------------------------------
 #  bpx_d_vars  <- nhanesTableVars('EXAM', 'BPX_D', namesonly=TRUE)
 #  #Alternatively may use bpx_d_vars = names(bpx_d)
-#  bpx_d <- suppressMessages(nhanesTranslate('BPX_D', bpx_d_vars, data=bpx_d))
+#  bpx_d <- nhanesTranslate('BPX_D', bpx_d_vars, data=bpx_d)
 
 ## ----simpletranslate2, echo=FALSE---------------------------------------------
 translated <- c('BPAARM', 'BPACSZ', 'BPAEN2', 'BPAEN3', 'BPAEN4', 'BPQ150A', 'BPQ150B', 'BPQ150C', 'BPQ150D', 'BPXPTY', 'BPXPULS', 'PEASCCT1', 'PEASCST1')
