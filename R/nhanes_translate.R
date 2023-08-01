@@ -42,16 +42,14 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
     warning("When a data table is passed to nhanesTranslate, the details variable is ignored")
   }
   
-  get_translation_table <- function(colname, url, details) {
+  get_translation_table <- function(colname, hurl, details) {
     xpt <- str_c('//*[h3[a[@name="', colname, '"]]]', sep='')
     
-    hurl <- .checkHtml(url)
     tabletree <- hurl %>% html_elements(xpath=xpt)
     #    tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
     if(length(tabletree)==0) { # If not found then try 'id' instead of 'name'
       xpt <- str_c('//*[h3[@id="', colname, '"]]', sep='')
       
-      hurl <- .checkHtml(url)
       tabletree <- hurl %>% html_elements(xpath=xpt)
       #      tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
     }
@@ -64,13 +62,11 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
         stringr::str_sub(lcnm, start=nc, end=nc) <- tolower(stringr::str_sub(lcnm, start=nc, end=nc))
         xpt <- str_c('//*[h3[a[@name="', lcnm, '"]]]', sep='')
         
-        hurl <- .checkHtml(url)
         tabletree <- hurl %>% html_elements(xpath=xpt)
-        #        tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
+
         if(length(tabletree)==0) { # If not found then try 'id' instead of 'name'
           xpt <- str_c('//*[h3[@id="', lcnm, '"]]', sep='')
           
-          hurl <- .checkHtml(url)
           tabletree <- hurl %>% html_elements(xpath=xpt)
           #          tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
         }
@@ -113,7 +109,8 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
       code_translation_url <- str_c(nhanesURL, nh_year, '/', nh_table, '.htm', sep='')
     }
   }
-  translations <- lapply(colnames, get_translation_table, code_translation_url, details)
+  hurl <- .checkHtml(code_translation_url)
+  translations <- lapply(colnames, get_translation_table, hurl, details)
   names(translations) <- colnames
   
   #nchar_max <- 128
