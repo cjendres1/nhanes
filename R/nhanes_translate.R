@@ -16,7 +16,8 @@ transform_translation_with_range = function(tabletrans) {
       # split 1 to 6 to 1 2 3 4 5 6
       ranges = strsplit(ranges, " to ")
       ranges = lapply(ranges, function(x) {
-        if (length(x) != 2) {
+        # NO DECIMALS ARE CONVERTED!
+        if (length(x) != 2 || any(grepl("[.]", x))) {
           # warning
           return(NULL)
         }
