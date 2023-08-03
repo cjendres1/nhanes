@@ -1,3 +1,42 @@
+transform_translation_with_range = function(tabletrans) {
+  # do you have range of values in the value description?
+  if (any(grepl("Range", tabletrans$Value.Description))) {
+    # grab the range and missing vars
+    range_vars = grepl("Range", tabletrans$Value.Description)
+    missing_vars = grepl("Missing", tabletrans$Value.Description)
+    
+    # this is missing and non-range variables
+    tt = tabletrans[!range_vars,]
+    # if the table is *just* range variables (or missing), skip
+    if (!all(range_vars | missing_vars)) {
+      # grab the values
+      ranges = tabletrans$Code.or.Value[range_vars]
+      ranges = trimws(ranges)
+      ranges = gsub("\\s+", " ", ranges)
+      # split 1 to 6 to 1 2 3 4 5 6
+      ranges = strsplit(ranges, " to ")
+      ranges = lapply(ranges, function(x) {
+        if (length(x) != 2) {
+          # warning
+          return(NULL)
+        }
+        x = as.numeric(x)
+        x = seq(x[1], x[2], by = 1)
+        data.frame(
+          Code.or.Value = as.character(x),
+          Value.Description = as.character(x)
+        )
+      })
+      any_null = any(sapply(ranges, is.null))
+      if (!any_null) {
+        ranges = do.call("rbind", ranges)
+        tabletrans = rbind(ranges, tt)
+      }
+    }
+  }
+  tabletrans
+}
+
 # FUNCTION nhanesTranslate
 #
 #------------------------------------------------------------------------------
@@ -63,7 +102,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
         xpt <- str_c('//*[h3[a[@name="', lcnm, '"]]]', sep='')
         
         tabletree <- hurl %>% html_elements(xpath=xpt)
-
+        
         if(length(tabletree)==0) { # If not found then try 'id' instead of 'name'
           xpt <- str_c('//*[h3[@id="', lcnm, '"]]', sep='')
           
@@ -118,6 +157,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
     nchar <- nchar_max
   }
   
+  translations <- lapply(translations, transform_translation_with_range)
   if(is.null(data)) { ## If no data to translate then just return the translation table
     return(Filter(Negate(function(x) is.null(unlist(x))), translations))
   } else {
@@ -135,15 +175,15 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
         idx <- grep(sstr, names(data)) 
         if(length(idx)>0) { ## The column is present. Next we need to decide if it should be translated.
           if(length(levels(as.factor(data[[idx]]))) >= mincategories) {
-               # If we reached this point then yes we are translating
-               # Check for SAS label attribute
+            # If we reached this point then yes we are translating
+            # Check for SAS label attribute
             idx_label <- attr(data[[idx]],"label")
             data[[idx]] <- as.factor(data[[idx]])
             data[[idx]] <- suppressMessages(plyr::mapvalues(data[[idx]], from = translations[[cname]][['Code.or.Value']], 
                                                             to = str_sub(translations[[cname]][['Value.Description']], 1, nchar)))
             if(!is.null(idx_label)) {
               attr(data[[idx]],"label") <- idx_label
-              }
+            }
             translated <- c(translated, cname) }
         } else {
           notfound <- c(notfound, cname)
