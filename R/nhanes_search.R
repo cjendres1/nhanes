@@ -179,7 +179,7 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
 #' @export
 #' 
 nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includerdc=FALSE, 
-                                   includewithdrawn=FALSE, nchar=128, details=FALSE) {
+                                   includewithdrawn=FALSE, includeurl=FALSE, nchar=128, details=FALSE) {
   if(is.null(pattern)) {stop('No pattern was entered')}
   if(length(pattern)>1) {
     pattern <- pattern[1]
@@ -202,7 +202,13 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
   if(!includewithdrawn) {
     df <- df[!(df$Date.Published=='Withdrawn'),]
   }
-  
+  if(includeurl) {
+    urls <- hurl %>% html_elements(xpath=xpath) %>% html_nodes("a") %>% html_attr('href')
+    
+    docurl <- paste0("https://wwwn.cdc.gov", urls[grep(paste0(pattern, ".*\\.htm"), urls)]) %>% sort() 
+    dataurl <- paste0("https://wwwn.cdc.gov", urls[grep(paste0(pattern, ".*\\.XPT"), urls)]) %>% sort()
+    df <- df %>% arrange(Doc.File) %>% mutate(DocURL = docurl, DataURL = dataurl)
+  }
   
   if( !is.null(ystart) || !is.null(ystop) ) {
     # Use the first year of cycle (the odd year) for comparison
