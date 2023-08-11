@@ -48,5 +48,6 @@ that match a given name pattern. Only a single pattern may be entered.
 }
 \examples{
 \donttest{nhanesSearchTableNames('BMX')}
+\donttest{nhanesSearchTableNames('HEPBD', includeurl=TRUE)}
 \donttest{nhanesSearchTableNames('HPVS', includerdc=TRUE, details=TRUE)}
 }
