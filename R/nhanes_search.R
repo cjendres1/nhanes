@@ -156,7 +156,7 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
 #' 
 #' Returns a list of table names that match a specified pattern.
 #' 
-#' @importFrom rvest html_table
+#' @importFrom rvest html_table html_nodes html_attr
 #' @importFrom xml2 read_html
 #' @importFrom magrittr %>%
 #' @param pattern Pattern of table names to match  
@@ -223,8 +223,6 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
       df$docurl[i] <- paste0("https://wwwn.cdc.gov", docurl[match.arg(row.names(df)[i], names(docurl))])
       df$dataurl[i] <- paste0("https://wwwn.cdc.gov", dataurl[match.arg(row.names(df)[i], names(dataurl))])
     }
-    
-    df <- df %>% arrange(Doc.File)
   }
   
   if( !is.null(ystart) || !is.null(ystop) ) {
