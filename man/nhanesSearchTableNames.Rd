@@ -10,6 +10,7 @@ nhanesSearchTableNames(
   ystop = NULL,
   includerdc = FALSE,
   includewithdrawn = FALSE,
+  includeurl = FALSE,
   nchar = 128,
   details = FALSE
 )
@@ -24,6 +25,8 @@ nhanesSearchTableNames(
 \item{includerdc}{If TRUE then RDC only tables are included (default=FALSE).}
 
 \item{includewithdrawn}{IF TRUE then withdrawn tables are included (default=FALSE).}
+
+\item{includeurl}{IF TRUE then return urls. Automatically sets details = TRUE.}
 
 \item{nchar}{Truncates the variable description to a max length of nchar.}
 
@@ -45,5 +48,6 @@ that match a given name pattern. Only a single pattern may be entered.
 }
 \examples{
 \donttest{nhanesSearchTableNames('BMX')}
+\donttest{nhanesSearchTableNames('HEPBD', includeurl=TRUE)}
 \donttest{nhanesSearchTableNames('HPVS', includerdc=TRUE, details=TRUE)}
 }

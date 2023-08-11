@@ -160,18 +160,52 @@ nhanesDXA <- function(year, suppl=FALSE, destfile=NULL) {
 #' 
 nhanesAttr <- function(nh_table) {
   nht <- tryCatch({    
+
     nh_year <- .get_year_from_nh_table(nh_table)
-    url <- str_c(nhanesURL, nh_year, '/', nh_table, '.XPT', collapse='')
-    tmp <- read.xport(url)
-    nhtatt <- attributes(tmp)
+    
+    if(length(grep('^Y_', nh_table)) > 0) {
+      url <- str_c('https://wwwn.cdc.gov/Nchs/', nh_year, '/', nh_table, '.XPT', collapse='')
+    } else {
+      url <- str_c(nhanesURL, nh_year, '/', nh_table, '.XPT', collapse='')
+    }
+    
+    tf <- tempfile()
+    download.file(url, tf, mode = "wb", quiet = TRUE)
+    
+#    tmp <- read.xport(tf)
+    xport_struct <- lookup.xport(tf)
+    
+    column_names  <- xport_struct[[1]]$name
+    column_labels <- xport_struct[[1]]$label
+    names(column_labels) <- column_names
+    nh_df <- read.xport(tf)
+    
+
+    nhtatt <- attributes(nh_df)
     nhtatt$row.names <- NULL
-    nhtatt$nrow <- nrow(tmp)
-    nhtatt$ncol <- ncol(tmp)
-    nhtatt$unique <- (length(unique(tmp$SEQN)) == nhtatt$nrow)
-    nhtatt$na <- sum(is.na(tmp))
-    nhtatt$size <- object.size(tmp)
-    nhtatt$types <- sapply(tmp,class)
-    rm(tmp)
+    nhtatt$nrow <- nrow(nh_df)
+    nhtatt$ncol <- ncol(nh_df)
+    nhtatt$unique <- (length(unique(nh_df$SEQN)) == nhtatt$nrow)
+    nhtatt$na <- sum(is.na(nh_df))
+    nhtatt$size <- object.size(nh_df)
+    nhtatt$types <- sapply(nh_df,class)
+    
+    # Ideal case where rows and labels are identical
+    if(identical(names(nh_df), column_names)) {
+      for( name in column_names) {
+        attr(nh_df[[name]],"label") = column_labels[which(names(column_labels)==name)]
+      }
+      
+      return_label <- function(var) {
+        return(as.character(attr(var, "label")))
+      }
+      nhtatt$labels = sapply(nh_df, return_label)
+      
+    } else {
+      message(paste0("Column names and labels are not consistent for table ", nh_table, ". No labels added"))
+    }
+    
+    rm(nh_df)
     return(nhtatt)
   },
   error = function(cond) {

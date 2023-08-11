@@ -156,7 +156,7 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
 #' 
 #' Returns a list of table names that match a specified pattern.
 #' 
-#' @importFrom rvest html_table
+#' @importFrom rvest html_table html_nodes html_attr
 #' @importFrom xml2 read_html
 #' @importFrom magrittr %>%
 #' @param pattern Pattern of table names to match  
@@ -164,6 +164,7 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
 #' @param ystop  Four digit year of final survey included in search, where ystop >= ystart.
 #' @param includerdc If TRUE then RDC only tables are included (default=FALSE).
 #' @param includewithdrawn IF TRUE then withdrawn tables are included (default=FALSE).
+#' @param includeurl IF TRUE then return urls. Automatically sets details = TRUE. 
 #' @param nchar Truncates the variable description to a max length of nchar.
 #' @param details If TRUE then complete table information from the comprehensive
 #' data list is returned (default=FALSE).
@@ -175,11 +176,12 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
 #' that match a given name pattern. Only a single pattern may be entered.
 #' @examples
 #' \donttest{nhanesSearchTableNames('BMX')}
+#' \donttest{nhanesSearchTableNames('HEPBD', includeurl=TRUE)}
 #' \donttest{nhanesSearchTableNames('HPVS', includerdc=TRUE, details=TRUE)}
 #' @export
 #' 
 nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includerdc=FALSE, 
-                                   includewithdrawn=FALSE, nchar=128, details=FALSE) {
+                                   includewithdrawn=FALSE, includeurl=FALSE, nchar=128, details=FALSE) {
   if(is.null(pattern)) {stop('No pattern was entered')}
   if(length(pattern)>1) {
     pattern <- pattern[1]
@@ -192,8 +194,7 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
     return(NULL)
   }
   df <- data.frame(hurl %>% html_elements(xpath=xpath) %>% html_table())
-  #  df <- data.frame(read_html(dataURL) %>% html_elements(xpath=xpath) %>% html_table())
-  
+
   df <- df[grep(paste(pattern,collapse="|"), df$Doc.File),]
   if(nrow(df)==0) {return(NULL)}
   if(!includerdc) {
@@ -202,7 +203,27 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
   if(!includewithdrawn) {
     df <- df[!(df$Date.Published=='Withdrawn'),]
   }
-  
+  if(includeurl) {
+    details <- TRUE
+    urls <- hurl %>% html_elements(xpath=xpath) %>% html_nodes("a") %>% html_attr('href')
+    
+    docurl  <- sort(urls[grep(paste0(pattern, ".*\\.htm"), urls)])
+    names(docurl) <- str_remove(sub('.*\\/', '', docurl),".htm")
+    dataurl <- sort(urls[grep(paste0(pattern, ".*\\.XPT"), urls)])
+    names(dataurl) <- str_remove(sub('.*\\/', '', dataurl),".XPT")
+    row.names(df) <- str_remove(df$Doc.File, " Doc")
+    docurl <- docurl[names(docurl) %in% names(dataurl)]
+    
+    df <- df[row.names(df) %in% names(dataurl),]
+    
+    df$docurl <- ""
+    df$dataurl <- ""
+    
+    for(i in 1:nrow(df)) {
+      df$docurl[i] <- paste0("https://wwwn.cdc.gov", docurl[match.arg(row.names(df)[i], names(docurl))])
+      df$dataurl[i] <- paste0("https://wwwn.cdc.gov", dataurl[match.arg(row.names(df)[i], names(dataurl))])
+    }
+  }
   
   if( !is.null(ystart) || !is.null(ystop) ) {
     # Use the first year of cycle (the odd year) for comparison
