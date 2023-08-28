@@ -38,6 +38,10 @@ nhanesTables <- function(data_group, year, nchar=128, details = FALSE, namesonly
     stop("Invalid survey group")
     return(NULL)
   }
+
+  if(!is.na(collection_date) & !is.na(container_version)){
+    return(.nhanesTablesDB(data_group, year, nchar, details, namesonly, includerdc))
+  }
   
   if(year == 'P' | year == 'p') {
     turl <- str_c(nhanesURL, 'search/datapage.aspx?Component=', 
@@ -157,6 +161,11 @@ nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=128, na
     stop("Invalid survey group")
     return(NULL)
   }
+
+  if(!is.na(collection_date) & !is.na(container_version)){
+    return(.nhanesTableVarsDB(data_group, nh_table, details, nchar, namesonly))
+  }
+
   
   if(length(grep('^P_', nh_table))>0){
     nh_year <- '2017-2020'

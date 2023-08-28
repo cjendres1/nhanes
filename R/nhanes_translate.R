@@ -36,6 +36,10 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
     message('Column name is required')
     return(NULL)
   }
+
+  if(dxa==FALSE & !is.na(collection_date) & !is.na(container_version)){
+    return(.nhanesTranslateDB(nh_table, colnames,data,nchar,mincategories,details))
+  }
   
   if(!is.null(data) & details == TRUE) {
     details = FALSE

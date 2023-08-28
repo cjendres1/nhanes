@@ -26,6 +26,10 @@ nhanesCodebook <- function(nh_table, colname, dxa=FALSE) {
     message('Column name is required')
     return(0)
   }
+
+  if(dxa==FALSE & !is.na(collection_date) & !is.na(container_version)){
+    return(.nhanesCodebookDB(nh_table, colname))
+  }
   
   if(dxa) {
     url <- "https://wwwn.cdc.gov/nchs/data/nhanes/dxa/dxx_d.htm"
