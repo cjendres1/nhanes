@@ -38,14 +38,14 @@
 }
 
 # is translated tables exist
-.tranlsatedTables = .nhanesQuery("SELECT DISTINCT TABLE_NAME
+.translatedTables = .nhanesQuery("SELECT DISTINCT TABLE_NAME
                                 FROM INFORMATION_SCHEMA.TABLES
                                 WHERE TABLE_TYPE = 'BASE TABLE'
                                       AND TABLE_CATALOG='NhanesLandingZone' AND TABLE_SCHEMA = 'Translated'")$TABLE_NAME
 # choose the to query translated or Raw table.
 .convertTranslatedTable = function(table_name,translated){
   if(translated ){
-    translatedIndx = (table_name %in% .tranlsatedTables)
+    translatedIndx = (table_name %in% .translatedTables)
     table_name[translatedIndx] = paste0("Translated.",table_name[translatedIndx])
     if(sum(!translatedIndx)>0){
 
