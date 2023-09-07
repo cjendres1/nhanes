@@ -15,6 +15,7 @@
 #' @importFrom stringr str_c
 #' @param nh_table The name of the specific table to retrieve.
 #' @param includelabels If TRUE, then include SAS labels as variable attribute (default = FALSE).
+#' @param translated translated whether the variables are translated.
 #' @return The table is returned as a data frame.
 #' @details Downloads a table from the NHANES website as is, i.e. in its entirety
 #' with no modification or cleansing. NHANES tables 
@@ -26,7 +27,12 @@
 #' \donttest{nhanes('FOLATE_F', includelabels = TRUE)}
 #' @export
 #' 
-nhanes <- function(nh_table, includelabels = FALSE) {
+nhanes <- function(nh_table, includelabels = FALSE, translated=TRUE) {
+
+  if(!is.na(collection_date) & !is.na(container_version)){
+    return(.nhanesDB (nh_table,translated))
+  }
+
   nht <- tryCatch({    
     nh_year <- .get_year_from_nh_table(nh_table)
     
@@ -69,6 +75,8 @@ nhanes <- function(nh_table, includelabels = FALSE) {
     message(cond, '\n')    
   }  
   )
+  #FIXME: we need to set nchar parameter after the issues https://github.com/cjendres1/nhanes/issues/30 got fixed.
+  nht = nhanesTranslate(nh_table,colnames = colnames(nht)[2:nrow(nht)],data = demo)
   return(nht)
 }
 

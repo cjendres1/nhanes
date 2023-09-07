@@ -10,6 +10,8 @@ nhanes(nh_table, includelabels = FALSE)
 \item{nh_table}{The name of the specific table to retrieve.}
 
 \item{includelabels}{If TRUE, then include SAS labels as variable attribute (default = FALSE).}
+
+\item{translated}{translated whether the variables are translated.}
 }
 \value{
 The table is returned as a data frame.
