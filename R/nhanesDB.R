@@ -186,7 +186,7 @@
                             mincategories = 2, details = FALSE, dxa = FALSE){
   .checkTableNames(nh_table)
   if(data){
-    return(.nhanes(nh_table))
+    return(.nhanesDB(nh_table))
   }
 
   if(length(nh_table) > 1 ) stop("you can only select one table")
