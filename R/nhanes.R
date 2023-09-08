@@ -29,7 +29,7 @@
 #' 
 nhanes <- function(nh_table, includelabels = FALSE, translated=TRUE) {
 
-  if(!is.na(collection_date) & !is.na(container_version)){
+  if(!is.na(.collection_date) & !is.na(.container_version)){
     return(.nhanesDB (nh_table,translated))
   }
 

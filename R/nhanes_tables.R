@@ -39,7 +39,7 @@ nhanesTables <- function(data_group, year, nchar=128, details = FALSE, namesonly
     return(NULL)
   }
 
-  if(!is.na(collection_date) & !is.na(container_version)){
+  if(!is.na(.collection_date) & !is.na(.container_version)){
     return(.nhanesTablesDB(data_group, year, nchar, details, namesonly, includerdc))
   }
   
@@ -162,7 +162,7 @@ nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=128, na
     return(NULL)
   }
 
-  if(!is.na(collection_date) & !is.na(container_version)){
+  if(!is.na(.collection_date) & !is.na(.container_version)){
     return(.nhanesTableVarsDB(data_group, nh_table, details, nchar, namesonly))
   }
 

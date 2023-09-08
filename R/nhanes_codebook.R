@@ -27,7 +27,7 @@ nhanesCodebook <- function(nh_table, colname, dxa=FALSE) {
     return(0)
   }
 
-  if(dxa==FALSE & !is.na(collection_date) & !is.na(container_version)){
+  if(dxa==FALSE & !is.na(.collection_date) & !is.na(.container_version)){
     return(.nhanesCodebookDB(nh_table, colname))
   }
   
