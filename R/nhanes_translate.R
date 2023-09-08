@@ -37,7 +37,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32,
     return(NULL)
   }
 
-  if(dxa==FALSE & !is.na(collection_date) & !is.na(container_version)){
+  if(dxa==FALSE & !is.na(.collection_date) & !is.na(.container_version)){
     return(.nhanesTranslateDB(nh_table, colnames,data,nchar,mincategories,details))
   }
   
