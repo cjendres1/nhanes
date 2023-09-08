@@ -16,8 +16,7 @@ Imports:
     rvest,
     magrittr,
     xml2,
-    plyr,
-    MsSqlTools
+    plyr
 Description: Utility to retrieve data from the National Health and Nutrition 
 	Examination Survey (NHANES) website <https://www.cdc.gov/nchs/nhanes/index.htm>.
 License: GPL (>= 2)
