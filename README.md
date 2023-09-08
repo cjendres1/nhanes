@@ -34,6 +34,32 @@ install.packages("devtools")
 install_github("cjendres1/nhanes")
 ```
 
+
+**Use nhanesA in Docker**
+
+Start Docker on Mac or Linux
+
+```dockerfile
+docker run  --rm --name nhanes-workbench \
+        -v <YOUR LOCAL PATH>:/mnt/ \
+        -d \
+        -p 8787:8787 \
+        -p 2200:22 \
+        -p 1433:1433 \
+        -e 'CONTAINER_USER_USERNAME=nhanes' \
+        -e 'CONTAINER_USER_PASSWORD=nhanes' \
+        -e 'ACCEPT_EULA=Y' \
+        -e 'SA_PASSWORD=yourStrong(!)Password' \
+         hmsccb/nhanes-workbench:latest
+```
+
+Start Docker on Windows
+
+```dockerfile
+docker run  --rm --name nhanes-workbench -d  -v <YOUR LOCAL PATH>:/mnt/ -p 8787:8787 -p 2200:22 -p 1433:1433  -e 'CONTAINER_USER_USERNAME=nhanes'  -e 'CONTAINER_USER_PASSWORD=nhanes' -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=yourStrong(!)Password' hmsccb/nhanes-workbench:latest
+```
+Use the Rstudio via: http://localhost:8787/
+
 <br/>
 
 **Working with nhanesA**
