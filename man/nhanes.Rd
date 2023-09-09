@@ -4,7 +4,7 @@
 \alias{nhanes}
 \title{Download an NHANES table and return as a data frame.}
 \usage{
-nhanes(nh_table, includelabels = FALSE)
+nhanes(nh_table, includelabels = FALSE, translated = TRUE)
 }
 \arguments{
 \item{nh_table}{The name of the specific table to retrieve.}

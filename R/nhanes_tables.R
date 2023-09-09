@@ -38,8 +38,8 @@ nhanesTables <- function(data_group, year, nchar=128, details = FALSE, namesonly
     stop("Invalid survey group")
     return(NULL)
   }
-
-  if(!is.na(.collection_date) & !is.na(.container_version)){
+  
+  if(is.numeric(year) & !is.na(.collection_date) & !is.na(.container_version)){
     return(.nhanesTablesDB(data_group, year, nchar, details, namesonly, includerdc))
   }
   
