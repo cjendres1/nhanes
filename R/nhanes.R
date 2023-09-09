@@ -81,10 +81,7 @@ nhanes <- function(nh_table, includelabels = FALSE, translated=TRUE) {
     message(cond, '\n')    
   }  
   )
-  #FIXME: we need to set nchar parameter after the issues https://github.com/cjendres1/nhanes/issues/30 got fixed.
-  # if(translated){
-  #   nht = nhanesTranslate(nh_table,colnames = colnames(nht)[2:ncol(nht)],data = nht)
-  # }
+
   return(nht)
 }
 
