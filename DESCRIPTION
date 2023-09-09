@@ -25,6 +25,7 @@ URL: https://cran.r-project.org/package=nhanesA
 Packaged: 2015-10-07 18:15:14 UTC; Endres
 Suggests:
     knitr,
+    MsSqlTools,
     rmarkdown
 VignetteBuilder: knitr
 RoxygenNote: 7.2.3
