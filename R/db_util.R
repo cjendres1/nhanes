@@ -5,6 +5,7 @@
 ## Query data from the Docker database
 ## examples: nhanesQuery("SELECT TOP(50) * FROM Metadata.QuestionnaireVariables;")
 
+
 .nhanesQuery = function(sql){
   if(is.na(.collection_date) | is.na(.container_version)) 
     stop("can't run .nhanesQuery - no DB detected")
@@ -37,8 +38,7 @@
   if(translated ){
     translatedIndx = (table_name %in% .translatedTables)
     table_name[translatedIndx] = paste0("Translated.",table_name[translatedIndx])
-    if(sum(!translatedIndx)>0){
-
+    if(any(!translatedIndx)){
       warning("Table ",paste(table_name[!translatedIndx],collapse = ", "),
               " does/do not exist in Translated schema, using Raw schema instead.")
       table_name[!translatedIndx] = paste0("Raw.",table_name[!translatedIndx])
