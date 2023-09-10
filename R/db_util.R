@@ -4,8 +4,6 @@
 
 ## Query data from the Docker database
 ## examples: nhanesQuery("SELECT TOP(50) * FROM Metadata.QuestionnaireVariables;")
-.collection_date = NA
-.container_version = NA
 
 .nhanesQuery = function(sql){
   if(is.na(.collection_date) | is.na(.container_version)) 
