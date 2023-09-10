@@ -37,6 +37,8 @@ install_github("cjendres1/nhanes")
 
 **Use nhanesA in Docker**
 
+The Docker container hosts the data, allowing for faster access and manipulation directly from the local Docker environment.
+
 Start Docker on Mac or Linux
 
 ```dockerfile
@@ -59,6 +61,7 @@ Start Docker on Windows
 docker run  --rm --name nhanes-workbench -d  -v <YOUR LOCAL PATH>:/mnt/ -p 8787:8787 -p 2200:22 -p 1433:1433  -e 'CONTAINER_USER_USERNAME=nhanes'  -e 'CONTAINER_USER_PASSWORD=nhanes' -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=yourStrong(!)Password' hmsccb/nhanes-workbench:latest
 ```
 Use the Rstudio via: http://localhost:8787/
+More details about the [NHANES Docker](https://github.com/ccb-hms/NHANES)
 
 <br/>
 
