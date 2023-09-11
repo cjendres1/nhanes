@@ -34,32 +34,45 @@ install.packages("devtools")
 devtools::install_github("cjendres1/nhanes")
 ```
 
-
 ### Use nhanesA in Docker
 
-The Docker container hosts the data, allowing for faster access and manipulation directly from the local Docker environment. The summary of the differences between using the standard nhanesA and using it inside Docker is as follows:
+The Docker container hosts the data, allowing for faster access and
+manipulation directly from the local Docker environment. The summary of
+the differences between using the standard nhanesA and using it inside
+Docker is as follows:
 
 **Standard nhanesA:**
 
-- When used outside of Docker, the `nhanesA` functions scrape data directly from the CDC website each time they are invoked.
-- The advantage is simplicity; users only need to install the `nhanesA` package without any additional setup.
-- However, the response time is contingent upon internet speed and the size of the requested data.
+-   When used outside of Docker, the `nhanesA` functions scrape data
+    directly from the CDC website each time they are invoked.
+-   The advantage is simplicity; users only need to install the
+    `nhanesA` package without any additional setup.
+-   However, the response time is contingent upon internet speed and the
+    size of the requested data.
 
 **Docker-enhanced nhanesA:**
 
-- The Docker container locally hosts most of the NHANES data, allowing for significantly faster data access and manipulation.
-- Initial setup requires Docker installation and downloading the Docker image.
-- Pre-pandemic tables, DXA and the youth survey, are also not present in the Docker database and would similarly be fetched from the CDC website.
+-   The Docker container locally hosts most of the NHANES data, allowing
+    for significantly faster data access and manipulation.
+-   Initial setup requires Docker installation and downloading the
+    Docker image.
+-   Pre-pandemic tables, DXA and the youth survey, are also not present
+    in the Docker database and would similarly be fetched from the CDC
+    website.
 
-In essence, while the Docker-enhanced version offers blazing-fast access to a majority of the data, it will fetch data in the standard `nhanesA` manner for datasets not present in its database. 
+In essence, while the Docker-enhanced version offers blazing-fast access
+to a majority of the data, it will fetch data in the standard `nhanesA`
+manner for datasets not present in its database.
 
-To use `nhanesA` inside Docker, you can follow the two steps below: start Docker using the provided command and access RStudio through the given link.
+To use `nhanesA` inside Docker, you can follow the two steps below:
+start Docker using the provided command and access RStudio through the
+given link.
 
 **1. Start Docker**
 
 Start Docker on Mac or Linux
 
-```dockerfile
+``` dockerfile
 docker run  --rm --name nhanes-workbench \
         -v <YOUR LOCAL PATH>:/mnt/ \
         -d \
@@ -75,14 +88,18 @@ docker run  --rm --name nhanes-workbench \
 
 Start Docker on Windows
 
-```dockerfile
+``` dockerfile
 docker run  --rm --name nhanes-workbench -d  -v <YOUR LOCAL PATH>:/mnt/ -p 8787:8787 -p 2200:22 -p 1433:1433  -e 'CONTAINER_USER_USERNAME=nhanes'  -e 'CONTAINER_USER_PASSWORD=nhanes' -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=yourStrong(!)Password' hmsccb/nhanes-workbench:latest
 ```
+
 **2. Log into Rstudio**
 
-Log into RStudio via: <http://localhost:8787> and using the username set in the command above. In that command, both the username and password are set as "`nhanes`", but you can modify them if you prefer.
+Log into RStudio via: <http://localhost:8787> and using the username set
+in the command above. In that command, both the username and password
+are set as “`nhanes`”, but you can modify them if you prefer.
 
-More details about the [NHANES Docker](https://github.com/ccb-hms/NHANES).
+More details about the [NHANES
+Docker](https://github.com/ccb-hms/NHANES).
 
 <br/>
 
