@@ -45,12 +45,19 @@ nhanes <- function(nh_table, includelabels = FALSE, translated=TRUE) {
     tf <- tempfile()
     download.file(url, tf, mode = "wb", quiet = TRUE)
     
+    
+    nh_df <- read.xport(tf)
+    #FIXME: we need to set nchar parameter after the issues https://github.com/cjendres1/nhanes/issues/30 got fixed.
+    if(translated){
+      # suppress warning because there will be a warning and the function returns NULL when no colunms need to translated.
+      suppressWarnings({nh_df = nhanesTranslate(nh_table,colnames = colnames(nh_df)[2:ncol(nh_df)],data = nh_df)})
+    }
+    
     if(includelabels) {
       xport_struct <- lookup.xport(tf)
       column_names  <- xport_struct[[1]]$name
       column_labels <- xport_struct[[1]]$label
       names(column_labels) <- column_names
-      nh_df <- read.xport(tf)
       
       # Ideal case where rows and labels are identical
       if(identical(names(nh_df), column_names)) {
@@ -60,11 +67,10 @@ nhanes <- function(nh_table, includelabels = FALSE, translated=TRUE) {
       } else {
         message(paste0("Column names and labels are not consistent for table ", nh_table, ". No labels added"))
       }
-      
-      return(nh_df)
-    } else {
-      return(read.xport(tf))
-    }
+  
+    } 
+    return(nh_df)
+    
   },
   error = function(cond) {
     message(paste("Data set ", nh_table,  " is not available"), collapse='')
@@ -75,8 +81,7 @@ nhanes <- function(nh_table, includelabels = FALSE, translated=TRUE) {
     message(cond, '\n')    
   }  
   )
-  #FIXME: we need to set nchar parameter after the issues https://github.com/cjendres1/nhanes/issues/30 got fixed.
-  nht = nhanesTranslate(nh_table,colnames = colnames(nht)[2:nrow(nht)],data = demo)
+
   return(nht)
 }
 
