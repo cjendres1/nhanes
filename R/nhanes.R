@@ -45,12 +45,12 @@ nhanes <- function(nh_table, includelabels = FALSE, translated=TRUE) {
     tf <- tempfile()
     download.file(url, tf, mode = "wb", quiet = TRUE)
     
-    
     nh_df <- read.xport(tf)
-    #FIXME: we need to set nchar parameter after the issues https://github.com/cjendres1/nhanes/issues/30 got fixed.
+
     if(translated){
-      # suppress warning because there will be a warning and the function returns NULL when no colunms need to translated.
-      suppressWarnings({nh_df = nhanesTranslate(nh_table,colnames = colnames(nh_df)[2:ncol(nh_df)],data = nh_df)})
+      # suppress warning because there will be a warning and the function returns NULL when no columns need to translated.
+      suppressWarnings(suppressMessages({nh_df = 
+        nhanesTranslate(nh_table,colnames = colnames(nh_df)[2:ncol(nh_df)],data = nh_df)}))
     }
     
     if(includelabels) {
