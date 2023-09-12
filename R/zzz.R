@@ -17,13 +17,18 @@ cn = function() .datacache$cn
     #message("Data Collection Date: ", .collection_date)
     # suppress warining from DBI::dbConnect()
     before <- getTaskCallbackNames()
-    cn  <- MsSqlTools::connectMsSqlSqlLogin(
-       server = "localhost",
-       user ="sa",
-       password="yourStrong(!)Password",
-       database="NhanesLandingZone")
-       after <- getTaskCallbackNames()
-       removeTaskCallback(which(!after %in% before))
+    cn = DBI::dbConnect(
+      odbc::odbc(), 
+      uid = "sa", 
+      pwd = "yourStrong(!)Password",
+      server = "localhost", 
+      database = "NhanesLandingZone",
+      port = 1433, 
+      driver = "ODBC Driver 17 for SQL Server"
+     )
+    
+      after <- getTaskCallbackNames()
+      removeTaskCallback(which(!after %in% before))
    assign("cn", cn, envir = .datacache) 
    ##set up a couple of global variables
    .translatedTables <<- .nhanesQuery("SELECT DISTINCT TABLE_NAME
@@ -40,5 +45,7 @@ cn = function() .datacache$cn
 
 .onUnload <- function(libpath)
 {
+  if(!is.na(.container_version) & !is.na(.collection_date)){
   DBI::dbDisconnect(cn)
+  }
 }
