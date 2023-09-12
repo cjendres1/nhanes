@@ -3,10 +3,20 @@ Version: 0.7.5
 Date: 2023-08-11
 Title: NHANES Data Retrieval
 Authors@R:
-    person(given = "Christopher",
+    c(person(given = "Christopher",
              family = "Endres",
              role = c("aut", "cre"),
-             email = "cjendres1@gmail.com")
+             email = "cjendres1@gmail.com"),
+      person(given="Laha", 
+             family="Ale",
+             role = "aut", 
+             email="ainilaha@gmail.com", 
+             comment = c(ORCID = "0000-0002-4070-5289")),
+      person(given="Robert",
+             family="Gentleman",
+             role = "aut", 
+             email= "robert_gentleman@g.harvard.edu")  
+             )
 BugReports: https://github.com/cjendres1/nhanes/issues
 Depends:
     R (>= 3.0.0)
@@ -25,6 +35,8 @@ URL: https://cran.r-project.org/package=nhanesA
 Packaged: 2015-10-07 18:15:14 UTC; Endres
 Suggests:
     knitr,
+    odbc,
+    DBI,
     rmarkdown
 VignetteBuilder: knitr
 RoxygenNote: 7.2.3

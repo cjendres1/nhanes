@@ -2,7 +2,7 @@
 # Laha Ale and Robert Gentleman 06/08/2023
 
 
-.nhanesTablesDB = function( data_group, year,
+.nhanesTablesDB = function(data_group, year,
                          nchar = 128,  details = FALSE,
                          namesonly = FALSE, includerdc = FALSE ) {
   .checkDataGroupDB(data_group)
@@ -127,7 +127,7 @@
 
   df =.nhanesQuery(sql)
   if(is.null(df)){
-    warning(paste("Variable ",v, "is not found in the database!"))
+    warning(paste("Variable ",toString(sprintf("'%s'", varnames)), "is not found in the database!"))
   }
 
 
@@ -182,10 +182,10 @@
 
 
 
-.nhanesTranslateDB = function( nh_table, colnames = NULL, data = FALSE, nchar = 32,
+.nhanesTranslateDB = function(nh_table, colnames = NULL, data = FALSE, nchar = 32,
                             mincategories = 2, details = FALSE, dxa = FALSE){
   .checkTableNames(nh_table)
-  if(data){
+  if(!is.null(data)){
     return(.nhanesDB(nh_table))
   }
 

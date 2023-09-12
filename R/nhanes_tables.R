@@ -25,7 +25,8 @@
 #' a convenient way to browse the available tables. NULL is returned when an
 #' HTML read error is encountered.
 #' @examples
-#' nhanesTables('EXAM', 2007)
+#' exam = nhanesTables('EXAM', 2007)
+#' dim(exam)
 #' \donttest{nhanesTables('LAB', 2009, details=TRUE, includerdc=TRUE)}
 #' \donttest{nhanesTables('Q', 2005, namesonly=TRUE)}
 #' \donttest{nhanesTables('DIET', 'P')}
@@ -38,8 +39,8 @@ nhanesTables <- function(data_group, year, nchar=128, details = FALSE, namesonly
     stop("Invalid survey group")
     return(NULL)
   }
-
-  if(!is.na(.collection_date) & !is.na(.container_version)){
+  
+  if(is.numeric(year) & !is.na(.collection_date) & !is.na(.container_version)){
     return(.nhanesTablesDB(data_group, year, nchar, details, namesonly, includerdc))
   }
   
