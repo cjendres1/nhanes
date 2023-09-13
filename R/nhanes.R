@@ -50,7 +50,7 @@ nhanes <- function(nh_table, includelabels = FALSE, translated=TRUE) {
     if(translated){
       # suppress warning because there will be a warning and the function returns NULL when no columns need to translated.
       suppressWarnings(suppressMessages({nh_df = 
-        nhanesTranslate(nh_table,colnames = colnames(nh_df)[2:ncol(nh_df)],data = nh_df)}))
+        nhanesTranslate(nh_table, colnames = colnames(nh_df)[2:ncol(nh_df)], nchar=512, data = nh_df)}))
     }
     
     if(includelabels) {
