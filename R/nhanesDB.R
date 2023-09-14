@@ -304,7 +304,7 @@
                 Please check the table and variable name!"))
   }
 
-  res[colname]= .nhanesTranslateDB(nh_table, colname,details = TRUE)
+  res[colname]= nhanesTranslate(nh_table, colname,details = TRUE)
 
   res
 }

@@ -56,12 +56,12 @@
 # FUNCTION checkHtml
 # If read_html is successful, then the html is returned.
 # Otherwise return NULL for proper error handling
+# And NA is returned if the CDC handled the page not found error
 .checkHtml <- function(url) {
   out <- tryCatch(
     {
       # when "try" is successful, 'tryCatch()' returns the html 
-      hurl <- xml2::read_html(url)
-      hurl
+      xml2::read_html(url)
     },
     error=function(cond) {
       # If there is an error, determine if it's a timeout error or URL error 
@@ -81,6 +81,12 @@
       return(NULL)
     }
   )
+  ##check to see if they handle the page not found issue
+  if( !is.null(out)) {
+    pageNotFound = rvest::html_element(out, xpath="//meta[@content='Page Not Found']")
+    if (!is.na(pageNotFound)) out = NULL
+  }
+  
   return(out)
 }
 
