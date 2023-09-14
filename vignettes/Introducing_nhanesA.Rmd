@@ -110,7 +110,7 @@ bmx_d  <- nhanes('BMX_D')
 demo_d <- nhanes('DEMO_D')
 ```
 
-We merge the tables and display several variables: 
+We merge the tables and display several variables. Note that RIAGENDR, like most categorical variables, is a coded field. By default, the original coded values (1,2) are translated to (Male, Female).
 ```{r bmd1, eval=FALSE}
 bmx_demo <- merge(demo_d, bmx_d)
 options(digits=4)
@@ -118,14 +118,14 @@ select_cols <- c('RIAGENDR', 'BMXHT', 'BMXWT', 'BMXLEG', 'BMXCALF', 'BMXTHICR')
 print(bmx_demo[5:8,select_cols], row.names=FALSE)
 ```
 
-
-```{r bmx0, echo=FALSE}
+```{r bmx4, echo=FALSE}
 df <- data.frame(matrix(1,nrow=4,ncol=6))
 names(df) <- c('RIAGENDR', 'BMXHT', 'BMXWT', 'BMXLEG', 'BMXCALF', 'BMXTHICR')
-df[1,] <- list(2, 156.0, 75.2, 38.0, 36.6, 53.7)
-df[2,] <- list(1, 167.6,  69.5,   40.4,    35.6, 48.0)
-df[3,] <- list(2, 163.7,  45.0,   39.2,    31.7,     41.3)
-df[4,] <- list(1, 182.4, 101.9,   41.5,    42.6,     50.5)
+df[1,] <- list('Female', 156.0, 75.2, 38.0, 36.6, 53.7)
+df[2,] <- list('Male', 167.6,  69.5,   40.4,    35.6, 48.0)
+df[3,] <- list('Female', 163.7,  45.0,   39.2,    31.7,     41.3)
+df[4,] <- list('Male', 182.4, 101.9,   41.5,    42.6,     50.5)
+
 print(df,row.names=FALSE)
 ```
 
@@ -149,50 +149,16 @@ names(codelist) <- c('Variable Name', 'SAS Label', 'English Text', 'Target', 'RI
 
 codelist
 ```
-### Translate Coded Values
 
-RIAGENDR, like most categorical variables, is a coded field. That is, the values 1,2 correspond to coded values (Male, Female). If desired, we can use nhanesTranslate to apply a code translation to demo\_d directly by assigning data=demo\_d. That will replace the original values with the coded values.
-```{r bmx1, eval=FALSE}
-demo_d <- nhanesTranslate('DEMO_D', 'RIAGENDR', data=demo_d)
-```
-
-```{r bmx_m1, echo=FALSE}
-message("Translated columns: RIAGENDR")
-```
-
-```{r bmx2, eval=FALSE}
-bmx_demo <- merge(demo_d, bmx_d)
-```
-
-```{r bmx3, echo=FALSE}
-#bmx_demo$RIAGENDR[bmx_demo$RIAGENDR==1] <- 'Male'
-#bmx_demo$RIAGENDR[bmx_demo$RIAGENDR==2] <- 'Female'
-```
-
-The RIAGENDR field is now recoded as Male, Female instead of 1,2.
-```{r bmx_final_result, eval=FALSE}
-print(bmx_demo[5:8,select_cols], row.names=FALSE)
-```
-
-```{r bmx4, echo=FALSE}
-df <- data.frame(matrix(1,nrow=4,ncol=6))
-names(df) <- c('RIAGENDR', 'BMXHT', 'BMXWT', 'BMXLEG', 'BMXCALF', 'BMXTHICR')
-df[1,] <- list('Female', 156.0, 75.2, 38.0, 36.6, 53.7)
-df[2,] <- list('Male', 167.6,  69.5,   40.4,    35.6, 48.0)
-df[3,] <- list('Female', 163.7,  45.0,   39.2,    31.7,     41.3)
-df[4,] <- list('Male', 182.4, 101.9,   41.5,    42.6,     50.5)
-
-print(df,row.names=FALSE)
-```
-
-### Apply All Possible Code Translations to a Table
-An NHANES table may have dozens of columns with coded values. Translating all possible columns is a three step process.
-1: Download the table
-2: Save a list of table variables
+### Apply Code Translations
+As a default, the nhanes function will translate coded values. If desired, this default behavior can be turned off by setting translate = FALSE. You may then customize the translation of coded fields using nhanesTranslate.
+Customized translation of coded fields is a three step process.
+1: Download the table using nhanes with translate = FALSE
+2: Select the table variables to translate
 3: Pass the table and variable list to nhanesTranslate
 
 ```{r nhanestranslate1, eval=FALSE}
-bpx_d <- nhanes('BPX_D')
+bpx_d <- nhanes('BPX_D', translate=FALSE)
 head(bpx_d[,6:11])
 ```
 
@@ -233,7 +199,7 @@ df[df==4] <- 'Large (15X32)'
 df
 ```
 
-Some discretion should be applied when translating coded columns as code translations can be quite long. To improve readability the translation string is restricted to a default length of 32 but can be set as high as 128. Also, columns that have at least two categories (e.g. Male, Female) will be translated, but mincategories can be set to 1 to perform the translation even if only a single category is present.
+Some discretion should be applied when translating coded columns as code translations can be quite long. To improve readability the translation string is restricted to a default length of 128 but can be set as high as 1024. Also, columns that have at least two categories (e.g. Male, Female) will be translated, but mincategories can be set to 1 to perform the translation even if only a single category is present.
 
 ### Download a Complete Survey
 The primary goal of nhanesA is to enable fully customizable processing of select NHANES tables. However, it is quite easy to download entire surveys using nhanesA functions.

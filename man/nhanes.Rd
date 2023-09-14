@@ -4,7 +4,7 @@
 \alias{nhanes}
 \title{Download an NHANES table and return as a data frame.}
 \usage{
-nhanes(nh_table, includelabels = FALSE, translated = TRUE)
+nhanes(nh_table, includelabels = FALSE, translated = TRUE, nchar = 128)
 }
 \arguments{
 \item{nh_table}{The name of the specific table to retrieve.}
@@ -12,6 +12,8 @@ nhanes(nh_table, includelabels = FALSE, translated = TRUE)
 \item{includelabels}{If TRUE, then include SAS labels as variable attribute (default = FALSE).}
 
 \item{translated}{translated whether the variables are translated.}
+
+\item{nchar}{Maximum length of translated string (default = 128). Ignored if translated=FALSE.}
 }
 \value{
 The table is returned as a data frame.

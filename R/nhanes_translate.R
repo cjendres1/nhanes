@@ -15,7 +15,7 @@
 #' @param data If a data frame is passed, then code translation will be applied directly to the data frame. \cr
 #' In that case the return argument is the code-translated data frame.
 #' @param nchar Applies only when data is defined. Code translations can be very long. \cr
-#' Truncate the length by setting nchar (default = 32).
+#' Truncate the length by setting nchar (default = 128).
 #' @param mincategories The minimum number of categories needed for code translations to be applied to the data (default=2).
 #' @param details If TRUE then all available table translation information is displayed (default=FALSE).
 #' @param dxa If TRUE then the 2005-2006 DXA translation table will be used (default=FALSE).
@@ -30,7 +30,7 @@
 #' \donttest{nhanesTranslate('BPX_F', 'BPACSZ', data=nhanes('BPX_F'))}
 #' @export
 #' 
-nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 32, 
+nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128, 
                             mincategories = 2, details=FALSE, dxa=FALSE) {
   if(is.null(colnames)) {
     message('Column name is required')

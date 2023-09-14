@@ -8,7 +8,7 @@ nhanesTranslate(
   nh_table,
   colnames = NULL,
   data = NULL,
-  nchar = 32,
+  nchar = 128,
   mincategories = 2,
   details = FALSE,
   dxa = FALSE
@@ -23,7 +23,7 @@ nhanesTranslate(
 In that case the return argument is the code-translated data frame.}
 
 \item{nchar}{Applies only when data is defined. Code translations can be very long. \cr
-Truncate the length by setting nchar (default = 32).}
+Truncate the length by setting nchar (default = 128).}
 
 \item{mincategories}{The minimum number of categories needed for code translations to be applied to the data (default=2).}
 

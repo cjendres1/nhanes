@@ -1,5 +1,5 @@
 #nhanesA - retrieve data from the CDC NHANES repository
-# Christopher J. Endres 06/25/2023
+# Christopher J. Endres 09/14/2023
 # FUNCTIONS:
 #   nhanes
 #   nhanesDXA
@@ -16,6 +16,7 @@
 #' @param nh_table The name of the specific table to retrieve.
 #' @param includelabels If TRUE, then include SAS labels as variable attribute (default = FALSE).
 #' @param translated translated whether the variables are translated.
+#' @param nchar Maximum length of translated string (default = 128). Ignored if translated=FALSE.
 #' @return The table is returned as a data frame.
 #' @details Downloads a table from the NHANES website as is, i.e. in its entirety
 #' with no modification or cleansing. NHANES tables 
@@ -27,7 +28,7 @@
 #' \donttest{nhanes('FOLATE_F', includelabels = TRUE)}
 #' @export
 #' 
-nhanes <- function(nh_table, includelabels = FALSE, translated=TRUE) {
+nhanes <- function(nh_table, includelabels = FALSE, translated=TRUE, nchar=128) {
 
   if(!is.na(.collection_date) & !is.na(.container_version)){
     return(.nhanesDB (nh_table,translated))
@@ -50,7 +51,7 @@ nhanes <- function(nh_table, includelabels = FALSE, translated=TRUE) {
     if(translated){
       # suppress warning because there will be a warning and the function returns NULL when no columns need to translated.
       suppressWarnings(suppressMessages({nh_df = 
-        nhanesTranslate(nh_table,colnames = colnames(nh_df)[2:ncol(nh_df)],data = nh_df)}))
+        nhanesTranslate(nh_table,colnames = colnames(nh_df)[2:ncol(nh_df)],data = nh_df, nchar=nchar)}))
     }
     
     if(includelabels) {

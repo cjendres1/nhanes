@@ -65,13 +65,14 @@ df
 #  select_cols <- c('RIAGENDR', 'BMXHT', 'BMXWT', 'BMXLEG', 'BMXCALF', 'BMXTHICR')
 #  print(bmx_demo[5:8,select_cols], row.names=FALSE)
 
-## ----bmx0, echo=FALSE---------------------------------------------------------
+## ----bmx4, echo=FALSE---------------------------------------------------------
 df <- data.frame(matrix(1,nrow=4,ncol=6))
 names(df) <- c('RIAGENDR', 'BMXHT', 'BMXWT', 'BMXLEG', 'BMXCALF', 'BMXTHICR')
-df[1,] <- list(2, 156.0, 75.2, 38.0, 36.6, 53.7)
-df[2,] <- list(1, 167.6,  69.5,   40.4,    35.6, 48.0)
-df[3,] <- list(2, 163.7,  45.0,   39.2,    31.7,     41.3)
-df[4,] <- list(1, 182.4, 101.9,   41.5,    42.6,     50.5)
+df[1,] <- list('Female', 156.0, 75.2, 38.0, 36.6, 53.7)
+df[2,] <- list('Male', 167.6,  69.5,   40.4,    35.6, 48.0)
+df[3,] <- list('Female', 163.7,  45.0,   39.2,    31.7,     41.3)
+df[4,] <- list('Male', 182.4, 101.9,   41.5,    42.6,     50.5)
+
 print(df,row.names=FALSE)
 
 ## ----nhanescodebook, eval=FALSE-----------------------------------------------
@@ -90,34 +91,8 @@ names(codelist) <- c('Variable Name', 'SAS Label', 'English Text', 'Target', 'RI
 
 codelist
 
-## ----bmx1, eval=FALSE---------------------------------------------------------
-#  demo_d <- nhanesTranslate('DEMO_D', 'RIAGENDR', data=demo_d)
-
-## ----bmx_m1, echo=FALSE-------------------------------------------------------
-message("Translated columns: RIAGENDR")
-
-## ----bmx2, eval=FALSE---------------------------------------------------------
-#  bmx_demo <- merge(demo_d, bmx_d)
-
-## ----bmx3, echo=FALSE---------------------------------------------------------
-#bmx_demo$RIAGENDR[bmx_demo$RIAGENDR==1] <- 'Male'
-#bmx_demo$RIAGENDR[bmx_demo$RIAGENDR==2] <- 'Female'
-
-## ----bmx_final_result, eval=FALSE---------------------------------------------
-#  print(bmx_demo[5:8,select_cols], row.names=FALSE)
-
-## ----bmx4, echo=FALSE---------------------------------------------------------
-df <- data.frame(matrix(1,nrow=4,ncol=6))
-names(df) <- c('RIAGENDR', 'BMXHT', 'BMXWT', 'BMXLEG', 'BMXCALF', 'BMXTHICR')
-df[1,] <- list('Female', 156.0, 75.2, 38.0, 36.6, 53.7)
-df[2,] <- list('Male', 167.6,  69.5,   40.4,    35.6, 48.0)
-df[3,] <- list('Female', 163.7,  45.0,   39.2,    31.7,     41.3)
-df[4,] <- list('Male', 182.4, 101.9,   41.5,    42.6,     50.5)
-
-print(df,row.names=FALSE)
-
 ## ----nhanestranslate1, eval=FALSE---------------------------------------------
-#  bpx_d <- nhanes('BPX_D')
+#  bpx_d <- nhanes('BPX_D', translate=FALSE)
 #  head(bpx_d[,6:11])
 
 ## ----simpletranslate1, echo=FALSE---------------------------------------------
