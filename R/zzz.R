@@ -39,10 +39,6 @@ cn = function() .datacache$cn
    # query table names from Metadata.QuestionnaireVariables
    .validTables <<- .nhanesQuery("SELECT DISTINCT TableName FROM Metadata.QuestionnaireVariables;")$TableName
 
-  }else{
-    html_doc = .checkHtml("https://wwwn.cdc.gov/nchs/nhanes/search/datapage.aspx")
-    tables <- rvest::html_elements(html_doc, xpath="//tbody/tr/td[2]/a/text()") |> xml2::xml_text()
-    .validTables <<- gsub(' Doc','',tables)
   }
 
 }
