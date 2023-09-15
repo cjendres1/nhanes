@@ -16,8 +16,8 @@
 # check if the table names are valid
 
 .checkTableNames = function(table_name){
-  if(is.na(.collection_date) | is.na(.container_version))
-   stop("no DB detected")
+  # if(is.na(.collection_date) | is.na(.container_version))
+  #  stop("no DB detected")
 
   if(is.null(table_name)){
     stop("Table name cannot be null!")

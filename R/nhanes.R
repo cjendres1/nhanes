@@ -29,7 +29,7 @@
 #' @export
 #' 
 nhanes <- function(nh_table, includelabels = FALSE, translated=TRUE, nchar=128) {
-
+   .checkTableNames(nh_table)
   if(!is.na(.collection_date) & !is.na(.container_version)){
     return(.nhanesDB (nh_table,translated))
   }
