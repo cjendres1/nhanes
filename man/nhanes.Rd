@@ -29,6 +29,8 @@ Function nhanes cannot be used to import limited
 access data.
 }
 \examples{
-\donttest{nhanes('BPX_E')}
-\donttest{nhanes('FOLATE_F', includelabels = TRUE)}
+\donttest{bpx_e = nhanes('BPX_E')}
+\donttest{dim(bpx_e)}
+\donttest{floate_f = nhanes('FOLATE_F', includelabels = TRUE)}
+\donttest{dim(floate_f)}
 }

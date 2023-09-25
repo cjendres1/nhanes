@@ -43,8 +43,12 @@ HTML read error is encountered.
 \examples{
 exam = nhanesTables('EXAM', 2007)
 dim(exam)
-\donttest{nhanesTables('LAB', 2009, details=TRUE, includerdc=TRUE)}
-\donttest{nhanesTables('Q', 2005, namesonly=TRUE)}
-\donttest{nhanesTables('DIET', 'P')}
-\donttest{nhanesTables('EXAM', 'Y')}
+\donttest{lab = nhanesTables('LAB', 2009, details=TRUE, includerdc=TRUE)}
+\donttest{dim(lab)}
+\donttest{q = nhanesTables('Q', 2005, namesonly=TRUE)}
+\donttest{length(q)}
+\donttest{diet = nhanesTables('DIET', 'P')}
+\donttest{dim(diet)}
+\donttest{exam = nhanesTables('EXAM', 'Y')}
+\donttest{dim(exam)}
 }

@@ -27,10 +27,14 @@
 #' @examples
 #' exam = nhanesTables('EXAM', 2007)
 #' dim(exam)
-#' \donttest{nhanesTables('LAB', 2009, details=TRUE, includerdc=TRUE)}
-#' \donttest{nhanesTables('Q', 2005, namesonly=TRUE)}
-#' \donttest{nhanesTables('DIET', 'P')}
-#' \donttest{nhanesTables('EXAM', 'Y')}
+#' \donttest{lab = nhanesTables('LAB', 2009, details=TRUE, includerdc=TRUE)}
+#' \donttest{dim(lab)}
+#' \donttest{q = nhanesTables('Q', 2005, namesonly=TRUE)}
+#' \donttest{length(q)}
+#' \donttest{diet = nhanesTables('DIET', 'P')}
+#' \donttest{dim(diet)}
+#' \donttest{exam = nhanesTables('EXAM', 'Y')}
+#' \donttest{dim(exam)}
 #' @export
 #'
 
@@ -152,9 +156,12 @@ nhanesTables <- function(data_group, year, nchar=128, details = FALSE, namesonly
 #' of variables for a specified table, which helps to ascertain quickly if the table is of interest. 
 #' NULL is returned when an HTML read error is encountered.
 #' @examples
-#' \donttest{nhanesTableVars('LAB', 'CBC_E')}
-#' \donttest{nhanesTableVars('EXAM', 'OHX_E', details=TRUE, nchar=50)}
-#' \donttest{nhanesTableVars('DEMO', 'DEMO_F', namesonly = TRUE)}
+#' \donttest{lab_cbc = nhanesTableVars('LAB', 'CBC_E')}
+#' \donttest{dim(lab_cbc)}
+#' \donttest{exam_ohx = nhanesTableVars('EXAM', 'OHX_E', details=TRUE, nchar=50)}
+#' \donttest{dim(exam_ohx)}
+#' \donttest{demo = nhanesTableVars('DEMO', 'DEMO_F', namesonly = TRUE)}
+#' \donttest{length(demo)}
 #' @export
 #' 
 nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=128, namesonly = FALSE) {

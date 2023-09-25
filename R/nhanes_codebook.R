@@ -19,6 +19,8 @@
 #' @examples
 #' \donttest{nhanesCodebook('AUX_D', 'AUQ020D')}
 #' \donttest{nhanesCodebook('BPX_J', 'BPACSZ')}
+#' \donttest{bpx_code = nhanesCodebook('BPX_J')}
+#' \donttest{length(bpx_code)}
 #' @export
 #'
 nhanesCodebook <- function(nh_table, colname=NULL, dxa=FALSE) {
