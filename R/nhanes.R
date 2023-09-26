@@ -26,8 +26,8 @@
 #' @examples 
 #' \donttest{bpx_e = nhanes('BPX_E')}
 #' \donttest{dim(bpx_e)}
-#' \donttest{floate_f = nhanes('FOLATE_F', includelabels = TRUE)}
-#' \donttest{dim(floate_f)}
+#' \donttest{folate_f = nhanes('FOLATE_F', includelabels = TRUE)}
+#' \donttest{dim(folate_f)}
 #' @export
 #' 
 nhanes <- function(nh_table, includelabels = FALSE, translated=TRUE, nchar=128) {
