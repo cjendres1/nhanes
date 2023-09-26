@@ -17,7 +17,7 @@ nhanesTranslate(
 \arguments{
 \item{nh_table}{The name of the NHANES table to retrieve.}
 
-\item{colnames}{The names of the columns to translate.}
+\item{colnames}{The names of the columns to translate. It will translate all the columns by default.}
 
 \item{data}{If a data frame is passed, then code translation will be applied directly to the data frame. \cr
 In that case the return argument is the code-translated data frame.}
@@ -48,4 +48,6 @@ can be selected. Code translations are retrieved for each variable.
 \donttest{nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN'))}
 \donttest{nhanesTranslate('BPX_F', 'BPACSZ', details=TRUE)}
 \donttest{nhanesTranslate('BPX_F', 'BPACSZ', data=nhanes('BPX_F'))}
+\donttest{trans_demo = nhanesTranslate('DEMO_B')}
+\donttest{length(trans_demo)}
 }

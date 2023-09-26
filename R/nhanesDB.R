@@ -289,22 +289,35 @@
 .nhanesCodebookDB = function(nh_table, colname){
   # FIXME: we need handle multiple targets once DB is updated!
   .checkTableNames(nh_table)
-  if(length(colname) > 1){
-    stop("colname not accepts a list, please provide one colunm name only!")
-  }
 
   sql = paste0("SELECT Variable AS 'Variable Name:',
                        SasLabel AS 'SAS Label:',
                        Description AS 'English Text:',
                        Target AS 'Target:'
-                       FROM Metadata.QuestionnaireVariables WHERE TableName='",nh_table,"' AND Variable='",colname,"'")
-  res = as.list(.nhanesQuery(sql))
+                       FROM Metadata.QuestionnaireVariables WHERE TableName='",nh_table,"'")
+  
+  if(!is.null(colname))
+    sql = paste0(sql," AND Variable IN (", toString(sprintf("'%s'", colname)),")")
+
+  # res = as.list(t(.nhanesQuery(sql)))
+  res = .nhanesQuery(sql)
+
   if(length(res[[1]])==0){
     stop(paste0("The variable \"",colname,"\" is not found in the data file/table \"",nh_table,"\".
                 Please check the table and variable name!"))
   }
+  colname = res$`Variable Name:`
+  res.list = split(res, seq(nrow(res)))
+  res.list = lapply(res.list, as.list)
+  names(res.list) = colname
 
-  res[colname]= nhanesTranslate(nh_table, colname,details = TRUE)
+  trans = nhanesTranslate(nh_table, colname,details = TRUE)
 
-  res
+  for (code in names(res.list)){
+    if(code %in% names(trans)){
+      res.list[[code]] = append(res.list[[code]],trans[code])
+    }
+  }
+
+  res.list 
 }

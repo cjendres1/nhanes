@@ -24,8 +24,10 @@
 #' Function nhanes cannot be used to import limited 
 #' access data.
 #' @examples 
-#' \donttest{nhanes('BPX_E')}
-#' \donttest{nhanes('FOLATE_F', includelabels = TRUE)}
+#' \donttest{bpx_e = nhanes('BPX_E')}
+#' \donttest{dim(bpx_e)}
+#' \donttest{floate_f = nhanes('FOLATE_F', includelabels = TRUE)}
+#' \donttest{dim(floate_f)}
 #' @export
 #' 
 nhanes <- function(nh_table, includelabels = FALSE, translated=TRUE, nchar=128) {
@@ -105,7 +107,7 @@ nhanes <- function(nh_table, includelabels = FALSE, translated=TRUE, nchar=128) 
 #' @examples
 #' \donttest{dxa_b <- nhanesDXA(2001)}
 #' \donttest{dxa_c_s <- nhanesDXA(2003, suppl=TRUE)}
-#' \dontrun{nhanesDXA(1999, destfile="dxx.xpt")}
+#' \dontrun{dxa = nhanesDXA(1999, destfile="dxx.xpt")}
 #' @export
 nhanesDXA <- function(year, suppl=FALSE, destfile=NULL) {
 

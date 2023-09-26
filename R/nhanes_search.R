@@ -31,9 +31,12 @@
 #' The search may be restricted to specific surveys using ystart and ystop.
 #' If no arguments are given, then nhanesSearch returns the complete variable list.
 #' @examples
-#'  \donttest{nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)}
-#'  \donttest{nhanesSearch("urin", exclude_terms="During", ystart=2009)}
-#'  \donttest{nhanesSearch(c("urine", "urinary"), ignore.case=TRUE, ystop=2006, namesonly=TRUE)}
+#'  \donttest{bladder = nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)}
+#'  \donttest{dim(bladder)}
+#'  \donttest{urin = nhanesSearch("urin", exclude_terms="During", ystart=2009)}
+#'  \donttest{dim(urin)}
+#'  \donttest{urine = nhanesSearch(c("urine", "urinary"), ignore.case=TRUE, ystop=2006, namesonly=TRUE)}
+#'  \donttest{dim(urine)}
 #' @export
 #' 
 nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL, ignore.case=FALSE, 
@@ -182,9 +185,12 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
 #' (see https://wwwn.cdc.gov/nchs/nhanes/search/DataPage.aspx) for tables
 #' that match a given name pattern. Only a single pattern may be entered.
 #' @examples
-#' \donttest{nhanesSearchTableNames('BMX')}
-#' \donttest{nhanesSearchTableNames('HEPBD', includeurl=TRUE)}
-#' \donttest{nhanesSearchTableNames('HPVS', includerdc=TRUE, details=TRUE)}
+#' \donttest{bmx = nhanesSearchTableNames('BMX')}
+#' \donttest{length(bmx)}
+#' \donttest{hepbd = nhanesSearchTableNames('HEPBD', includeurl=TRUE)}
+#' \donttest{dim(hepbd)}
+#' \donttest{hpvs = nhanesSearchTableNames('HPVS', includerdc=TRUE, details=TRUE)}
+#' \donttest{dim(hpvs)}
 #' @export
 #' 
 nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includerdc=FALSE, 

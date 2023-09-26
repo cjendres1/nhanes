@@ -11,7 +11,7 @@
 #' @importFrom xml2 read_html
 #' @importFrom plyr mapvalues
 #' @param nh_table The name of the NHANES table to retrieve.
-#' @param colnames The names of the columns to translate.
+#' @param colnames The names of the columns to translate. It will translate all the columns by default.
 #' @param data If a data frame is passed, then code translation will be applied directly to the data frame. \cr
 #' In that case the return argument is the code-translated data frame.
 #' @param nchar Applies only when data is defined. Code translations can be very long. \cr
@@ -28,18 +28,21 @@
 #' \donttest{nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN'))}
 #' \donttest{nhanesTranslate('BPX_F', 'BPACSZ', details=TRUE)}
 #' \donttest{nhanesTranslate('BPX_F', 'BPACSZ', data=nhanes('BPX_F'))}
+#' \donttest{trans_demo = nhanesTranslate('DEMO_B')}
+#' \donttest{length(trans_demo)}
 #' @export
 #' 
 nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128, 
                             mincategories = 2, details=FALSE, dxa=FALSE) {
-  if(is.null(colnames)) {
-    message('Column name is required')
-    return(NULL)
-  }
 
   if(dxa==FALSE & !is.na(.collection_date) & !is.na(.container_version)){
     return(.nhanesTranslateDB(nh_table, colnames,data,nchar,mincategories,details))
   }
+
+  # if(is.null(colnames)) {
+  #   message('Column name is required')
+  #   return(NULL)
+  # }
   
   if(!is.null(data) & details == TRUE) {
     details = FALSE
@@ -114,6 +117,8 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128,
     }
   }
   hurl <- .checkHtml(code_translation_url)
+  if(is.null(colnames) )
+    colnames = .getVarNames(hurl)$VarNames
   translations <- lapply(colnames, get_translation_table, hurl, details)
   names(translations) <- colnames
   

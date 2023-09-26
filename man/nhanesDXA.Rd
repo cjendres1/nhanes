@@ -28,5 +28,5 @@ the data will be imported into the R environment.
 \examples{
 \donttest{dxa_b <- nhanesDXA(2001)}
 \donttest{dxa_c_s <- nhanesDXA(2003, suppl=TRUE)}
-\dontrun{nhanesDXA(1999, destfile="dxx.xpt")}
+\dontrun{dxa = nhanesDXA(1999, destfile="dxx.xpt")}
 }
