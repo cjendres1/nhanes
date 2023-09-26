@@ -32,7 +32,7 @@
 #' 
 nhanes <- function(nh_table, includelabels = FALSE, translated=TRUE, nchar=128) {
 
-  if(!is.na(.collection_date) & !is.na(.container_version)){
+  if(!grepl("^(P_|Y_)\\w+", nh_table) & !is.na(.collection_date) & !is.na(.container_version)){
     return(.nhanesDB (nh_table,translated))
   }
 

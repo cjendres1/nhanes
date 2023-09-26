@@ -36,7 +36,7 @@
 #'  \donttest{urin = nhanesSearch("urin", exclude_terms="During", ystart=2009)}
 #'  \donttest{dim(urin)}
 #'  \donttest{urine = nhanesSearch(c("urine", "urinary"), ignore.case=TRUE, ystop=2006, namesonly=TRUE)}
-#'  \donttest{dim(urine)}
+#'  \donttest{length(urine)}
 #' @export
 #' 
 nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL, ignore.case=FALSE, 
