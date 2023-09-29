@@ -170,7 +170,7 @@ nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=128, na
     return(NULL)
   }
 
-  if(!is.na(.collection_date) & !is.na(.container_version)){
+  if(!grepl("^(P_|Y_)\\w+", nh_table) & !is.na(.collection_date) & !is.na(.container_version)){
     return(.nhanesTableVarsDB(data_group, nh_table, details, nchar, namesonly))
   }
 

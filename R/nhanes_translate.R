@@ -35,7 +35,7 @@
 nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128, 
                             mincategories = 2, details=FALSE, dxa=FALSE) {
 
-  if(dxa==FALSE & !is.na(.collection_date) & !is.na(.container_version)){
+  if(dxa==FALSE & !grepl("^(P_|Y_)\\w+", nh_table) & !is.na(.collection_date) & !is.na(.container_version)){
     return(.nhanesTranslateDB(nh_table, colnames,data,nchar,mincategories,details))
   }
 

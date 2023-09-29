@@ -152,7 +152,7 @@ df
 #  dxx_c_s <- nhanesDXA(2003, suppl=TRUE)
 #  #Apply code translations
 #  dxalist <- c('DXAEXSTS', 'DXIHE')
-#  dxx_b <- nhanesTranslate(colnames=dxalist, data=dxx_b, dxa=TRUE)
+#  dxx_b <- nhanesTranslate("dxxb",colnames=dxalist, data=dxx_b, dxa=TRUE)
 
 ## ----nnyfs, eval=FALSE--------------------------------------------------------
 #  #List NNYFS EXAM tables
