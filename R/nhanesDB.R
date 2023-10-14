@@ -21,11 +21,10 @@
   tables = paste0("SELECT TableName AS 'Data.File.Name',
                 Description as 'Data.File.Description',
                 CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS Component,
-                Year AS 'Begin.Year',
-                (Year+1) AS EndYear
+                BeginYear AS 'Begin.Year', EndYear
                 FROM
                 Metadata.QuestionnaireDescriptions where DataGroup='",
-                  data_group, "' and Year=",ifelse(EVEN, year-1, year))
+                  data_group, "' and BeginYear=",ifelse(EVEN, year-1, year))
 
 
   if(details==FALSE){
@@ -33,7 +32,7 @@
                 Description as 'Data.File.Description'
                 FROM
                 Metadata.QuestionnaireDescriptions where DataGroup='",
-                    data_group, "' and Year=",ifelse(EVEN, year-1, year))
+                    data_group, "' and BeginYear=",ifelse(EVEN, year-1, year))
   }
 
   df =.nhanesQuery(tables)
@@ -68,8 +67,7 @@
                        SUBSTRING(V.Description,1,",nchar,") AS 'Variable.Description',
                        V.TableName AS 'Data.File.Name',
                        SUBSTRING(Q.[Description],1,",nchar,") AS 'Data.File.Description',
-                       Year AS 'Begin.Year',
-                       (Year+1) AS EndYear,
+                       BeginYear AS 'Begin.Year', EndYear,
                        CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS Component
                   FROM Metadata.QuestionnaireDescriptions Q
                   JOIN Metadata.QuestionnaireVariables V ON V.TableName = Q.TableName
@@ -108,8 +106,7 @@
                        SUBSTRING(V.Description,1,",nchar,") AS 'Variable.Description',
                        V.TableName AS 'Data.File.Name',
                        SUBSTRING(Q.[Description],1,",nchar,") AS 'Data.File.Description',
-                       Year AS 'Begin.Year',
-                       (Year+1) AS EndYear,
+                       BeginYear AS 'Begin.Year', EndYear,
                        CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS Component
                   FROM Metadata.QuestionnaireDescriptions Q
                   JOIN Metadata.QuestionnaireVariables V ON V.TableName = Q.TableName
@@ -118,10 +115,10 @@
 
 
   if(!is.null(ystart)){
-    sql <- paste(sql,"AND Q.Year >=",ystart)
+    sql <- paste(sql,"AND Q.BeginYear >=",ystart)
   }
   if(!is.null(ystop)){
-    sql <- paste(sql,"AND Q.Year <",ystop)
+    sql <- paste(sql,"AND Q.EndYear <=",ystop)
   }
 
 
@@ -149,15 +146,15 @@
                                     details = FALSE){
 
   sql <- paste0("SELECT DISTINCT TableName,
-                        CONCAT(Q.Year, '-', (Q.Year+1)) AS Years
+                        CONCAT(Q.BeginYear, '-', Q.EndYear) AS Years
                       FROM Metadata.QuestionnaireDescriptions Q
                   WHERE TableName LIKE '%",pattern,"%'"
   )
   if(!is.null(ystart)){
-    sql = paste(sql,"AND Q.Year >=",ystart)
+    sql = paste(sql,"AND Q.BeginYear >=",ystart)
   }
   if(!is.null(ystop)){
-    sql <- paste(sql,"AND Q.Year <",ystop)
+    sql <- paste(sql,"AND Q.EndYear <=",ystop)
   }
 
   if( includerdc ) warning("The DB has no restricted data")
@@ -224,8 +221,7 @@
                        SUBSTRING(V.Description,1,",nchar,") AS 'Variable.Description',
                        V.TableName AS 'Data.File.Name',
                        SUBSTRING(Q.[Description],1,",nchar,") AS 'Data.File.Description',
-                       Year AS 'Begin.Year',
-                       (Year+1) AS EndYear,
+                       BeginYear AS 'Begin.Year', EndYear,
                        CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS Component
                   FROM Metadata.QuestionnaireDescriptions Q
                   JOIN Metadata.QuestionnaireVariables V ON V.TableName = Q.TableName
@@ -272,10 +268,10 @@
   sql = gsub("%\\^", "", sql) # address start with ..
 
   if(!is.null(ystart)){
-    sql <- paste(sql,"AND Q.Year >=",ystart)
+    sql <- paste(sql,"AND Q.BeginYear >=",ystart)
   }
   if(!is.null(ystop)){
-    sql <- paste(sql,"AND Q.Year <=",ystop)
+    sql <- paste(sql,"AND Q.EndYear <=",ystop)
   }
   df =.nhanesQuery(sql)
   if(namesonly){
