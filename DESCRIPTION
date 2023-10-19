@@ -1,6 +1,6 @@
 Package: nhanesA
-Version: 0.8.2
-Date: 2023-10-15
+Version: 0.8.3
+Date: 2023-10-19
 Title: NHANES Data Retrieval
 Authors@R:
     c(person(given = "Christopher",
@@ -37,6 +37,8 @@ Suggests:
     knitr,
     odbc,
     DBI,
-    rmarkdown
+    rmarkdown,
+	survey,
+	ggplot2
 VignetteBuilder: knitr
 RoxygenNote: 7.2.3

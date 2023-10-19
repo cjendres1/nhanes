@@ -2,12 +2,12 @@
 title: "Using Survey Weights with nhanesA"
 author: "Robert Gentleman and Teresa Filshtein Sonmez"
 date: "`r Sys.Date()`"
-output: html_document
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using Survey Weights with nhanesA}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
-
-```{r setup, include=FALSE,message = FALSE, warning = FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
 ### NHANES and Survey Weights
 

@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Robert Gentleman and Teresa Filshtein Sonmez" />
+
+<meta name="date" content="2023-10-19" />
+
+<title>Using Survey Weights with nhanesA</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Using Survey Weights with nhanesA</h1>
+<h4 class="author">Robert Gentleman and Teresa Filshtein Sonmez</h4>
+<h4 class="date">2023-10-19</h4>
+
+
+
+<div id="nhanes-and-survey-weights" class="section level3">
+<h3>NHANES and Survey Weights</h3>
+<p>NHANES aims to produce national estimates on a range of health,
+nutrition, and other factors that accurately represent the
+non-institutionalized civilian U.S. population. The data is gathered
+using a complex, four-stage sampling design. When analyzing this data,
+it’s crucial to use specialized survey analysis techniques that
+incorporate specific weights. These weights account for the intricate
+sampling strategy employed during data collection.</p>
+<p>You can find the NHANES sample weights as part of the downloadable
+data. For a detailed understanding of these weights and their correct
+usage, the CDC provides extensive documentation: <a href="https://wwwn.cdc.gov/nchs/nhanes/tutorials/default.aspx">CDC
+NHANES Tutorials</a>.</p>
+<p>It’s worth noting that the methodologies and strategies for NHANES
+have evolved over time. Reasons for these changes range from
+methodological enhancements, external events like the COVID epidemic, to
+a recent shift towards a more longitudinal perspective. Such changes can
+significantly influence any analysis. Thus, analysts should approach
+this data with diligence and care.</p>
+<p>There are numerous online resources that offer worked examples for
+further understanding:</p>
+<ol style="list-style-type: decimal">
+<li>The official resource for the R <code>survey</code> package: <a href="http://r-survey.r-forge.r-project.org/survey/">R-Survey</a>.</li>
+<li>An up-to-date resource by the Advanced Research Computing group at
+UCLA: <a href="https://stats.oarc.ucla.edu/r/seminars/survey-data-analysis-with-r/">Survey
+Data Analysis with R</a>.</li>
+<li>A growing collection of presentations on platforms like
+YouTube.</li>
+</ol>
+<p>This vignette’s intent is not to serve as an exhaustive guide.
+Instead, we aim to showcase some fundamental functions and point you
+towards more in-depth online resources necessary for specialized
+analyses. Here we will cover the basics of setting up the survey design
+and performing basic tasks. For those interested in diving deeper, we
+encourage you to develop and share more comprehensive documents.</p>
+</div>
+<div id="example" class="section level3">
+<h3>Example</h3>
+<p>Using the <code>nhanesA</code> and <code>survey</code> packages, we
+will explore the average blood pressure of individuals over 40 years of
+age, segmented by their reported ethnicity, during the 2017-2018 cycle.
+To achieve this, we’ll merge the demographic (<code>DEMO_J</code>) and
+blood pressure (<code>BXP_J</code>) datasets. Our examination will cover
+average blood pressure distributions across different sexes and
+ethnicities, and we’ll conduct a regression analysis to understand the
+relationship between blood pressure and age. This is a basic
+demonstration; comprehensive analyses would need to consider various
+risk factors and align with specific epidemiological queries.</p>
+<div id="pull-in-the-relevant-data" class="section level4">
+<h4>Pull in the relevant data</h4>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;nhanesA&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>demoj <span class="ot">=</span> <span class="fu">nhanes</span>(<span class="st">&quot;DEMO_J&quot;</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(demoj)</span></code></pre></div>
+<pre><code>## [1] 9254   46</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">## merge DEMO_J and BXP_J using SEQN.  </span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>bpxj <span class="ot">=</span> <span class="fu">nhanes</span>(<span class="st">&quot;BPX_J&quot;</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>data <span class="ot">=</span> <span class="fu">merge</span>(demoj, bpxj, <span class="at">by=</span><span class="st">&quot;SEQN&quot;</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(data)</span></code></pre></div>
+<pre><code>## [1] 8704   66</code></pre>
+</div>
+<div id="create-survey-design-object" class="section level4">
+<h4>Create survey design object</h4>
+<p>To generate accurate estimates, it’s essential to establish a survey
+design object that integrates the weights into our analysis. This design
+object should be created <em>before</em> any subsetting or manipulation
+of the data. By doing this, we ensure that intricate survey design
+elements, like stratification and clustering, are fully captured and
+applied across the dataset.</p>
+<p>It is also crucial to choose the appropriate weighting scheme for
+your analysis. NHANES offers various weights, such as interview,
+examination, fasting, and MEC laboratory weights, to name a few. The
+selection hinges on the specific dataset components and analyses you’re
+focusing on. Moreover, when analyzing data across multiple cycles, it
+will be necessary to modify these weights to ensure accurate
+representation and inference.</p>
+<p>For a comprehensive understanding, the CDC provides in-depth guidance
+on its website: <a href="https://wwwn.cdc.gov/nchs/nhanes/tutorials/weighting.aspx">CDC
+NHANES Weighting Tutorial</a>.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;survey&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>nhanesDesign <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">id =</span> <span class="sc">~</span>SDMVPSU,  <span class="co"># Primary Sampling Units (PSU)</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">strata  =</span> <span class="sc">~</span>SDMVSTRA, <span class="co"># Stratification used in the survey</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                          <span class="at">weights =</span> <span class="sc">~</span>WTMEC2YR,   <span class="co"># Survey weights</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>                          <span class="at">nest    =</span> <span class="cn">TRUE</span>,      <span class="co"># Whether PSUs are nested within strata</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>                          <span class="at">data    =</span> data)</span></code></pre></div>
+</div>
+<div id="subset-the-survey-design-object" class="section level4">
+<h4>Subset the survey design object</h4>
+<p>Next, we subset the data to focus on individuals over 40 years of
+age. At this stage, it’s imperative to use the tools in the
+<code>survey</code> package for any data manipulations. This procedure
+guarantees that weight adjustments are correctly applied, ensuring the
+validity of subsequent analyses. For comparison purposes, we also create
+an additional subset without the survey design framework, which allows
+for easy examination of unadjusted values.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># subset survey design object</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>dfsub <span class="ot">=</span> <span class="fu">subset</span>(nhanesDesign, data<span class="sc">$</span>RIDAGEYR<span class="sc">&gt;=</span><span class="dv">40</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># subset the original dataset</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>datasub <span class="ot">=</span> data[data<span class="sc">$</span>RIDAGEYR<span class="sc">&gt;=</span><span class="dv">40</span>,]</span></code></pre></div>
+</div>
+<div id="basic-data-exploration" class="section level4">
+<h4>Basic data exploration</h4>
+<p>Next, we’ll explore the variable RIDRETH1 from the DEMO_J table,
+which represents reported ethnicity. We’ll focus on diastolic blood
+pressure for our analysis. For simplicity in our presentation, we’ll
+utilize only the first measurement, represented by the variable BPXDI1
+in the BPX_J table.</p>
+<div id="calculating-means" class="section level5">
+<h5>Calculating means</h5>
+<p>First we split by ethnicity and calculate mean blood pressure for
+each group on the unweighted data.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">## mean on total data set</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(datasub<span class="sc">$</span>BPXDI1, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<pre><code>## [1] 73.04455</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="do">##split the data by ethnicity and calculate mean of the unweighted data</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>unweighted_means <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">split</span>(datasub<span class="sc">$</span>BPXDI1, datasub<span class="sc">$</span>RIDRETH1), mean, <span class="at">na.rm=</span><span class="cn">TRUE</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>unweighted_means </span></code></pre></div>
+<pre><code>##                    Mexican American                      Other Hispanic 
+##                            72.41000                            72.97611 
+##                  Non-Hispanic White                  Non-Hispanic Black 
+##                            70.84130                            75.71466 
+## Other Race - Including Multi-Racial 
+##                            74.41311</code></pre>
+<p>Now, we perform the same analysis using the survey weights.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>adjmns <span class="ot">=</span> <span class="fu">svymean</span>(<span class="sc">~</span>BPXDI1, dfsub, <span class="at">na.rm=</span><span class="cn">TRUE</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>adjmns</span></code></pre></div>
+<pre><code>##          mean     SE
+## BPXDI1 73.237 0.5597</code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># By ethnicity</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>adjmnsbyEth <span class="ot">=</span> <span class="fu">svyby</span>(<span class="sc">~</span>BPXDI1, <span class="sc">~</span>RIDRETH1, dfsub, svymean, <span class="at">na.rm=</span><span class="cn">TRUE</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>weighted_means <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(adjmnsbyEth<span class="sc">$</span>BPXDI1)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>combined_data <span class="ot">&lt;-</span> <span class="fu">cbind</span>(unweighted_means, weighted_means)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(combined_data) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Unweighted&quot;</span>, <span class="st">&quot;Weighted&quot;</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>combined_data</span></code></pre></div>
+<pre><code>##                                     Unweighted Weighted
+## Mexican American                      72.41000 74.03194
+## Other Hispanic                        72.97611 74.73756
+## Non-Hispanic White                    70.84130 72.45422
+## Non-Hispanic Black                    75.71466 75.71874
+## Other Race - Including Multi-Racial   74.41311 74.60215</code></pre>
+<p>We can do this with gender and any other categorical variable:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># By Gender </span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>mns <span class="ot">=</span> <span class="fu">sapply</span>(<span class="fu">split</span>(datasub<span class="sc">$</span>BPXDI1, datasub<span class="sc">$</span>RIAGENDR), mean, <span class="at">na.rm=</span><span class="cn">TRUE</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>adjmnsbyGen <span class="ot">=</span> <span class="fu">svyby</span>(<span class="sc">~</span>BPXDI1, <span class="sc">~</span>RIAGENDR, dfsub, svymean, <span class="at">na.rm=</span><span class="cn">TRUE</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>combined_data <span class="ot">&lt;-</span> <span class="fu">cbind</span>(mns, adjmnsbyGen<span class="sc">$</span>BPXDI1)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(combined_data) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Unweighted&quot;</span>, <span class="st">&quot;Weighted&quot;</span>)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>combined_data</span></code></pre></div>
+<pre><code>##        Unweighted Weighted
+## Male     74.67330 75.31134
+## Female   71.43385 71.31453</code></pre>
+<p>In addition to computing the mean, various other summary statistics,
+such as quantiles and variance, can be readily calculated using the
+survey design object. Importantly, each of these summary statistics will
+come with a corresponding standard error that accounts for the weights,
+providing insights into the precision of the estimates.</p>
+</div>
+<div id="calculating-quantiles" class="section level5">
+<h5>Calculating quantiles</h5>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># For the unweighted data</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>(datasub<span class="sc">$</span>BPXDI1, <span class="fu">c</span>(<span class="fl">0.25</span>,<span class="fl">0.5</span>,.<span class="dv">75</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<pre><code>## 25% 50% 75% 
+##  66  74  82</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># For the survey weighted data</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">svyquantile</span>(<span class="sc">~</span>BPXDI1, dfsub, <span class="at">quantiles =</span> <span class="fu">c</span>(<span class="fl">0.25</span>,<span class="fl">0.5</span>,<span class="fl">0.75</span>), <span class="at">na.rm=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<pre><code>## $BPXDI1
+##      quantile ci.2.5 ci.97.5        se
+## 0.25       66     66      68 0.4691643
+## 0.5        74     74      76 0.4691643
+## 0.75       80     80      82 0.4691643
+## 
+## attr(,&quot;hasci&quot;)
+## [1] TRUE
+## attr(,&quot;class&quot;)
+## [1] &quot;newsvyquantile&quot;</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># By Gender </span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>(<span class="sc">~</span>BPXDI1, <span class="sc">~</span>RIAGENDR, dfsub, svyquantile, <span class="at">quantiles =</span> <span class="fu">c</span>(<span class="fl">0.5</span>), <span class="at">na.rm=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<pre><code>##        RIAGENDR BPXDI1 se.BPXDI1
+## Male       Male     76 0.9383286
+## Female   Female     72 0.4691643</code></pre>
+<p><strong>Note:</strong> The columns ci.2.5 and ci.97.5 in the output
+represent percentile intervals, not the traditional confidence
+intervals. Specifically, for a given quantile (like the 25th
+percentile), the values in these columns denote the range between the
+2.5th percentile and the 97.5th percentile of that particular quantile
+estimate, when considering the survey weights.</p>
+</div>
+<div id="calculating-variances" class="section level5">
+<h5>Calculating variances</h5>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># For the entire dataset</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">svyvar</span>(<span class="sc">~</span>BPXDI1, dfsub, <span class="at">quantiles =</span> <span class="fu">c</span>(<span class="fl">0.25</span>,<span class="fl">0.5</span>,<span class="fl">0.75</span>), <span class="at">na.rm=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<pre><code>##        variance     SE
+## BPXDI1   173.68 12.279</code></pre>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># By ethnicity</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>(<span class="sc">~</span>BPXDI1, <span class="sc">~</span>RIDRETH1, dfsub, svyvar, <span class="at">na.rm=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<pre><code>##                                                                RIDRETH1
+## Mexican American                                       Mexican American
+## Other Hispanic                                           Other Hispanic
+## Non-Hispanic White                                   Non-Hispanic White
+## Non-Hispanic Black                                   Non-Hispanic Black
+## Other Race - Including Multi-Racial Other Race - Including Multi-Racial
+##                                       BPXDI1       se
+## Mexican American                    200.8781 45.43074
+## Other Hispanic                      160.0157 23.79938
+## Non-Hispanic White                  168.3504 18.30355
+## Non-Hispanic Black                  202.3565 37.12593
+## Other Race - Including Multi-Racial 156.9968 17.26037</code></pre>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># By Gender </span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">svyby</span>(<span class="sc">~</span>BPXDI1, <span class="sc">~</span>RIAGENDR, dfsub, svyvar, <span class="at">na.rm=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<pre><code>##        RIAGENDR   BPXDI1       se
+## Male       Male 141.2704 10.52796
+## Female   Female 196.1199 20.65706</code></pre>
+</div>
+</div>
+<div id="conducting-simple-regression-analysis" class="section level4">
+<h4>Conducting Simple Regression Analysis</h4>
+<p>The <code>svyglm</code> function allows us to perform regression
+analyses while accounting for the survey’s design. In this section, we
+will demonstrate how to model diastolic blood pressure levels based on
+age and ethnicity.</p>
+<div id="syntax-for-svyglm" class="section level5">
+<h5>Syntax for <code>svyglm</code></h5>
+<p>Using <code>svyglm()</code> is akin to utilizing the
+<code>glm()</code> function from base R. The key difference is that
+<code>svyglm()</code> is specifically tailored to work with survey
+objects, considering the intricate sampling design and weights.</p>
+<p>To model diastolic blood pressure (noted as <code>BPXDI1</code> in
+our dataset) as a function of age (<code>RIDAGEYR</code>) and ethnicity
+(<code>RIDRETH3</code>), we can construct our model as outlined below.
+The resulting output will furnish regression coefficients, standard
+errors, and significance tests that have been adjusted for the complex
+survey design. When interpreting these results, it’s crucial to remember
+that they resemble outputs from a generalized linear model
+(<code>glm</code>). However, the estimates provided by
+<code>svyglm()</code> have been weighted to produce nationally
+representative conclusions.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>weighted_model <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(BPXDI1 <span class="sc">~</span> RIDAGEYR <span class="sc">+</span> RIDRETH1, <span class="at">design =</span> dfsub, <span class="at">family =</span> <span class="fu">gaussian</span>())</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(weighted_model)</span></code></pre></div>
+<pre><code>## 
+## Call:
+## svyglm(formula = BPXDI1 ~ RIDAGEYR + RIDRETH1, design = dfsub, 
+##     family = gaussian())
+## 
+## Survey design:
+## subset(nhanesDesign, data$RIDAGEYR &gt;= 40)
+## 
+## Coefficients:
+##                                             Estimate Std. Error t value
+## (Intercept)                                 90.96516    1.24720  72.935
+## RIDAGEYR                                    -0.31522    0.01853 -17.012
+## RIDRETH1Other Hispanic                       1.43894    1.25518   1.146
+## RIDRETH1Non-Hispanic White                   0.49810    0.73132   0.681
+## RIDRETH1Non-Hispanic Black                   2.92332    1.09594   2.667
+## RIDRETH1Other Race - Including Multi-Racial  1.38532    0.63780   2.172
+##                                             Pr(&gt;|t|)    
+## (Intercept)                                 5.73e-15 ***
+## RIDAGEYR                                    1.04e-08 ***
+## RIDRETH1Other Hispanic                        0.2783    
+## RIDRETH1Non-Hispanic White                    0.5113    
+## RIDRETH1Non-Hispanic Black                    0.0236 *  
+## RIDRETH1Other Race - Including Multi-Racial   0.0550 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 162.6653)
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+</div>
+</div>
+<div id="visualizing-differences-in-weighted-and-unweighted-survey-data" class="section level4">
+<h4>Visualizing differences in weighted and unweighted survey data</h4>
+<p>Visualizing the differences between weighted and unweighted analyses
+can offer a clear, intuitive understanding of the impact of weights. We
+can use bar plots to compare mean diastolic blood pressures across
+different ethnicities. This plot could be extended to other metrics as
+well.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="do">## recalculating means (same as above) </span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>unweighted_means <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">split</span>(datasub<span class="sc">$</span>BPXDI1, datasub<span class="sc">$</span>RIDRETH1), mean, <span class="at">na.rm=</span><span class="cn">TRUE</span>)</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>weighted_means <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(adjmnsbyEth<span class="sc">$</span>BPXDI1)</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>plot_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">Ethnicity =</span> <span class="fu">factor</span>(<span class="fu">rep</span>(<span class="fu">names</span>(unweighted_means), <span class="dv">2</span>),</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>                     <span class="at">levels =</span> <span class="fu">names</span>(unweighted_means)),</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">Means =</span> <span class="fu">c</span>(unweighted_means, weighted_means),</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">Type =</span> <span class="fu">factor</span>(<span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;Unweighted&quot;</span>, <span class="fu">length</span>(unweighted_means)),</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">rep</span>(<span class="st">&quot;Weighted&quot;</span>, <span class="fu">length</span>(weighted_means))),</span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>               <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;Unweighted&quot;</span>, <span class="st">&quot;Weighted&quot;</span>))</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating the plot</span></span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plot_data, <span class="fu">aes</span>(<span class="at">x =</span> Ethnicity, <span class="at">y =</span> Means, <span class="at">fill =</span> Type)) <span class="sc">+</span></span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">&quot;identity&quot;</span>, <span class="at">position =</span> <span class="st">&quot;dodge&quot;</span>, <span class="at">width =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Comparison of Diastolic Blood Pressure by Ethnicity&quot;</span>,</span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Mean Diastolic Blood Pressure&quot;</span>) <span class="sc">+</span></span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;red&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.title =</span> <span class="fu">element_blank</span>())</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="visualizing-regression-results" class="section level4">
+<h4>Visualizing Regression Results</h4>
+<p>Visualizing regression coefficients can provide a clear understanding
+of how different variables impact the outcome, especially when using
+weighted and unweighted data.</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>unweighted_model <span class="ot">&lt;-</span> <span class="fu">glm</span>(BPXDI1 <span class="sc">~</span> RIDAGEYR <span class="sc">+</span> RIDRETH1, <span class="at">data =</span> datasub, <span class="at">family =</span> <span class="fu">gaussian</span>())</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>weighted_model <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(BPXDI1 <span class="sc">~</span> RIDAGEYR <span class="sc">+</span> RIDRETH1, <span class="at">design =</span> dfsub, <span class="at">family =</span> <span class="fu">gaussian</span>())</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co"># For the unweighted model</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>unweighted_summary <span class="ot">&lt;-</span> <span class="fu">summary</span>(unweighted_model)</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>unweighted_coefs <span class="ot">&lt;-</span> unweighted_summary<span class="sc">$</span>coefficients[, <span class="st">&quot;Estimate&quot;</span>]</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>unweighted_se <span class="ot">&lt;-</span> unweighted_summary<span class="sc">$</span>coefficients[, <span class="st">&quot;Std. Error&quot;</span>]</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="co"># For the weighted model</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>weighted_summary <span class="ot">&lt;-</span> <span class="fu">summary</span>(weighted_model)</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>weighted_coefs <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(weighted_summary<span class="sc">$</span>coefficients[, <span class="st">&quot;Estimate&quot;</span>])</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>weighted_se <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(weighted_summary<span class="sc">$</span>coefficients[, <span class="st">&quot;Std. Error&quot;</span>])</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>comparison <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">Variable =</span> <span class="fu">names</span>(unweighted_coefs),</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">Unweighted =</span> unweighted_coefs,</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">Weighted =</span> <span class="fu">as.numeric</span>(weighted_coefs)</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(comparison)</span></code></pre></div>
+<pre><code>##                                                                                Variable
+## (Intercept)                                                                 (Intercept)
+## RIDAGEYR                                                                       RIDAGEYR
+## RIDRETH1Other Hispanic                                           RIDRETH1Other Hispanic
+## RIDRETH1Non-Hispanic White                                   RIDRETH1Non-Hispanic White
+## RIDRETH1Non-Hispanic Black                                   RIDRETH1Non-Hispanic Black
+## RIDRETH1Other Race - Including Multi-Racial RIDRETH1Other Race - Including Multi-Racial
+##                                             Unweighted   Weighted
+## (Intercept)                                 92.2848149 90.9651590
+## RIDAGEYR                                    -0.3460552 -0.3152158
+## RIDRETH1Other Hispanic                       1.2325637  1.4389441
+## RIDRETH1Non-Hispanic White                   0.7553912  0.4981020
+## RIDRETH1Non-Hispanic Black                   4.2996735  2.9233165
+## RIDRETH1Other Race - Including Multi-Racial  2.0667520  1.3853204</code></pre>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>unweighted_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Variable =</span> <span class="fu">names</span>(unweighted_coefs), </span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">Estimate =</span> unweighted_coefs, </span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">SE =</span> unweighted_se, </span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">Type =</span> <span class="st">&quot;Unweighted&quot;</span>)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>weighted_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Variable =</span> <span class="fu">names</span>(unweighted_coefs), </span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>                          <span class="at">Estimate =</span> weighted_coefs, </span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>                          <span class="at">SE =</span> weighted_se, </span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>                          <span class="at">Type =</span> <span class="st">&quot;Weighted&quot;</span>)</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>plot_data <span class="ot">&lt;-</span> <span class="fu">rbind</span>(unweighted_df, weighted_df)</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">subset</span>(plot_data, Variable<span class="sc">!=</span><span class="st">&#39;(Intercept)&#39;</span>), <span class="fu">aes</span>(<span class="at">x =</span> Estimate, <span class="at">y =</span> <span class="fu">reorder</span>(Variable, Estimate), <span class="at">color =</span> Type)) <span class="sc">+</span></span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="fl">0.5</span>), <span class="at">size =</span> <span class="fl">2.5</span>) <span class="sc">+</span></span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbarh</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> Estimate <span class="sc">-</span> SE, <span class="at">xmax =</span> Estimate <span class="sc">+</span> SE),</span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>                 <span class="at">height =</span> <span class="fl">0.2</span>, <span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="fl">0.5</span>)) <span class="sc">+</span></span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">&quot;dashed&quot;</span>, <span class="at">color =</span> <span class="st">&quot;grey50&quot;</span>) <span class="sc">+</span></span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Comparison of Regression Coefficients: Weighted vs Unweighted&quot;</span>,</span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">&quot;Coefficient Value&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Predictors&quot;</span>) <span class="sc">+</span></span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;Unweighted&quot;</span> <span class="ot">=</span> <span class="st">&quot;blue&quot;</span>, <span class="st">&quot;Weighted&quot;</span> <span class="ot">=</span> <span class="st">&quot;red&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.title =</span> <span class="fu">element_blank</span>())</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
