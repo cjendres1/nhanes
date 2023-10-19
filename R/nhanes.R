@@ -33,7 +33,7 @@
 nhanes <- function(nh_table, includelabels = FALSE, translated=TRUE, nchar=128) {
 
   if(!grepl("^(Y_)\\w+", nh_table) & !is.na(.collection_date) & !is.na(.container_version)){
-    return(.nhanesDB (nh_table,translated))
+    return(.nhanesDB (nh_table,includelabels,translated))
   }
 
   nht <- tryCatch({    

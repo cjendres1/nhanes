@@ -87,11 +87,32 @@
 }
 
 
-.nhanesDB = function(nh_table,translated=TRUE){
+.nhanesDB = function(nh_table, includelabels = FALSE, translated=TRUE){
   .checkTableNames(nh_table)
+  label_sql = paste0("SELECT Variable,Description 
+                     FROM [Metadata].[QuestionnaireVariables] 
+                     WHERE TableName = '",nh_table,"'")
   nh_table = .convertTranslatedTable(nh_table,translated)
   sql = paste0("SELECT * FROM ",nh_table)
- .nhanesQuery(sql)
+  nh_df = .nhanesQuery(sql)
+  if(includelabels){
+    var_label = .nhanesQuery(label_sql)
+    column_labels = var_label$Description
+    column_names = var_label$Variable
+    names(column_labels) = column_names
+    
+    # Ideal case where rows and labels are identical
+    if(identical(names(nh_df), column_names)) {
+      for( name in column_names) {
+        attr(nh_df[[name]],"label") = column_labels[which(names(column_labels)==name)]
+      }
+    } else {
+      message(paste0("Column names and labels are not consistent for table ", nh_table, ". No labels added"))
+    }
+  }
+  
+  nh_df
+  
 }
 
 
