@@ -1,7 +1,46 @@
 # FUNCTIONS:
+#   nhanesManifest
 #   nhanesTables
 #   nhanesTableVars
-#
+#------------------------------------------------------------------------------
+#' Returns the entire NHANES manifest
+#' @param which Either "Tables" or "Variables"
+#' @return When "Tables" is specified it returns a data.frame with one row for 
+#' each NHANES data table, with columns "Table", "DocURL", "DataURL", "Years", "Date.Published"
+#' @details Will download the comprehensive manifest of variables or tables
+#' @examples
+#' manifest = nhanesManifest()
+#' dim(manifest)
+#' 
+#' @export
+
+nhanesManifest = function(which="Tables") 
+{
+  hurl <- .checkHtml(dataURL)
+  if(is.null(hurl)) {
+    message("Error occurred during read. No tables returned")
+    return(NULL)
+  }
+  ##get to the table
+  xpath <- '//*[@id="GridView1"]'
+  tab1 <- hurl %>% html_elements(xpath=xpath)
+  ##pull out all the hrefs 
+  tab2 = tab1 |> html_nodes("a") |> html_attr("href")
+  ## PAHS_H was withdrawn - only one entry in the table
+  ## so add in one 
+  tab2 = c(tab2[1:2413], tab2[2413:length(tab2)])
+  ##whenever they update we need to error out and then fix it
+  if(length(tab2) !=3026) stop("CDC updated data manifest")
+  htmNames = tab2[seq(1, 3025, by=2)]
+  xptNames = tab2[seq(2, 3026, by=2)]
+  df = as.data.frame(tab1 |> html_table())
+  df$Table = sub(" Doc", "", df$Doc.File)
+  df$DocURL = htmNames
+  df$DataURL = xptNames
+  df = df[,c("Table", "DocURL", "DataURL", "Years", "Date.Published")]
+  return(df)
+}
+
 #------------------------------------------------------------------------------
 #' Returns a list of table names for the specified survey group.
 #' 
