@@ -198,7 +198,7 @@ summary(weighted_model)
 Visualizing the differences between weighted and unweighted analyses can offer a clear, intuitive understanding of the impact of weights. We can use bar plots to compare mean diastolic blood pressures across different ethnicities. This plot could be extended to other metrics as well.
 
 
-```{r, message = FALSE, warning = FALSE}
+```{r, fig.width=7, message = FALSE, warning = FALSE}
 library(ggplot2)
 
 ## recalculating means (same as above) 
@@ -221,6 +221,7 @@ ggplot(plot_data, aes(x = Ethnicity, y = Means, fill = Type)) +
   geom_bar(stat = "identity", position = "dodge", width = 0.6) +
   labs(title = "Comparison of Diastolic Blood Pressure by Ethnicity",
        y = "Mean Diastolic Blood Pressure") +
+  scale_x_discrete(labels = c('Mex-Amer','Other Hisp','White', 'Black', 'Other')) +
   scale_fill_manual(values = c("blue", "red")) +
   theme_minimal() +
   theme(legend.title = element_blank())
@@ -233,7 +234,7 @@ ggplot(plot_data, aes(x = Ethnicity, y = Means, fill = Type)) +
 
 Visualizing regression coefficients can provide a clear understanding of how different variables impact the outcome, especially when using weighted and unweighted data.
 
-```{r, message = FALSE, warning = FALSE}
+```{r, fig.width=7, message = FALSE, warning = FALSE}
 
 unweighted_model <- glm(BPXDI1 ~ RIDAGEYR + RIDRETH1, data = datasub, family = gaussian())
 weighted_model <- svyglm(BPXDI1 ~ RIDAGEYR + RIDRETH1, design = dfsub, family = gaussian())
@@ -273,7 +274,7 @@ ggplot(subset(plot_data, Variable!='(Intercept)'), aes(x = Estimate, y = reorder
   geom_errorbarh(aes(xmin = Estimate - SE, xmax = Estimate + SE),
                  height = 0.2, position = position_dodge(0.5)) +
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
-  labs(title = "Comparison of Regression Coefficients: Weighted vs Unweighted",
+  labs(title = "Comparison of Regression Coefficients",
        x = "Coefficient Value", y = "Predictors") +
   theme_minimal() +
   scale_color_manual(values = c("Unweighted" = "blue", "Weighted" = "red")) +

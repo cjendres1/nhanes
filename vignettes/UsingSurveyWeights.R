@@ -94,7 +94,7 @@ svyby(~BPXDI1, ~RIAGENDR, dfsub, svyvar, na.rm=TRUE)
 weighted_model <- svyglm(BPXDI1 ~ RIDAGEYR + RIDRETH1, design = dfsub, family = gaussian())
 summary(weighted_model)
 
-## ----message = FALSE, warning = FALSE-----------------------------------------
+## ----fig.width=7, message = FALSE, warning = FALSE----------------------------
 library(ggplot2)
 
 ## recalculating means (same as above) 
@@ -117,13 +117,14 @@ ggplot(plot_data, aes(x = Ethnicity, y = Means, fill = Type)) +
   geom_bar(stat = "identity", position = "dodge", width = 0.6) +
   labs(title = "Comparison of Diastolic Blood Pressure by Ethnicity",
        y = "Mean Diastolic Blood Pressure") +
+  scale_x_discrete(labels = c('Mex-Amer','Other Hisp','White', 'Black', 'Other')) +
   scale_fill_manual(values = c("blue", "red")) +
   theme_minimal() +
   theme(legend.title = element_blank())
 
 
 
-## ----message = FALSE, warning = FALSE-----------------------------------------
+## ----fig.width=7, message = FALSE, warning = FALSE----------------------------
 
 unweighted_model <- glm(BPXDI1 ~ RIDAGEYR + RIDRETH1, data = datasub, family = gaussian())
 weighted_model <- svyglm(BPXDI1 ~ RIDAGEYR + RIDRETH1, design = dfsub, family = gaussian())
@@ -163,7 +164,7 @@ ggplot(subset(plot_data, Variable!='(Intercept)'), aes(x = Estimate, y = reorder
   geom_errorbarh(aes(xmin = Estimate - SE, xmax = Estimate + SE),
                  height = 0.2, position = position_dodge(0.5)) +
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
-  labs(title = "Comparison of Regression Coefficients: Weighted vs Unweighted",
+  labs(title = "Comparison of Regression Coefficients",
        x = "Coefficient Value", y = "Predictors") +
   theme_minimal() +
   scale_color_manual(values = c("Unweighted" = "blue", "Weighted" = "red")) +
