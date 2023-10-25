@@ -32,7 +32,7 @@
 #' 
 nhanes <- function(nh_table, includelabels = FALSE, translated=TRUE, nchar=128) {
 
-  if(!grepl("^(Y_)\\w+", nh_table) & !is.na(.collection_date) & !is.na(.container_version)){
+  if(!grepl("^(Y_)\\w+", nh_table) && .useDB()){
     return(.nhanesDB (nh_table,includelabels,translated))
   }
 
@@ -46,6 +46,7 @@ nhanes <- function(nh_table, includelabels = FALSE, translated=TRUE, nchar=128) 
     }
     
     tf <- tempfile()
+    if (isTRUE(nhanesOptions("log.access"))) message("Downloading: ", url)
     download.file(url, tf, mode = "wb", quiet = TRUE)
     
     nh_df <- read.xport(tf)
@@ -130,6 +131,7 @@ nhanesDXA <- function(year, suppl=FALSE, destfile=NULL) {
     } else {
       fname <- dxa_fname(year, suppl)
       url <- stringr::str_c(dxaURL, fname, '.xpt', collapse='')
+      if (isTRUE(nhanesOptions("log.access"))) message("Downloading: ", url)
       if(!is.null(destfile)) {
         ok <- suppressWarnings(tryCatch({download.file(url, destfile, mode="wb", quiet=TRUE)},
                                         error=function(cond){message(cond); return(NULL)}))         
@@ -186,6 +188,7 @@ nhanesAttr <- function(nh_table) {
     }
     
     tf <- tempfile()
+    if (isTRUE(nhanesOptions("log.access"))) message("Downloading: ", url)
     download.file(url, tf, mode = "wb", quiet = TRUE)
     
 #    tmp <- read.xport(tf)

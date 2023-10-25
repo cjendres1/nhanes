@@ -49,3 +49,14 @@
   }
   table_name
 }
+
+.useDB <- function() {
+    ## returns TRUE iff DB is available AND nhanesOptions("use.db") is not FALSE
+    if (isFALSE(nhanesOptions("use.db")) ||
+        is.na(.collection_date) || is.na(.container_version))
+        FALSE
+    else
+        TRUE
+}
+
+
