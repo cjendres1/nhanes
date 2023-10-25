@@ -61,6 +61,7 @@
   out <- tryCatch(
     {
       # when "try" is successful, 'tryCatch()' returns the html 
+      if (isTRUE(nhanesOptions("log.access"))) message("Downloading: ", url)
       xml2::read_html(url)
     },
     error=function(cond) {

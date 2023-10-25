@@ -28,7 +28,7 @@ nhanesCodebook <- function(nh_table, colname=NULL, dxa=FALSE) {
 ##  if(is.null(colname)) 
 ##    colname = nhanesAttr(nh_table)$names
 
-  if(dxa==FALSE & !grepl("^(P_|Y_)\\w+", nh_table) & !is.na(.collection_date) & !is.na(.container_version)){
+  if(isFALSE(dxa) && !grepl("^(P_|Y_)\\w+", nh_table) && .useDB()) {
     return(.nhanesCodebookDB(nh_table, colname))
   }
   

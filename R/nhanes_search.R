@@ -46,7 +46,7 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
     stop("Search term is missing")
   }
 
-  if(!is.na(.collection_date) & !is.na(.container_version)){
+  if(.useDB()){
     return(.nhanesSearchDB(search_terms, exclude_terms, data_group,
                            ignore.case, ystart, ystop, includerdc, nchar,
                            namesonly))
@@ -197,7 +197,7 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
                                    includewithdrawn=FALSE, includeurl=FALSE, nchar=128, details=FALSE) {
   if(is.null(pattern)) {stop('No pattern was entered')}
 
-  if(!is.na(.collection_date) & !is.na(.container_version)){
+  if(.useDB()){
     return(.nhanesSearchTableNamesDB(pattern, ystart, ystop, includerdc,
                                      includewithdrawn, nchar, details))
   }
@@ -312,7 +312,7 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
 nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=128, namesonly=TRUE) {
   if(is.null(varname)) {stop('No varname was entered')}
 
-  if(!is.na(.collection_date) & !is.na(.container_version)){
+  if(.useDB()){
     return(.nhanesSearchVarNameDB(varname, ystart, ystop, includerdc,nchar, namesonly))
   }
 

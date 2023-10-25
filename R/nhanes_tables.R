@@ -83,7 +83,7 @@ nhanesTables <- function(data_group, year, nchar=128, details = FALSE, namesonly
     return(NULL)
   }
   
-  if(is.numeric(year) & !is.na(.collection_date) & !is.na(.container_version)){
+  if(is.numeric(year) && .useDB()){
     return(.nhanesTablesDB(data_group, year, nchar, details, namesonly, includerdc))
   }
   
@@ -209,7 +209,7 @@ nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=128, na
     return(NULL)
   }
 
-  if(!grepl("^(P_|Y_)\\w+", nh_table) & !is.na(.collection_date) & !is.na(.container_version)){
+  if(!grepl("^(P_|Y_)\\w+", nh_table) && .useDB()){
     return(.nhanesTableVarsDB(data_group, nh_table, details, nchar, namesonly))
   }
 
