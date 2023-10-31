@@ -71,6 +71,9 @@ validTables <- function() .dbEnv$validTables
 .onLoad = function(libname, pkgname)
 {
   nhanesOptions(use.db = .init_db())
+  nhanesTableBASE <- Sys.getenv("NHANES_TABLE_BASE")
+  if (nzchar(nhanesTableBASE))
+      nhanesTableURL <<- paste0(nhanesTableBASE, '/Nchs/Nhanes/')
 }
 
 .onUnload <- function(libpath)
