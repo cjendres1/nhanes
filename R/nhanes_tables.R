@@ -3,19 +3,49 @@
 #   nhanesTables
 #   nhanesTableVars
 #------------------------------------------------------------------------------
-#' Returns the entire NHANES manifest
-#' @param which Either "Tables" or "Variables"
-#' @return When "Tables" is specified it returns a data.frame with one row for 
-#' each NHANES data table, with columns "Table", "DocURL", "DataURL", "Years", "Date.Published"
-#' @details Will download the comprehensive manifest of variables or tables
-#' @examples
-#' manifest = nhanesManifest()
-#' dim(manifest)
-#' 
-#' @export
 
-nhanesManifest = function(which="Tables") 
+.get_content_length <- function(url, verbose = FALSE)
 {
+    url_base <- "https://wwwn.cdc.gov"
+    if (!startsWith(url, "/Nchs/Nhanes")) {
+        if (verbose) message("SKIPPING ", url)
+        return(NA_real_)
+    }
+    url <- paste0(url_base, url)
+    if (verbose) message(url)
+    h <- tolower(curlGetHeaders(url))
+    ok <- startsWith(h, "content-length")
+    if (any(ok)) {
+        ## pick the last one
+        id <- rev(which(ok))[[1]]
+        as.numeric(strsplit(trimws(h[[id]]), ":")[[1]][[2]])
+    }
+    else NA_real_
+}
+
+##' Downloads and parses the NHANES manifest available at
+##' \url{https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx} and
+##' returns it as a data frame.
+##'
+##' @title Download and parse the entire NHANES manifest
+##' @param which Either "Tables" or "Variables"
+##' @param sizes Logical, whether to compute data file sizes (as
+##'     reported by the server) and include them in the result.
+##' @param verbose Logical flag indicating whether information on
+##'     progress should be reported.
+##' @return When "Tables" is specified it returns a data.frame with
+##'     one row for each NHANES data table, with columns "Table",
+##'     "DocURL", "DataURL", "Years", "Date.Published". If \code{sizes
+##'     = TRUE}, an additional column "DataSize" giving the data file
+##'     sizes in bytes (as reported by the server) is included.
+##' @examples
+##' manifest <- nhanesManifest(sizes = FALSE)
+##' dim(manifest)
+##' 
+##' @export
+nhanesManifest <- function(which = "Tables", sizes = TRUE, verbose = getOption("verbose"))
+{
+  if (verbose) message("Downloading ", dataURL)
   hurl <- .checkHtml(dataURL)
   if(is.null(hurl)) {
     message("Error occurred during read. No tables returned")
@@ -30,7 +60,7 @@ nhanesManifest = function(which="Tables")
   ## so add in one 
   tab2 = c(tab2[1:2413], tab2[2413:length(tab2)])
   ##whenever they update we need to error out and then fix it
-  if(length(tab2) !=3026) stop("CDC updated data manifest")
+  if(length(tab2) != 3026) stop("CDC updated data manifest")
   htmNames = tab2[seq(1, 3025, by=2)]
   xptNames = tab2[seq(2, 3026, by=2)]
   df = as.data.frame(tab1 |> html_table())
@@ -38,6 +68,11 @@ nhanesManifest = function(which="Tables")
   df$DocURL = htmNames
   df$DataURL = xptNames
   df = df[,c("Table", "DocURL", "DataURL", "Years", "Date.Published")]
+  if (sizes) {
+    if (verbose) message("Checking data file sizes...")
+    s <- sapply(df$DataURL, .get_content_length, verbose = verbose)
+    df$DataSize <- s
+  }
   return(df)
 }
 

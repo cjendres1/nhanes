@@ -44,11 +44,10 @@ validTables <- function() .dbEnv$validTables
       port = 1433, 
       driver = "ODBC Driver 17 for SQL Server"
     )
-  after <- getTaskCallbackNames()
-  removeTaskCallback(which(!after %in% before))
+    after <- getTaskCallbackNames()
+    removeTaskCallback(which(!after %in% before))
   return(TRUE)
 }
-
 
 .init_db <- function()
 {

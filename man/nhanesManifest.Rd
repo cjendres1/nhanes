@@ -2,25 +2,33 @@
 % Please edit documentation in R/nhanes_tables.R
 \name{nhanesManifest}
 \alias{nhanesManifest}
-\title{Returns the entire NHANES manifest}
+\title{Download and parse the entire NHANES manifest}
 \usage{
-nhanesManifest(which = "Tables")
+nhanesManifest(which = "Tables", sizes = TRUE, verbose = getOption("verbose"))
 }
 \arguments{
 \item{which}{Either "Tables" or "Variables"}
+
+\item{sizes}{Logical, whether to compute data file sizes (as
+reported by the server) and include them in the result.}
+
+\item{verbose}{Logical flag indicating whether information on
+progress should be reported.}
 }
 \value{
-When "Tables" is specified it returns a data.frame with one row for 
-each NHANES data table, with columns "Table", "DocURL", "DataURL", "Years", "Date.Published"
+When "Tables" is specified it returns a data.frame with
+    one row for each NHANES data table, with columns "Table",
+    "DocURL", "DataURL", "Years", "Date.Published". If \code{sizes
+    = TRUE}, an additional column "DataSize" giving the data file
+    sizes in bytes (as reported by the server) is included.
 }
 \description{
-Returns the entire NHANES manifest
-}
-\details{
-Will download the comprehensive manifest of variables or tables
+Downloads and parses the NHANES manifest available at
+\url{https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx} and
+returns it as a data frame.
 }
 \examples{
-manifest = nhanesManifest()
+manifest <- nhanesManifest(sizes = FALSE)
 dim(manifest)
 
 }
