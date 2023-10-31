@@ -9,11 +9,13 @@ nhanes(nh_table, includelabels = FALSE, translated = TRUE, nchar = 128)
 \arguments{
 \item{nh_table}{The name of the specific table to retrieve.}
 
-\item{includelabels}{If TRUE, then include SAS labels as variable attribute (default = FALSE).}
+\item{includelabels}{If TRUE, then include SAS labels as variable
+attribute (default = FALSE).}
 
 \item{translated}{translated whether the variables are translated.}
 
-\item{nchar}{Maximum length of translated string (default = 128). Ignored if translated=FALSE.}
+\item{nchar}{Maximum length of translated string (default =
+128). Ignored if translated=FALSE.}
 }
 \value{
 The table is returned as a data frame.
@@ -22,11 +24,15 @@ The table is returned as a data frame.
 Use to download NHANES data tables that are in SAS format.
 }
 \details{
-Downloads a table from the NHANES website as is, i.e. in its entirety
-with no modification or cleansing. NHANES tables 
-are stored in SAS '.XPT' format but are imported as a data frame.
-Function nhanes cannot be used to import limited 
-access data.
+Downloads a table from the NHANES website as is, i.e. in
+  its entirety with no modification or cleansing. If the
+  environment variable \code{NHANES_TABLE_BASE} was set during
+  startup, the value of this variable is used as the base URL
+  instead of \url{https://wwwn.cdc.gov} (this allows the use of a
+  local or alternative mirror of the CDC data). NHANES tables are
+  stored in SAS '.XPT' format but are imported as a data frame.
+  The \code{nhanes} function cannot be used to import limited
+  access data.
 }
 \examples{
 \donttest{bpx_e = nhanes('BPX_E')}

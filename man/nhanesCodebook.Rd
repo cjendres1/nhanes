@@ -21,9 +21,13 @@ Returns full NHANES codebook including Variable Name, SAS Label, English Text, T
 and Value distribution.
 }
 \details{
-Each NHANES variable has a codebook that provides a basic description
-as well as the distribution or range of values. This function returns the full
-codebook information for the selected variable.
+Each NHANES variable has a codebook that provides a basic
+  description as well as the distribution or range of values. This
+  function returns the full codebook information for the selected
+  variable. If the environment variable \code{NHANES_TABLE_BASE}
+  was set during startup, the value of this variable is used as the
+  base URL instead of \url{https://wwwn.cdc.gov} (this allows the
+  use of a local or alternative mirror of the CDC documentation).
 }
 \examples{
 \donttest{nhanesCodebook('AUX_D', 'AUQ020D')}
