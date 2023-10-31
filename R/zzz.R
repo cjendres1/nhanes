@@ -40,7 +40,7 @@ validTables <- function() .dbEnv$validTables
       uid = Sys.getenv("EPICONDUCTOR_DB_UID", unset = "sa"),
       pwd = Sys.getenv("EPICONDUCTOR_DB_PWD", unset = "yourStrong(!)Password"),
       server = Sys.getenv("EPICONDUCTOR_DB_SERVER", unset = "localhost"),
-      port = as.integer(Sys.getenv("EPICONDUCTOR_DB_SERVER", unset = "1433")),
+      port = as.integer(Sys.getenv("EPICONDUCTOR_DB_PORT", unset = "1433")),
       database = Sys.getenv("EPICONDUCTOR_DB_DATABASE", unset = "NhanesLandingZone"),
       driver = Sys.getenv("EPICONDUCTOR_DB_DRIVER", unset = "ODBC Driver 17 for SQL Server")
     )
