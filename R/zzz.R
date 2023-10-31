@@ -24,8 +24,7 @@ cn = function() .datacache$cn
       server = "localhost", 
       database = "NhanesLandingZone",
       port = 1433, 
-      driver = "ODBC Driver 17 for SQL Server"
-    )
+      driver = "ODBC Driver 17 for SQL Server")
     
     after <- getTaskCallbackNames()
     removeTaskCallback(which(!after %in% before))
@@ -48,6 +47,6 @@ cn = function() .datacache$cn
 .onUnload <- function(libpath)
 {
   if(!is.na(.container_version) & !is.na(.collection_date)){
-    DBI::dbDisconnect(cn)
+    DBI::dbDisconnect(cn())
   }
 }
