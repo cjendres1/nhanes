@@ -19,11 +19,10 @@ Authors@R:
              )
 BugReports: https://github.com/cjendres1/nhanes/issues
 Depends:
-    R (>= 3.0.0)
+    R (>= 3.0.0), methods
 Imports:
     stringr,
     foreign,
-    methods,
     rvest,
     magrittr,
     xml2,
