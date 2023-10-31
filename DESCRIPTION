@@ -23,6 +23,7 @@ Depends:
 Imports:
     stringr,
     foreign,
+    methods,
     rvest,
     magrittr,
     xml2,
