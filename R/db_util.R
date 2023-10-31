@@ -6,57 +6,46 @@
 ## examples: nhanesQuery("SELECT TOP(50) * FROM Metadata.QuestionnaireVariables;")
 
 
-.nhanesQuery = function(sql){
-  if(is.na(.collection_date) | is.na(.container_version)) 
-    stop("can't run .nhanesQuery - no DB detected")
- return(DBI::dbGetQuery(cn(), sql))
+.nhanesQuery <- function(sql)
+{
+  if(!.dbEnv$ok) stop("no database available for use")
+  return(DBI::dbGetQuery(cn(), sql))
 }
 
 
-# check if the table names are valid
+## check if the table names are valid
 
-.checkTableNames = function(table_name){
-  if(is.na(.collection_date) | is.na(.container_version))
-   stop("no DB detected")
-
-  if(is.null(table_name)){
-    stop("Table name cannot be null!")
-  }
-  validIndx = (table_name %in% .validTables)
-  if(sum(!validIndx)>0){
-    stop("Table ",paste(table_name[!validIndx],collapse = ", "),
-         " does/do not exist in database, please check the table names.")
-  }
+.checkTableNames <- function(table_name)
+{
+  if(!.dbEnv$ok) stop("no database available for use")
+  if(is.null(table_name)) stop("Table name cannot be NULL!")
+  ok <- (table_name %in% validTables())
+  if (any(!ok)) 
+    stop("Table(s) ", paste(table_name[!ok], collapse = ", "),
+         " missing from database")
+  invisible()
 }
 
 
-# choose the to query translated or Raw table.
-.convertTranslatedTable = function(table_name,translated){
-  if(is.na(.collection_date) | is.na(.container_version))
-    stop("no DB detected")
-  # is translated tables exist
-  if(translated ){
-    translatedIndx = (table_name %in% .translatedTables)
-    table_name[translatedIndx] = paste0("Translated.",table_name[translatedIndx])
-    if(any(!translatedIndx)){
-      warning("Table ",paste(table_name[!translatedIndx],collapse = ", "),
-              " does/do not exist in Translated schema, using Raw schema instead.")
-      table_name[!translatedIndx] = paste0("Raw.",table_name[!translatedIndx])
+## choose translated or Raw table.
+
+.convertTranslatedTable <- function(table_name, translated)
+{
+  if (!.dbEnv$ok) stop("no database available for use")
+  prefix <-
+    if (translated)
+    {
+      ok <- (table_name %in% translatedTables()) # whether translated tables exist
+      if (any(!ok))
+      {
+        warning("Table(s) ", paste(table_name[!ok], collapse = ", "),
+                " missing from Translated schema, using Raw schema instead.")
+      }
+      ifelse(ok, "Translated.", "Raw.")
     }
-  }else{
-    table_name = paste0("Raw.",table_name)
-
-  }
-  table_name
+    else "Raw."
+  paste0(prefix, table_name)
 }
 
-.useDB <- function() {
-    ## returns TRUE iff DB is available AND nhanesOptions("use.db") is not FALSE
-    if (isFALSE(nhanesOptions("use.db")) ||
-        is.na(.collection_date) || is.na(.container_version))
-        FALSE
-    else
-        TRUE
-}
 
 
