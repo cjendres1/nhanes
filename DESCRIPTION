@@ -32,13 +32,12 @@ Description: Utility to retrieve data from the National Health and Nutrition
 License: GPL (>= 2)
 Encoding: UTF-8
 URL: https://cran.r-project.org/package=nhanesA
-Packaged: 2015-10-07 18:15:14 UTC; Endres
 Suggests:
     knitr,
     odbc,
     DBI,
     rmarkdown,
-	survey,
-	ggplot2
+    survey,
+    ggplot2
 VignetteBuilder: knitr
 RoxygenNote: 7.2.3
