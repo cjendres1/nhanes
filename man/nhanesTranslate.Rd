@@ -17,32 +17,45 @@ nhanesTranslate(
 \arguments{
 \item{nh_table}{The name of the NHANES table to retrieve.}
 
-\item{colnames}{The names of the columns to translate. It will translate all the columns by default.}
+\item{colnames}{The names of the columns to translate. It will
+translate all the columns by default.}
 
-\item{data}{If a data frame is passed, then code translation will be applied directly to the data frame. \cr
-In that case the return argument is the code-translated data frame.}
+\item{data}{If a data frame is passed, then code translation will
+be applied directly to the data frame. \cr In that case the
+return argument is the code-translated data frame.}
 
-\item{nchar}{Applies only when data is defined. Code translations can be very long. \cr
-Truncate the length by setting nchar (default = 128).}
+\item{nchar}{Applies only when data is defined. Code translations
+can be very long. \cr Truncate the length by setting nchar
+(default = 128).}
 
-\item{mincategories}{The minimum number of categories needed for code translations to be applied to the data (default=2).}
+\item{mincategories}{The minimum number of categories needed for
+code translations to be applied to the data (default=2).}
 
-\item{details}{If TRUE then all available table translation information is displayed (default=FALSE).}
+\item{details}{If TRUE then all available table translation
+information is displayed (default=FALSE).}
 
-\item{dxa}{If TRUE then the 2005-2006 DXA translation table will be used (default=FALSE).}
+\item{dxa}{If TRUE then the 2005-2006 DXA translation table will be
+used (default=FALSE).}
 }
 \value{
-The code translation table (or translated data frame when data is defined). Returns NULL upon error.
+The code translation table (or translated data frame when
+  data is defined). Returns NULL upon error.
 }
 \description{
 Returns code translations for categorical variables, 
 which appear in most NHANES tables.
 }
 \details{
-Most NHANES data tables have encoded values. E.g. 1 = 'Male', 2 = 'Female'.
-Thus it is often helpful to view the code translations and perhaps insert the translated values
-in a data frame. Only a single table may be specified, but multiple variables within that table
-can be selected. Code translations are retrieved for each variable.
+Most NHANES data tables have encoded values. E.g. 1 =
+  'Male', 2 = 'Female'.  Thus it is often helpful to view the code
+  translations and perhaps insert the translated values in a data
+  frame. Only a single table may be specified, but multiple
+  variables within that table can be selected. Code translations
+  are retrieved for each variable. If the environment variable
+  \code{NHANES_TABLE_BASE} was set during startup, the value of
+  this variable is used as the base URL instead of
+  \url{https://wwwn.cdc.gov} (this allows the use of a local or
+  alternative mirror of the CDC documentation).
 }
 \examples{
 \donttest{nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN'))}

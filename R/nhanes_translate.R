@@ -11,19 +11,33 @@
 #' @importFrom xml2 read_html
 #' @importFrom plyr mapvalues
 #' @param nh_table The name of the NHANES table to retrieve.
-#' @param colnames The names of the columns to translate. It will translate all the columns by default.
-#' @param data If a data frame is passed, then code translation will be applied directly to the data frame. \cr
-#' In that case the return argument is the code-translated data frame.
-#' @param nchar Applies only when data is defined. Code translations can be very long. \cr
-#' Truncate the length by setting nchar (default = 128).
-#' @param mincategories The minimum number of categories needed for code translations to be applied to the data (default=2).
-#' @param details If TRUE then all available table translation information is displayed (default=FALSE).
-#' @param dxa If TRUE then the 2005-2006 DXA translation table will be used (default=FALSE).
-#' @return The code translation table (or translated data frame when data is defined). Returns NULL upon error.
-#' @details Most NHANES data tables have encoded values. E.g. 1 = 'Male', 2 = 'Female'.
-#' Thus it is often helpful to view the code translations and perhaps insert the translated values
-#' in a data frame. Only a single table may be specified, but multiple variables within that table
-#' can be selected. Code translations are retrieved for each variable. 
+#' @param colnames The names of the columns to translate. It will
+#'   translate all the columns by default.
+#' @param data If a data frame is passed, then code translation will
+#'   be applied directly to the data frame. \cr In that case the
+#'   return argument is the code-translated data frame.
+#' @param nchar Applies only when data is defined. Code translations
+#'   can be very long. \cr Truncate the length by setting nchar
+#'   (default = 128).
+#' @param mincategories The minimum number of categories needed for
+#'   code translations to be applied to the data (default=2).
+#' @param details If TRUE then all available table translation
+#'   information is displayed (default=FALSE).
+#' @param dxa If TRUE then the 2005-2006 DXA translation table will be
+#'   used (default=FALSE).
+#'
+#' @return The code translation table (or translated data frame when
+#'   data is defined). Returns NULL upon error.
+#' @details Most NHANES data tables have encoded values. E.g. 1 =
+#'   'Male', 2 = 'Female'.  Thus it is often helpful to view the code
+#'   translations and perhaps insert the translated values in a data
+#'   frame. Only a single table may be specified, but multiple
+#'   variables within that table can be selected. Code translations
+#'   are retrieved for each variable. If the environment variable
+#'   \code{NHANES_TABLE_BASE} was set during startup, the value of
+#'   this variable is used as the base URL instead of
+#'   \url{https://wwwn.cdc.gov} (this allows the use of a local or
+#'   alternative mirror of the CDC documentation).
 #' @examples
 #' \donttest{nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN'))}
 #' \donttest{nhanesTranslate('BPX_F', 'BPACSZ', details=TRUE)}
@@ -113,7 +127,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128,
     if(nh_year == "Nnyfs"){
       code_translation_url <- str_c("https://wwwn.cdc.gov/Nchs/", nh_year, '/', nh_table, '.htm', sep='')
     } else {
-      code_translation_url <- str_c(nhanesURL, nh_year, '/', nh_table, '.htm', sep='')
+      code_translation_url <- str_c(nhanesTableURL, nh_year, '/', nh_table, '.htm', sep='')
     }
   }
   hurl <- .checkHtml(code_translation_url)
