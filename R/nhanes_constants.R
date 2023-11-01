@@ -1,6 +1,7 @@
 # nhanes_constants.R
 nhanesURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/'
 dataURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx'
+ladDataURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx?Component=LimitedAccess'
 dxaURL  <- "https://wwwn.cdc.gov/nchs/data/nhanes/dxa/"
 
 demoURL <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Demographics"
@@ -8,7 +9,7 @@ dietURL <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=
 examURL <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Examination"
 labURL  <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Laboratory"
 qURL    <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Questionnaire"
-#ladURL  <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=LimitedAccess"
+# ladURL  <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=LimitedAccess"
 varURLs <- c(demoURL, dietURL, examURL, labURL, qURL) #, ladURL)
 
 
