@@ -95,6 +95,57 @@ nhanes <- function(nh_table, includelabels = FALSE, translated=TRUE, nchar=128) 
   return(nht)
 }
 
+
+##' Download an NHANES table from URL
+##'
+##' Downloads an NHANES table from a URL and returns it as a data frame
+##' @title Parse NHANES doc URL
+##' @importFrom tools file_path_sans_ext
+##' @param url URL of XPT file to be downloaded
+##' @param prefix Base of the site hosting the data
+##' @param translated logical, whether variable codes should be translated
+##' @param nchar integer, labels are truncated after this
+##' @return data frame
+##' @export
+nhanesFromURL <- function(url, nh_table = NULL, prefix = "https://wwwn.cdc.gov", translated = TRUE, nchar = 128)
+{
+  if (length(url) != 1) stop("'url' must have length 1")
+  if (startsWith(tolower(url), "/nchs/nhanes"))
+    url <- paste0(prefix, url)
+  tryCatch({    
+    tf <- tempfile()
+    if (isTRUE(nhanesOptions("log.access"))) message("Downloading: ", url)
+    download.file(url, tf, mode = "wb", quiet = TRUE)
+    
+    nh_df <- read.xport(tf)
+
+    ## guess table name
+    if (is.null(nh_table)) {
+      nh_table <- file_path_sans_ext(basename(url))
+    }
+    
+    if(translated){
+      # suppress warning because there will be a warning and the function returns NULL when no columns need to translated.
+      suppressWarnings(suppressMessages({
+        nh_df <- nhanesTranslate(nh_table,
+                                 colnames = colnames(nh_df)[2:ncol(nh_df)],
+                                 data = nh_df,
+                                 nchar=nchar)
+      }))
+    }
+    nh_df
+  },
+  error = function(cond) {
+    stop(paste0("could not find a XPT file at: ", url))
+  },
+  warning = function(cond) {
+    message(cond, '\n')
+  })
+} 
+
+
+
+
 ## #------------------------------------------------------------------------------
 #' Import Dual Energy X-ray Absorptiometry (DXA) data.
 #' 

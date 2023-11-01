@@ -70,6 +70,29 @@ nhanesCodebook <- function(nh_table, colname=NULL, dxa=FALSE) {
     return(ans)
 } 
 
+
+##' Download and parse an NHANES doc file
+##'
+##' Downloads and parses an NHANES doc file from a URL and returns it as a list
+##' @title Parse NHANES doc URL
+##' @param url URL to be downloaded
+##' @param prefix Base of the site hosting the data
+##' @return list with one element for each variable
+##' @export
+nhanesParseCodeBook <- function(url, prefix = "https://wwwn.cdc.gov") {
+  if (length(url) != 1) stop("'url' must have length 1")
+  if (startsWith(tolower(url), "/nchs/nhanes"))
+    url <- paste0(prefix, url)
+  hurl <- .checkHtml(url)
+  if( is.null(hurl) ||  is.na(hurl)) {
+    stop(paste0("could not find a web page at: ", url))
+  }
+  colname = .getVarNames(hurl)$VarNames
+  lapply(colname, .codeBookHelper, hurl)
+} 
+
+
+
 ##helper function to get the variable names from the HTML and not via nhanesAttr
 .getVarNames = function(doc) {
     xx = xml2::xml_find_all(doc, "//*[a]")

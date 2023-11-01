@@ -24,8 +24,10 @@
 }
 
 ##' Downloads and parses the NHANES manifest available at
-##' \url{https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx} and
-##' returns it as a data frame.
+##' \url{https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx} (for
+##' public data) or
+##' \url{https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx?Component=LimitedAccess}
+##' (for limited access data) and returns it as a data frame.
 ##'
 ##' @title Download and parse the entire NHANES manifest
 ##' @param which Either "public" or "limitedaccess"
@@ -48,7 +50,7 @@ nhanesManifest <- function(which = c("public", "limitedaccess"),
 {
   which <- match.arg(which)
   switch(which,
-         public = nhanesManifest_public(size = size, verbose = verbose),
+         public = nhanesManifest_public(sizes = sizes, verbose = verbose),
          limitedaccess = nhanesManifest_limitedaccess(verbose = verbose))
 }
 
