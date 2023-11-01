@@ -4,27 +4,45 @@
 \alias{browseNHANES}
 \title{Open a browser to NHANES.}
 \usage{
-browseNHANES(year = NULL, data_group = NULL, nh_table = NULL)
+browseNHANES(
+  year = NULL,
+  data_group = NULL,
+  nh_table = NULL,
+  local = TRUE,
+  browse = TRUE
+)
 }
 \arguments{
 \item{year}{The year in yyyy format where 1999 <= yyyy.}
 
-\item{data_group}{The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
-Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).}
+\item{data_group}{The type of survey (DEMOGRAPHICS, DIETARY,
+EXAMINATION, LABORATORY, QUESTIONNAIRE).  Abbreviated terms may
+also be used: (DEMO, DIET, EXAM, LAB, Q).}
 
 \item{nh_table}{The name of an NHANES table.}
+
+\item{local}{logical flag. If \code{TRUE}, and a local or
+alternative source was specificed using the environment variable
+\code{NHANES_TABLE_BASE}, this will be used in preference to the
+CDC website at \url{https://wwwn.cdc.gov} for named tables.}
+
+\item{browse}{logical flag, indicating whether the specific NHANES
+site should be opened using a browser (which is the default
+behaviour).}
 }
 \value{
-No return value
+A character string giving the URL, invisibly if the URL is
+  also opened using \code{\link{browseURL}}.
 }
 \description{
 The browser may be directed to a specific year, survey, or table.
 }
 \details{
-browseNHANES will open a web browser to the specified NHANES site.
+By default, browseNHANES will open a web browser to the
+  specified NHANES site.
 }
 \examples{
-browseNHANES()                     # Defaults to the main data sets page
+browseNHANES(browse = FALSE)       # Defaults to the main data sets page
 browseNHANES(2005)                 # The main page for the specified survey year
 browseNHANES(2009, 'EXAM')         # Page for the specified year and survey group
 browseNHANES(nh_table = 'VIX_D')   # Page for a specific table

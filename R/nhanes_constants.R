@@ -1,4 +1,8 @@
 # nhanes_constants.R
+
+## This may be overwritten in .onLoad() (see zzz.R)
+nhanesTableURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/'
+
 nhanesURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/'
 dataURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx'
 ladDataURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx?Component=LimitedAccess'

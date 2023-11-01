@@ -12,9 +12,13 @@
 #' @param nh_table The name of the NHANES table that contains the desired variable.
 #' @param colname The name of the table column (variable).
 #' @param dxa If TRUE then the 2005-2006 DXA codebook will be used (default=FALSE).
-#' @details Each NHANES variable has a codebook that provides a basic description
-#' as well as the distribution or range of values. This function returns the full
-#' codebook information for the selected variable.
+#' @details Each NHANES variable has a codebook that provides a basic
+#'   description as well as the distribution or range of values. This
+#'   function returns the full codebook information for the selected
+#'   variable. If the environment variable \code{NHANES_TABLE_BASE}
+#'   was set during startup, the value of this variable is used as the
+#'   base URL instead of \url{https://wwwn.cdc.gov} (this allows the
+#'   use of a local or alternative mirror of the CDC documentation).
 #' @return The codebook is returned as a list object. Returns NULL upon error.
 #' @examples
 #' \donttest{nhanesCodebook('AUX_D', 'AUQ020D')}
@@ -32,7 +36,6 @@ nhanesCodebook <- function(nh_table, colname=NULL, dxa=FALSE) {
     return(.nhanesCodebookDB(nh_table, colname))
   }
   
-
   if(dxa) {
     url <- "https://wwwn.cdc.gov/nchs/data/nhanes/dxa/dxx_d.htm"
   } else {  nh_year <- .get_year_from_nh_table(nh_table)
@@ -42,7 +45,7 @@ nhanesCodebook <- function(nh_table, colname=NULL, dxa=FALSE) {
   if(nh_year == "Nnyfs"){
     url <- str_c("https://wwwn.cdc.gov/Nchs/", nh_year, '/', nh_table, '.htm', sep='')
   } else {
-    url <- str_c(nhanesURL, nh_year, '/', nh_table, '.htm', sep='')
+    url <- str_c(nhanesTableURL, nh_year, '/', nh_table, '.htm', sep='')
   }
   }
   hurl <- .checkHtml(url)
