@@ -2,7 +2,7 @@
 
 ## The two 'constants' nhanesTableURL and nhanesManifestPrefix are
 ## designed to be changed dynamically (currently by setting an
-## environment variable) to allow <table>.html and <table>.xpt files
+## environment variable) to allow <table>.htm and <table>.xpt files
 ## to be accessed from a location other than the NHANES website (e.g.,
 ## from a local copy). To keep the implementing functions see them as
 ## regular character variables, we implement them as active bindings
