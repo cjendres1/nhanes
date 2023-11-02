@@ -4,10 +4,14 @@
 \alias{nhanesManifest}
 \title{Download and parse the entire NHANES manifest}
 \usage{
-nhanesManifest(which = "Tables", sizes = TRUE, verbose = getOption("verbose"))
+nhanesManifest(
+  which = c("public", "limitedaccess"),
+  sizes = TRUE,
+  verbose = getOption("verbose")
+)
 }
 \arguments{
-\item{which}{Either "Tables" or "Variables"}
+\item{which}{Either "public" or "limitedaccess"}
 
 \item{sizes}{Logical, whether to compute data file sizes (as
 reported by the server) and include them in the result.}
@@ -24,8 +28,10 @@ When "Tables" is specified it returns a data.frame with
 }
 \description{
 Downloads and parses the NHANES manifest available at
-\url{https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx} and
-returns it as a data frame.
+\url{https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx} (for
+public data) or
+\url{https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx?Component=LimitedAccess}
+(for limited access data) and returns it as a data frame.
 }
 \examples{
 manifest <- nhanesManifest(sizes = FALSE)

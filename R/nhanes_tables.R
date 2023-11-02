@@ -24,11 +24,13 @@
 }
 
 ##' Downloads and parses the NHANES manifest available at
-##' \url{https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx} and
-##' returns it as a data frame.
+##' \url{https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx} (for
+##' public data) or
+##' \url{https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx?Component=LimitedAccess}
+##' (for limited access data) and returns it as a data frame.
 ##'
 ##' @title Download and parse the entire NHANES manifest
-##' @param which Either "Tables" or "Variables"
+##' @param which Either "public" or "limitedaccess"
 ##' @param sizes Logical, whether to compute data file sizes (as
 ##'     reported by the server) and include them in the result.
 ##' @param verbose Logical flag indicating whether information on
@@ -43,7 +45,17 @@
 ##' dim(manifest)
 ##' 
 ##' @export
-nhanesManifest <- function(which = "Tables", sizes = TRUE, verbose = getOption("verbose"))
+nhanesManifest <- function(which = c("public", "limitedaccess"),
+                           sizes = TRUE, verbose = getOption("verbose"))
+{
+  which <- match.arg(which)
+  switch(which,
+         public = nhanesManifest_public(sizes = sizes, verbose = verbose),
+         limitedaccess = nhanesManifest_limitedaccess(verbose = verbose))
+}
+
+
+nhanesManifest_public <- function(sizes, verbose)
 {
   if (verbose) message("Downloading ", dataURL)
   hurl <- .checkHtml(dataURL)
@@ -65,8 +77,8 @@ nhanesManifest <- function(which = "Tables", sizes = TRUE, verbose = getOption("
   xptNames = tab2[seq(2, 3026, by=2)]
   df = as.data.frame(tab1 |> html_table())
   df$Table = sub(" Doc", "", df$Doc.File)
-  df$DocURL = htmNames
-  df$DataURL = xptNames
+  df$DocURL = parseRedirect(htmNames)
+  df$DataURL = parseRedirect(xptNames)
   df = df[,c("Table", "DocURL", "DataURL", "Years", "Date.Published")]
   if (sizes) {
     if (verbose) message("Checking data file sizes...")
@@ -75,6 +87,60 @@ nhanesManifest <- function(which = "Tables", sizes = TRUE, verbose = getOption("
   }
   return(df)
 }
+
+nhanesManifest_limitedaccess <- function(verbose)
+{
+  if (verbose) message("Downloading ", ladDataURL)
+  hurl <- .checkHtml(ladDataURL)
+  if(is.null(hurl)) {
+    message("Error occurred during read. No tables returned")
+    return(NULL)
+  }
+  ##get to the table
+  xpath <- '//*[@id="GridView1"]'
+  tab1 <- hurl %>% html_elements(xpath=xpath)
+  ##pull out all the hrefs 
+  tab2 = tab1 |> html_nodes("a") |> html_attr("href")
+  ## drop Omp and # (withdrawn)
+  skip <- (tab2 %in% c("#", "/Nchs/Nhanes/Omp/Default.aspx"))
+  tab2 <- tab2[!skip]
+  ##whenever they update we need to error out and then fix it
+  if(length(tab2) != 223) stop("CDC updated data manifest")
+  htmNames = tab2
+  df = as.data.frame(tab1 |> html_table())
+  df = subset(df, !skip)
+  df$Table = sub(" Doc", "", df$Doc.File)
+  df$DocURL = htmNames
+  df = df[,c("Table", "DocURL", "Years", "Date.Published")]
+  return(df)
+}
+
+
+
+# helper functions
+
+string2url <- function(s)
+{
+  s <- gsub("=", ":",
+            gsub("&", "\n", s, fixed = TRUE),
+            fixed = TRUE)
+  e <- read.dcf(textConnection(s))
+  with(as.list(e[1, , drop = TRUE]),
+       sprintf("/Nchs/Nhanes/%s-%s/%s.%s", b, e, d, x))
+}
+
+
+parseRedirect <- function(s, prefix = "../vitamind/analyticalnote.aspx?")
+{
+  ans <- s
+  tofix <- startsWith(tolower(s), tolower(prefix))
+  ss <- substring(s[tofix], 1 + nchar(prefix), 999)
+  ss <- sapply(ss, string2url)
+  ans[tofix] <- ss
+  ans
+}
+
+
 
 #------------------------------------------------------------------------------
 #' Returns a list of table names for the specified survey group.
