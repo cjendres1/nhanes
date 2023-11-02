@@ -4,18 +4,10 @@
 \alias{nhanesFromURL}
 \title{Parse NHANES doc URL}
 \usage{
-nhanesFromURL(
-  url,
-  nh_table = NULL,
-  prefix = "https://wwwn.cdc.gov",
-  translated = TRUE,
-  nchar = 128
-)
+nhanesFromURL(url, translated = TRUE, nchar = 128)
 }
 \arguments{
 \item{url}{URL of XPT file to be downloaded}
-
-\item{prefix}{Base of the site hosting the data}
 
 \item{translated}{logical, whether variable codes should be translated}
 

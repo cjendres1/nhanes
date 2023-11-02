@@ -4,12 +4,10 @@
 \alias{nhanesParseCodeBook}
 \title{Parse NHANES doc URL}
 \usage{
-nhanesParseCodeBook(url, prefix = "https://wwwn.cdc.gov")
+nhanesParseCodeBook(url)
 }
 \arguments{
 \item{url}{URL to be downloaded}
-
-\item{prefix}{Base of the site hosting the data}
 }
 \value{
 list with one element for each variable

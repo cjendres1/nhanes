@@ -102,30 +102,25 @@ nhanes <- function(nh_table, includelabels = FALSE, translated=TRUE, nchar=128) 
 ##' @title Parse NHANES doc URL
 ##' @importFrom tools file_path_sans_ext
 ##' @param url URL of XPT file to be downloaded
-##' @param prefix Base of the site hosting the data
 ##' @param translated logical, whether variable codes should be translated
 ##' @param nchar integer, labels are truncated after this
 ##' @return data frame
 ##' @export
-nhanesFromURL <- function(url, nh_table = NULL, prefix = "https://wwwn.cdc.gov", translated = TRUE, nchar = 128)
+nhanesFromURL <- function(url, translated = TRUE, nchar = 128)
 {
   if (length(url) != 1) stop("'url' must have length 1")
   if (startsWith(tolower(url), "/nchs/nhanes"))
-    url <- paste0(prefix, url)
+    url <- paste0(nhanesManifestPrefix, url)
   tryCatch({    
     tf <- tempfile()
     if (isTRUE(nhanesOptions("log.access"))) message("Downloading: ", url)
     download.file(url, tf, mode = "wb", quiet = TRUE)
-    
     nh_df <- read.xport(tf)
-
-    ## guess table name
-    if (is.null(nh_table)) {
+    if (translated) {
+      ## guess table name
       nh_table <- file_path_sans_ext(basename(url))
-    }
-    
-    if(translated){
-      # suppress warning because there will be a warning and the function returns NULL when no columns need to translated.
+      ## suppress warning because there will be a warning and the
+      ## function returns NULL when no columns need to translated.
       suppressWarnings(suppressMessages({
         nh_df <- nhanesTranslate(nh_table,
                                  colnames = colnames(nh_df)[2:ncol(nh_df)],

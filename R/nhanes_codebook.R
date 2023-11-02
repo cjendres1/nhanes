@@ -76,15 +76,14 @@ nhanesCodebook <- function(nh_table, colname=NULL, dxa=FALSE) {
 ##' Downloads and parses an NHANES doc file from a URL and returns it as a list
 ##' @title Parse NHANES doc URL
 ##' @param url URL to be downloaded
-##' @param prefix Base of the site hosting the data
 ##' @return list with one element for each variable
 ##' @export
-nhanesParseCodeBook <- function(url, prefix = "https://wwwn.cdc.gov") {
+nhanesParseCodeBook <- function(url) {
   if (length(url) != 1) stop("'url' must have length 1")
   if (startsWith(tolower(url), "/nchs/nhanes"))
-    url <- paste0(prefix, url)
+    url <- paste0(nhanesManifestPrefix, url)
   hurl <- .checkHtml(url)
-  if( is.null(hurl) ||  is.na(hurl)) {
+  if (is.null(hurl) ||  is.na(hurl)) {
     stop(paste0("could not find a web page at: ", url))
   }
   colname = .getVarNames(hurl)$VarNames
