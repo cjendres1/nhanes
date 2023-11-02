@@ -65,17 +65,17 @@ nhanesManifest_public <- function(sizes, verbose)
   }
   ##get to the table
   xpath <- '//*[@id="GridView1"]'
-  tab1 <- hurl %>% html_elements(xpath=xpath)
-  ##pull out all the hrefs 
+  tab1 <- hurl |> html_elements(xpath=xpath)
+  ##pull out all the hrefs
   tab2 = tab1 |> html_nodes("a") |> html_attr("href")
   ## PAHS_H was withdrawn - only one entry in the table
-  ## so add in one 
+  ## so add in one
   tab2 = c(tab2[1:2413], tab2[2413:length(tab2)])
   ##whenever they update we need to error out and then fix it
   if(length(tab2) != 3026) stop("CDC updated data manifest")
   htmNames = tab2[seq(1, 3025, by=2)]
   xptNames = tab2[seq(2, 3026, by=2)]
-  df = as.data.frame(tab1 |> html_table())
+  df = tab1 |> html_table() |> as.data.frame()
   df$Table = sub(" Doc", "", df$Doc.File)
   df$DocURL = parseRedirect(htmNames)
   df$DataURL = parseRedirect(xptNames)
@@ -98,8 +98,8 @@ nhanesManifest_limitedaccess <- function(verbose)
   }
   ##get to the table
   xpath <- '//*[@id="GridView1"]'
-  tab1 <- hurl %>% html_elements(xpath=xpath)
-  ##pull out all the hrefs 
+  tab1 <- hurl |> html_elements(xpath=xpath)
+  ##pull out all the hrefs
   tab2 = tab1 |> html_nodes("a") |> html_attr("href")
   ## drop Omp and # (withdrawn)
   skip <- (tab2 %in% c("#", "/Nchs/Nhanes/Omp/Default.aspx"))
@@ -107,7 +107,7 @@ nhanesManifest_limitedaccess <- function(verbose)
   ##whenever they update we need to error out and then fix it
   if(length(tab2) != 223) stop("CDC updated data manifest")
   htmNames = tab2
-  df = as.data.frame(tab1 |> html_table())
+  df = tab1 |> html_table() |> as.data.frame()
   df = subset(df, !skip)
   df$Table = sub(" Doc", "", df$Doc.File)
   df$DocURL = htmNames
@@ -147,10 +147,9 @@ parseRedirect <- function(s, prefix = "../vitamind/analyticalnote.aspx?")
 #' 
 #' Enables quick display of all available tables in the survey group.
 #' 
-#' @importFrom stringr str_replace str_c str_match str_to_title str_sub str_split str_remove str_detect
+#' @importFrom stringr str_replace str_match str_to_title str_sub str_split str_remove str_detect
 #' @importFrom rvest html_elements html_table
 #' @importFrom xml2 read_html
-#' @importFrom magrittr %>%
 #' @param data_group The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
 #' Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).
 #' @param year The year in yyyy format where 1999 <= yyyy.
@@ -188,19 +187,19 @@ nhanesTables <- function(data_group, year, nchar=128, details = FALSE, namesonly
     return(.nhanesTablesDB(data_group, year, nchar, details, namesonly, includerdc))
   }
   
-  if(year == 'P' | year == 'p') {
-    turl <- str_c(nhanesURL, 'search/datapage.aspx?Component=', 
-                  str_to_title(as.character(nhanes_group[data_group])), 
-                  '&CycleBeginYear=', '2017-2020', sep='')
-  } else if(year == 'Y' | year == 'y') {
-    turl <- str_c(nhanesURL, 'search/NnyfsData.aspx?Component=', 
-                  str_to_title(as.character(nhanes_group[data_group])), 
-                  '&CycleBeginYear=', '2012', sep='')
+  if(year == 'P' || year == 'p') {
+    turl <- paste0(nhanesURL, 'search/datapage.aspx?Component=',
+                   str_to_title(as.character(nhanes_group[data_group])),
+                   '&CycleBeginYear=', '2017-2020')
+  } else if (year == 'Y' || year == 'y') {
+    turl <- paste0(nhanesURL, 'search/NnyfsData.aspx?Component=',
+                   str_to_title(as.character(nhanes_group[data_group])),
+                   '&CycleBeginYear=', '2012')
   } else {
     nh_year <- .get_nh_survey_years(year)
-    turl <- str_c(nhanesURL, 'search/variablelist.aspx?Component=', 
-                  str_to_title(as.character(nhanes_group[data_group])), 
-                  '&CycleBeginYear=', unlist(str_split(as.character(nh_year), '-'))[[1]] , sep='')
+    turl <- paste0(nhanesURL, 'search/variablelist.aspx?Component=',
+                   str_to_title(as.character(nhanes_group[data_group])),
+                   '&CycleBeginYear=', unlist(str_split(as.character(nh_year), '-'))[[1]])
   }
   
   # At this point df contains every table for the specified survey & year
@@ -209,8 +208,7 @@ nhanesTables <- function(data_group, year, nchar=128, details = FALSE, namesonly
     message("Error occurred during read. No tables returned")
     return(NULL)
   }
-  df <- as.data.frame(hurl %>% html_elements(xpath=xpath) %>% html_table())
-  #  df <- as.data.frame(turl %>% read_html() %>% html_elements(xpath=xpath) %>% html_table())
+  df <- hurl |> html_elements(xpath=xpath) |> html_table() |> as.data.frame()
   # By default we exclude RDC Only tables as those cannot be downloaded
   
   if(nrow(df)==0) {
@@ -261,7 +259,7 @@ nhanesTables <- function(data_group, year, nchar=128, details = FALSE, namesonly
   # Get possible table suffixes for the specified year
   if(nh_year != "1999-2000") { ## No exclusion needed for first survey
     suffix <- names(data_idx[which(data_idx == nh_year)])
-    suffix <- unlist(lapply(suffix, function(x) {str_c('_', x, sep='')}))
+    suffix <- unlist(lapply(suffix, function(x) { paste0('_', x)}))
     if(nh_year == '2005-2006') {suffix <- c(suffix, anomalytables2005)}
     matches <- unique(grep(paste(suffix,collapse="|"), df[['Data.File.Name']], value=TRUE))  
     df <- df[(df$Data.File.Name %in% matches),]
@@ -279,10 +277,9 @@ nhanesTables <- function(data_group, year, nchar=128, details = FALSE, namesonly
 #' 
 #' Enables quick display of table variables and their definitions.
 #' 
-#' @importFrom stringr str_replace str_c str_sub str_split
+#' @importFrom stringr str_replace str_sub str_split
 #' @importFrom rvest html_elements html_table
 #' @importFrom xml2 read_html
-#' @importFrom magrittr %>%
 #' @param data_group The type of survey (DEMOGRAPHICS, DIETARY, EXAMINATION, LABORATORY, QUESTIONNAIRE).
 #' Abbreviated terms may also be used: (DEMO, DIET, EXAM, LAB, Q).
 #' @param nh_table The name of the specific table to retrieve.
@@ -317,15 +314,15 @@ nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=128, na
   
   if(length(grep('^P_', nh_table))>0){
     nh_year <- '2017-2020'
-    turl <- str_c(nhanesURL, 'search/variablelist.aspx?Component=', 
-                  str_to_title(as.character(nhanes_group[data_group])), 
-                  '&Cycle=', nh_year , sep='')
+    turl <- paste0(nhanesURL, 'search/variablelist.aspx?Component=', 
+                   str_to_title(as.character(nhanes_group[data_group])), 
+                   '&Cycle=', nh_year)
     
   } else {
     nh_year <- .get_year_from_nh_table(nh_table)
-    turl <- str_c(nhanesURL, 'search/variablelist.aspx?Component=', 
-                  str_to_title(as.character(nhanes_group[data_group])), 
-                  '&CycleBeginYear=', unlist(str_split(as.character(nh_year), '-'))[[1]] , sep='') 
+    turl <- paste0(nhanesURL, 'search/variablelist.aspx?Component=', 
+                   str_to_title(as.character(nhanes_group[data_group])), 
+                   '&CycleBeginYear=', unlist(str_split(as.character(nh_year), '-'))[[1]]) 
   }
   
   hurl <- .checkHtml(turl) 
@@ -333,8 +330,7 @@ nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=128, na
     message("Error occurred during read. No table variables returned")
     return(NULL)
   }
-  df <- as.data.frame(hurl %>% html_elements(xpath=xpath) %>% html_table())
-  #  df <- as.data.frame(turl %>% read_html() %>% html_elements(xpath=xpath) %>% html_table())
+  df <- hurl |> html_elements(xpath=xpath) |> html_table() |> as.data.frame()
   
   if(!(nh_table %in% df$Data.File.Name)) {
     stop('Table ', nh_table, ' not present in the ', data_group, ' survey' )

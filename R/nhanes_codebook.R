@@ -6,7 +6,7 @@
 #' Returns full NHANES codebook including Variable Name, SAS Label, English Text, Target,
 #' and Value distribution.
 #' 
-#' @importFrom stringr str_c str_sub str_remove_all str_trim
+#' @importFrom stringr str_sub str_remove_all str_trim
 #' @importFrom rvest html_elements html_table html_text2
 #'  
 #' @param nh_table The name of the NHANES table that contains the desired variable.
@@ -43,9 +43,9 @@ nhanesCodebook <- function(nh_table, colname=NULL, dxa=FALSE) {
     return(NULL)
   }
   if(nh_year == "Nnyfs"){
-    url <- str_c("https://wwwn.cdc.gov/Nchs/", nh_year, '/', nh_table, '.htm', sep='')
+    url <- paste0("https://wwwn.cdc.gov/Nchs/", nh_year, '/', nh_table, '.htm')
   } else {
-    url <- str_c(nhanesTableURL, nh_year, '/', nh_table, '.htm', sep='')
+    url <- paste0(nhanesTableURL, nh_year, '/', nh_table, '.htm')
   }
   }
   hurl <- .checkHtml(url)
@@ -118,12 +118,12 @@ nhanesParseCodeBook <- function(url) {
   
 ##helper function that gives a couple of locations in the document to search
 .testLocations = function(colname, hurl) {
-  xpt <- str_c('//*[h3[a[@name="', colname, '"]]]', sep='')
-  tabletree <- hurl %>% html_elements(xpath=xpt)
+  xpt <- paste0('//*[h3[a[@name="', colname, '"]]]')
+  tabletree <- hurl |> html_elements(xpath=xpt)
 
   if(length(tabletree)==0) { # If not found then try 'id' instead of 'name'
-    xpt <- str_c('//*[h3[@id="', colname, '"]]', sep='')
-    tabletree <- hurl %>% html_elements(xpath=xpt)
+    xpt <- paste0('//*[h3[@id="', colname, '"]]')
+    tabletree <- hurl |> html_elements(xpath=xpt)
   }
   return(tabletree)
 }
@@ -159,10 +159,10 @@ nhanesParseCodeBook <- function(url) {
    }
   }
   if(length(tabletree)>0) {
-    codetitles <- html_elements(tabletree, "dt") %>% html_text2()
-    codetext <- html_elements(tabletree, "dd") %>% html_text2()
+    codetitles <- html_elements(tabletree, "dt") |> html_text2()
+    codetext <- html_elements(tabletree, "dd") |> html_text2()
     names(codetext) <- codetitles
-    tabletrans <- html_elements(tabletree, 'table') %>% html_table()
+    tabletrans <- html_elements(tabletree, 'table') |> html_table()
     if(length(tabletrans) > 0) {
       names(tabletrans) <- colname
       codebook <- c(codetext, tabletrans)

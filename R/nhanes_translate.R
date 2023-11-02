@@ -6,7 +6,7 @@
 #' Returns code translations for categorical variables, 
 #' which appear in most NHANES tables.
 #' 
-#' @importFrom stringr str_c str_locate str_sub 
+#' @importFrom stringr str_locate str_sub 
 #' @importFrom rvest html_elements html_table
 #' @importFrom xml2 read_html
 #' @importFrom plyr mapvalues
@@ -64,36 +64,33 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128,
   }
   
   get_translation_table <- function(colname, hurl, details) {
-    xpt <- str_c('//*[h3[a[@name="', colname, '"]]]', sep='')
+    xpt <- paste0('//*[h3[a[@name="', colname, '"]]]')
     
-    tabletree <- hurl %>% html_elements(xpath=xpt)
-    #    tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
+    tabletree <- hurl |> html_elements(xpath=xpt)
     if(length(tabletree)==0) { # If not found then try 'id' instead of 'name'
-      xpt <- str_c('//*[h3[@id="', colname, '"]]', sep='')
+      xpt <- paste0('//*[h3[@id="', colname, '"]]')
       
-      tabletree <- hurl %>% html_elements(xpath=xpt)
-      #      tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
+      tabletree <- hurl |> html_elements(xpath=xpt)
     }
     if(length(tabletree)>0) {
-      tabletrans <- as.data.frame(html_elements(tabletree, 'table') %>% html_table())
+      tabletrans <- html_elements(tabletree, 'table') |> html_table() |> as.data.frame()
     } else { # Code table not found so let's see if last letter should be lowercase
       nc <- nchar(colname)
       if(length(grep("[[:upper:]]", stringr::str_sub(colname, start=nc, end=nc)))>0){
         lcnm <- colname
-        stringr::str_sub(lcnm, start=nc, end=nc) <- tolower(stringr::str_sub(lcnm, start=nc, end=nc))
-        xpt <- str_c('//*[h3[a[@name="', lcnm, '"]]]', sep='')
+        stringr::str_sub(lcnm, start=nc, end=nc) <-
+            tolower(stringr::str_sub(lcnm, start=nc, end=nc))
+        xpt <- paste0('//*[h3[a[@name="', lcnm, '"]]]')
         
-        tabletree <- hurl %>% html_elements(xpath=xpt)
+        tabletree <- hurl |> html_elements(xpath=xpt)
 
         if(length(tabletree)==0) { # If not found then try 'id' instead of 'name'
-          xpt <- str_c('//*[h3[@id="', lcnm, '"]]', sep='')
-          
-          tabletree <- hurl %>% html_elements(xpath=xpt)
-          #          tabletree <- url %>% read_html() %>% html_elements(xpath=xpt)
+          xpt <- paste0('//*[h3[@id="', lcnm, '"]]')
+          tabletree <- hurl |> html_elements(xpath=xpt)
         }
         
         if(length(tabletree)>0) {
-          tabletrans <- as.data.frame(html_elements(tabletree, 'table') %>% html_table())
+          tabletrans <- html_elements(tabletree, 'table') |> html_table() |> as.data.frame()
         } else { # Still not found even after converting to lowercase
           warning(c('Column "', colname, '" not found'), collapse='')
           return(NULL)
@@ -124,11 +121,12 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128,
     if(is.null(nh_year)) {
       return(NULL)
     }
-    if(nh_year == "Nnyfs"){
-      code_translation_url <- str_c("https://wwwn.cdc.gov/Nchs/", nh_year, '/', nh_table, '.htm', sep='')
-    } else {
-      code_translation_url <- str_c(nhanesTableURL, nh_year, '/', nh_table, '.htm', sep='')
-    }
+    code_translation_url <- 
+      if(nh_year == "Nnyfs"){
+        paste0("https://wwwn.cdc.gov/Nchs/", nh_year, '/', nh_table, '.htm')
+      } else {
+        paste0(nhanesTableURL, nh_year, '/', nh_table, '.htm')
+      }
   }
   hurl <- .checkHtml(code_translation_url)
   if(is.null(colnames) )
@@ -154,7 +152,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128,
     for( i in 1:length(colnames) ) {
       if(!(i %in% nskip)) {
         cname <- unlist(colnames[i])
-        sstr <- str_c('^', cname, '$') # Construct the search string
+        sstr <- paste0('^', cname, '$') # Construct the search string
         idx <- grep(sstr, names(data)) 
         if(length(idx)>0) { ## The column is present. Next we need to decide if it should be translated.
           if(length(levels(as.factor(data[[idx]]))) >= mincategories) {

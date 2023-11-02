@@ -1,6 +1,6 @@
 Package: nhanesA
-Version: 0.8.6
-Date: 2023-11-01
+Version: 0.8.7
+Date: 2023-11-02
 Title: NHANES Data Retrieval
 Authors@R:
     c(person(given = "Christopher",
@@ -15,16 +15,18 @@ Authors@R:
       person(given="Robert",
              family="Gentleman",
              role = "aut", 
-             email= "robert_gentleman@g.harvard.edu")  
-             )
+             email= "robert_gentleman@g.harvard.edu"),
+      person(given="Deepayan", 
+             family="Sarkar",
+             role = "ctb", 
+             email="deepayan.sarkar@gmail.com"))
 BugReports: https://github.com/cjendres1/nhanes/issues
 Depends:
-    R (>= 3.0.0), methods
+    R (>= 4.1.0), methods
 Imports:
     stringr,
     foreign,
     rvest,
-    magrittr,
     xml2,
     plyr
 Description: Utility to retrieve data from the National Health and Nutrition 

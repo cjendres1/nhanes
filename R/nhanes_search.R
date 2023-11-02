@@ -12,7 +12,6 @@
 #' 
 #' @importFrom rvest html_table
 #' @importFrom xml2 xml_children xml_text read_html
-#' @importFrom magrittr %>%
 #' @param search_terms List of terms or keywords.
 #' @param exclude_terms List of exclusive terms or keywords.
 #' @param data_group Which data groups (e.g. DIET, EXAM, LAB) to search. Default is to search all groups.
@@ -70,10 +69,10 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
       vnodes <- html_elements(vlhtml, xpath=xpathv)
       if(length(vnodes) > 0){
         if(!df_initialized) {
-          df <- t(sapply(lapply(vnodes,xml_children),xml_text)) %>% as.data.frame(stringsAsFactors=FALSE)
+          df <- t(sapply(lapply(vnodes,xml_children),xml_text)) |> as.data.frame()
           df_initialized = TRUE
         } else {
-          dfadd <- t(sapply(lapply(vnodes,xml_children),xml_text)) %>% as.data.frame(stringsAsFactors=FALSE)
+          dfadd <- t(sapply(lapply(vnodes,xml_children),xml_text)) |> as.data.frame()
           df <- rbind(df, dfadd)
         }
       }
@@ -168,7 +167,6 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
 #' 
 #' @importFrom rvest html_table html_nodes html_attr
 #' @importFrom xml2 read_html
-#' @importFrom magrittr %>%
 #' @param pattern Pattern of table names to match  
 #' @param ystart Four digit year of first survey included in search, where ystart >= 1999.
 #' @param ystop  Four digit year of final survey included in search, where ystop >= ystart.
@@ -213,7 +211,7 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
     message("Error occurred during read. No table names returned")
     return(NULL)
   }
-  df <- data.frame(hurl %>% html_elements(xpath=xpath) %>% html_table())
+  df <- data.frame(hurl |> html_elements(xpath=xpath) |> html_table())
 
   df <- df[grep(paste(pattern,collapse="|"), df$Doc.File),]
   if(nrow(df)==0) {return(NULL)}
@@ -225,7 +223,7 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
   }
   if(includeurl) {
     details <- TRUE
-    urls <- hurl %>% html_elements(xpath=xpath) %>% html_nodes("a") %>% html_attr('href')
+    urls <- hurl |> html_elements(xpath=xpath) |> html_nodes("a") |> html_attr('href')
     
     docurl  <- sort(urls[grep(paste0(pattern, ".*\\.htm"), urls)])
     names(docurl) <- str_remove(sub('.*\\/', '', docurl),".htm")
@@ -292,7 +290,6 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
 #' Returns a list of table names that contain the variable
 #' @importFrom rvest html_elements html_table
 #' @importFrom xml2 xml_children xml_text read_html
-#' @importFrom magrittr %>%
 #' @param varname Name of variable to match.
 #' @param ystart Four digit year of first survey included in search, where ystart >= 1999.
 #' @param ystop  Four digit year of final survey included in search, where ystop >= ystart.
@@ -321,8 +318,8 @@ nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerd
     warning("Multiple variable names entered. Only the first will be matched.")
   }
   
-  #  xpt <- str_c('//*[@id="ContentPlaceHolder1_GridView1"]/*[td[1]="', varname, '"]', sep='')
-  xpt <- str_c('//*[@id="GridView1"]/tbody/*[td[1]="', varname, '"]', sep='')
+  #  xpt <- paste0('//*[@id="ContentPlaceHolder1_GridView1"]/*[td[1]="', varname, '"]')
+  xpt <- paste0('//*[@id="GridView1"]/tbody/*[td[1]="', varname, '"]')
   df_initialized = FALSE
   
   for(i in 1:length(varURLs)) {
@@ -330,18 +327,16 @@ nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerd
     hurl <- .checkHtml(varURLs[i])
     
     if(!is.null(hurl)) {
-      tabletree <- hurl %>% html_elements(xpath=xpt)    
-      #    tabletree <- varURLs[i] %>% read_html() %>% html_elements(xpath=xpt)
-      
+      tabletree <- hurl |> html_elements(xpath=xpt)    
       ttlist <- lapply(lapply(tabletree, xml_children), xml_text)
       # Convert the list to a data frame
       
       if(length(ttlist) > 0) { # Determine if there was a successful match
         if(!df_initialized) {
-          df <- unique(data.frame(matrix(unlist(ttlist), nrow=length(ttlist), byrow=TRUE), stringsAsFactors = FALSE))
+          df <- unique(data.frame(matrix(unlist(ttlist), nrow=length(ttlist), byrow=TRUE)))
           df_initialized = TRUE
         } else { # End up here if df is already initialized
-          dfadd <- unique(data.frame(matrix(unlist(ttlist), nrow=length(ttlist), byrow=TRUE), stringsAsFactors = FALSE))
+          dfadd <- unique(data.frame(matrix(unlist(ttlist), nrow=length(ttlist), byrow=TRUE)))
           if(nrow(dfadd) > 0) {
             df <- rbind(df,dfadd)
           }
@@ -355,8 +350,10 @@ nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerd
     return(NULL)
   }
   
-  names(df) <- c('Variable.Name', 'Variable.Description', 'Data.File.Name', 'Data.File.Description', 
-                 'Begin.Year', 'EndYear', 'Component', 'Use.Constraints')
+  names(df) <- c('Variable.Name', 'Variable.Description',
+                 'Data.File.Name', 'Data.File.Description',
+                 'Begin.Year', 'EndYear', 'Component',
+                 'Use.Constraints')
   
   if(includerdc == FALSE){
     df <- df[(df$Use.Constraints != "RDC Only"),]
