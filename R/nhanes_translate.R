@@ -118,7 +118,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128,
     code_translation_url <- "https://wwwn.cdc.gov/nchs/data/nhanes/dxa/dxx_d.htm"
   } else {
     nh_year <- .get_year_from_nh_table(nh_table)
-    if(is.null(nh_year)) {
+    if(anyNA(nh_year)) {
       return(NULL)
     }
     code_translation_url <- 
@@ -160,8 +160,11 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128,
                # Check for SAS label attribute
             idx_label <- attr(data[[idx]],"label")
             data[[idx]] <- as.factor(data[[idx]])
-            data[[idx]] <- suppressMessages(plyr::mapvalues(data[[idx]], from = translations[[cname]][['Code.or.Value']], 
-                                                            to = str_sub(translations[[cname]][['Value.Description']], 1, nchar)))
+              data[[idx]] <-
+                  suppressMessages(
+                      plyr::mapvalues(data[[idx]],
+                                      from = translations[[cname]][['Code.or.Value']], 
+                                      to = str_sub(translations[[cname]][['Value.Description']], 1, nchar)))
             if(!is.null(idx_label)) {
               attr(data[[idx]],"label") <- idx_label
               }

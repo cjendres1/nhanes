@@ -1,31 +1,29 @@
 # nhanesDB - retrieve nhanes data from the local container
 # Laha Ale and Robert Gentleman 06/08/2023
 
-
-.nhanesTablesDB = function(data_group, year,
-                         nchar = 128,  details = FALSE,
-                         namesonly = FALSE, includerdc = FALSE ) {
+.nhanesTablesDB <-
+    function(data_group, year,
+             nchar = 128,  details = FALSE,
+             namesonly = FALSE, includerdc = FALSE )
+{
   .checkDataGroupDB(data_group)
-  # ##check if they are using the short name
+  ## check if they are using the short name
   if( data_group %in% names(nhanes_group) )
-    data_group = nhanes_group[data_group]
-
-
+    data_group <- nhanes_group[data_group]
 
   if (is.numeric(year))
     EVEN = .is.even(year)
   else stop("Invalid year")
   ##construct SQL queries
 
-
-  tables = paste0("SELECT TableName AS 'Data.File.Name',
+  tables <-
+      paste0("SELECT TableName AS 'Data.File.Name',
                 Description as 'Data.File.Description',
                 CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS Component,
                 BeginYear AS 'Begin.Year', EndYear
                 FROM
                 Metadata.QuestionnaireDescriptions where DataGroup='",
-                  data_group, "' and BeginYear=",ifelse(EVEN, year-1, year))
-
+                  data_group, "' and BeginYear=", if (EVEN) year-1 else year)
 
   if(details==FALSE){
     tables = paste0("SELECT TableName AS 'Data.File.Name',
@@ -43,13 +41,16 @@
   }
 }
 
-.checkDataGroupDB = function(data_group){
+.checkDataGroupDB <- function(data_group)
+{
   if (!(data_group %in% names(nhanes_group)))
     stop("Invalid survey group!")
 
 }
 
-.nhanesTableVarsDB = function(data_group, nh_table, details = FALSE, nchar=128, namesonly = FALSE) {
+.nhanesTableVarsDB <- function(data_group, nh_table, details = FALSE,
+                               nchar=128, namesonly = FALSE)
+{
 
   # FIXME: We need to add Use.Constraints when DB is updated
   param = match.call()
@@ -76,7 +77,7 @@
     sql = paste0(sql," AND DataGroup LIKE '",data_group,"%'")
   }
 
-  df =.nhanesQuery(sql)
+  df <- .nhanesQuery(sql)
   if(namesonly){
     return(unique(df$Variable.Name))
   }else if(!details){
@@ -87,7 +88,8 @@
 }
 
 
-.nhanesDB = function(nh_table, includelabels = FALSE, translated=TRUE){
+.nhanesDB <- function(nh_table, includelabels = FALSE, translated=TRUE)
+{
   .checkTableNames(nh_table)
   label_sql = paste0("SELECT Variable,Description 
                      FROM [Metadata].[QuestionnaireVariables] 
@@ -116,12 +118,13 @@
 }
 
 
-.nhanesSearchVarNameDB = function(varnames = NULL,
+.nhanesSearchVarNameDB <- function(varnames = NULL,
                                 ystart = NULL,
                                 ystop = NULL,
                                 includerdc = FALSE,
                                 nchar = 128,
-                                namesonly = TRUE){
+                                namesonly = TRUE)
+{
 
   sql = paste0("SELECT DISTINCT V.Variable AS 'Variable.Name',
                        SUBSTRING(V.Description,1,",nchar,") AS 'Variable.Description',
@@ -158,13 +161,14 @@
 }
 
 
-.nhanesSearchTableNamesDB = function(pattern = NULL,
+.nhanesSearchTableNamesDB <- function(pattern = NULL,
                                     ystart = NULL,
                                     ystop = NULL,
                                     includerdc = FALSE,
                                     includewithdrawn=FALSE,
                                     nchar = 128,
-                                    details = FALSE){
+                                    details = FALSE)
+{
 
   sql <- paste0("SELECT DISTINCT TableName,
                         CONCAT(Q.BeginYear, '-', Q.EndYear) AS Years
@@ -200,8 +204,9 @@
 
 
 
-.nhanesTranslateDB = function(nh_table, colnames = NULL, data = FALSE, nchar = 32,
-                            mincategories = 2, details = FALSE, dxa = FALSE){
+.nhanesTranslateDB <- function(nh_table, colnames = NULL, data = FALSE, nchar = 32,
+                               mincategories = 2, details = FALSE, dxa = FALSE)
+{
   .checkTableNames(nh_table)
   if(!is.null(data)){
     return(.nhanesDB(nh_table))
@@ -227,7 +232,7 @@
 }
 
 
-.nhanesSearchDB = function( search_terms = NULL,
+.nhanesSearchDB <- function( search_terms = NULL,
                          exclude_terms = NULL,
                          data_group = NULL,
                          ignore.case = FALSE,
@@ -235,8 +240,8 @@
                          ystop = NULL,
                          includerdc = FALSE,
                          nchar = 128,
-                         namesonly = FALSE){
-
+                         namesonly = FALSE)
+{
 
   sql = paste0("SELECT V.Variable AS 'Variable.Name',
                        SUBSTRING(V.Description,1,",nchar,") AS 'Variable.Description',
@@ -303,7 +308,8 @@
 }
 
 
-.nhanesCodebookDB = function(nh_table, colname){
+.nhanesCodebookDB <- function(nh_table, colname)
+{
   # FIXME: we need handle multiple targets once DB is updated!
   .checkTableNames(nh_table)
 

@@ -38,8 +38,11 @@
 #'  \donttest{length(urine)}
 #' @export
 #' 
-nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL, ignore.case=FALSE, 
-                         ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=128, namesonly=FALSE) {
+nhanesSearch <- function(search_terms = NULL, exclude_terms = NULL,
+                         data_group = NULL, ignore.case = FALSE, 
+                         ystart = NULL, ystop = NULL, includerdc = FALSE,
+                         nchar = 128, namesonly = FALSE)
+{
   
   if(is.null(search_terms)) {
     stop("Search term is missing")
@@ -86,28 +89,25 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
   names(df) <- vmcols
   
   # Remove rdc tables if desired
-  if(includerdc == FALSE){
-    df <- df[(df$Use.Constraints != "RDC Only"),]
+  if(includerdc == FALSE) {
+    df <- subset(df, Use.Constraints != "RDC Only")
   }
   
-  # 
   if(!is.null(search_terms)) {
-    idx <- grep(paste(search_terms,collapse="|"), df[['Variable.Description']], ignore.case=ignore.case, value=FALSE)
-    if(length(idx) > 0) {df <- df[idx,]} else {
+    pattern <- paste(search_terms, collapse = "|")
+    df <- subset(df, grepl(pattern, Variable.Description, ignore.case = ignore.case))
+    if(nrow(df) == 0) {
       message("No matches found")
       return(NULL)
     }
   }
   
-  if(!is.null(data_group)){ # Restrict search to specific data group(s) e.g. 'EXAM' or 'LAB'
-    sgroups <- list()
-    for(i in 1:length(data_group)) {
-      if(data_group[i] %in% names(nhanes_group)) {
-        sgroups <- c(sgroups, nhanes_group[[data_group[i]]])
-      }
-    }
-    if(length(sgroups)>0) {
-      df <- df[grep(paste(unlist(sgroups),collapse="|"), df$Component, ignore.case=TRUE),]
+  if(!is.null(data_group)) { # Restrict search to specific data group(s) e.g. 'EXAM' or 'LAB'
+    sgroups <- unique(nhanes_group[data_group])
+    sgroups <- sgroups[!is.na(sgroups)]
+    if(length(sgroups) > 0) {
+      pattern <- paste(sgroups, collapse = "|")
+      df <- subset(df, grepl(pattern, Component, ignore.case = TRUE))
     }
   }
   
@@ -123,41 +123,41 @@ nhanesSearch <- function(search_terms=NULL, exclude_terms=NULL, data_group=NULL,
         stop('Stop year (ystop) cannot precede the Start year (ystart)')
       } else { #Determine if Start year is odd or even
         if(.is.even(ystart)) {
-          df <- df[(as.numeric(df$EndYear) >= ystart),]
+          df <- subset(df, as.numeric(EndYear) >= ystart)
         } else {
-          df <- df[(as.numeric(df$Begin.Year) >= ystart),]
+          df <- subset(df, as.numeric(Begin.Year) >= ystart)
         }
         if(.is.even(ystop)) {
-          df <- df[(as.numeric(df$EndYear) <= ystop),]
+          df <- subset(df, as.numeric(EndYear) <= ystop)
         } else {
-          df <- df[(as.numeric(df$Begin.Year) <= ystop),]
+          df <- subset(df, as.numeric(Begin.Year) <= ystop)
         }
       }
     } else { # No ystart, assume it is 1999 (i.e. the first survey)
       if(.is.even(ystop)) {
-        df <- df[(as.numeric(df$EndYear) <= ystop),]
+        df <- subset(df, as.numeric(EndYear) <= ystop)
       } else {
-        df <- df[(as.numeric(df$Begin.Year) <= ystop),]
+        df <- subset(df, as.numeric(Begin.Year) <= ystop)
       }
     }
   } else if(!is.null(ystart)) { # ystart only, i.e. no ystop
     if(!is.numeric(ystart)) {stop("Start year (ystart) must be a 4-digit year")}
     if(.is.even(ystart)) {
-      df <- df[(as.numeric(df$EndYear) >= ystart),]
+      df <- subset(df, as.numeric(EndYear) >= ystart)
     } else {
-      df <- df[(as.numeric(df$Begin.Year) >= ystart),]
+      df <- subset(df, as.numeric(Begin.Year) >= ystart)
     }
   }
   
   if(!is.null(exclude_terms)) {
-    idx <- grep(paste(exclude_terms,collapse="|"), df[['Variable.Description']], ignore.case=ignore.case, value=FALSE)
-    if(length(idx)>0) {df <- df[-idx,]}
+    pattern <- paste(exclude_terms, collapse = "|")
+    df <- subset(df, !grepl(pattern, Variable.Description, ignore.case = ignore.case))
   }
   row.names(df) <- NULL
   if(namesonly) {
     return(unique(df$Data.File.Name))
   }
-  df$Variable.Description <- str_sub(df$Variable.Description, 1, nchar)
+  df$Variable.Description <- substring(df$Variable.Description, 1, nchar)
   return(df)
 }
 #------------------------------------------------------------------------------
@@ -213,21 +213,21 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
   }
   df <- data.frame(hurl |> html_elements(xpath=xpath) |> html_table())
 
-  df <- df[grep(paste(pattern,collapse="|"), df$Doc.File),]
+  df <- subset(df, grep(paste(pattern,collapse="|"), Doc.File))
   if(nrow(df)==0) {return(NULL)}
   if(!includerdc) {
-    df <- df[!(df$Data.File=='RDC Only'),]
+    df <- subset(df, !(Data.File == 'RDC Only'))
   }
   if(!includewithdrawn) {
-    df <- df[!(df$Date.Published=='Withdrawn'),]
+    df <- subset(df, !(Date.Published == 'Withdrawn'))
   }
   if(includeurl) {
     details <- TRUE
     urls <- hurl |> html_elements(xpath=xpath) |> html_nodes("a") |> html_attr('href')
     
-    docurl  <- sort(urls[grep(paste0(pattern, ".*\\.htm"), urls)])
+    docurl  <- sort(grep(paste0(pattern, ".*\\.htm"), urls, value = TRUE))
     names(docurl) <- str_remove(sub('.*\\/', '', docurl),".htm")
-    dataurl <- sort(urls[grep(paste0(pattern, ".*\\.XPT"), urls)])
+    dataurl <- sort(grep(paste0(pattern, ".*\\.XPT"), urls, value = TRUE))
     names(dataurl) <- str_remove(sub('.*\\/', '', dataurl),".XPT")
     row.names(df) <- str_remove(df$Doc.File, " Doc")
     docurl <- docurl[names(docurl) %in% names(dataurl)]
@@ -237,9 +237,11 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
     df$docurl <- ""
     df$dataurl <- ""
     
-    for(i in 1:nrow(df)) {
-      df$docurl[i] <- paste0("https://wwwn.cdc.gov", docurl[match.arg(row.names(df)[i], names(docurl))])
-      df$dataurl[i] <- paste0("https://wwwn.cdc.gov", dataurl[match.arg(row.names(df)[i], names(dataurl))])
+    for(i in 1:nrow(df)) { # FIXME: use pmatch() instead?
+      df$docurl[i] <- paste0("https://wwwn.cdc.gov",
+                             docurl[match.arg(row.names(df)[i], names(docurl))])
+      df$dataurl[i] <- paste0("https://wwwn.cdc.gov",
+                              dataurl[match.arg(row.names(df)[i], names(dataurl))])
     }
   }
   
@@ -261,24 +263,24 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
           if(.is.even(ystart)) {
             ystart <- ystart - 1
           }
-          df <- df[(year1 >= ystart & year1 <= ystop),]
+          df <- subset(df, year1 >= ystart & year1 <= ystop)
         }
       } else { # No ystart, assume it is 1999 (i.e. the first survey)
-        df <- df[(year1 <= ystop),]
+        df <- subset(df, year1 <= ystop)
       }
     } else if(!is.null(ystart)) { # ystart only, i.e. no ystop
       if(!is.numeric(ystart)) {stop("Start year (ystart) must be a 4-digit year")}
       if(.is.even(ystart)) {
         ystart <- ystart - 1
       } 
-      df <- df[(year1 >= ystart),]
+      df <- subset(df, year1 >= ystart)
     }
   }
   
   if(nrow(df)==0) {return(NULL)}
   row.names(df) <- NULL
-  if(details==TRUE){
-    df$Data.File <- str_sub(df$Data.File, 1, nchar)
+  if(isTRUE(details)) {
+    df$Data.File <- substring(df$Data.File, 1, nchar)
     return(df)
   } else {
     return(unlist(strsplit(df$Doc.File, " Doc")))
@@ -356,7 +358,7 @@ nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerd
                  'Use.Constraints')
   
   if(includerdc == FALSE){
-    df <- df[(df$Use.Constraints != "RDC Only"),]
+    df <- subset(df, Use.Constraints != "RDC Only")
   }
   
   if(!is.null(ystop)){  # ystop has been provided
@@ -371,29 +373,29 @@ nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerd
         stop('Stop year (ystop) cannot precede the Start year (ystart)')
       } else { #Determine if Start year is odd or even
         if(.is.even(ystart)) {
-          df <- df[(df$EndYear >= ystart),]
+          df <- subset(df, EndYear >= ystart)
         } else {
-          df <- df[(df$Begin.Year >= ystart),]
+          df <- subset(df, Begin.Year >= ystart)
         }
         if(.is.even(ystop)) {
-          df <- df[(df$EndYear <= ystop),]
+          df <- subset(df, EndYear <= ystop)
         } else {
-          df <- df[(df$Begin.Year <= ystop),]
+          df <- subset(df, Begin.Year <= ystop)
         }
       }
     } else { # No ystart, assume it is 1999 (i.e. the first survey)
       if(.is.even(ystop)) {
-        df <- df[(df$EndYear <= ystop),]
+        df <- subset(df, EndYear <= ystop)
       } else {
-        df <- df[(df$Begin.Year <= ystop),]
+        df <- subset(df, Begin.Year <= ystop)
       }
     }
   } else if(!is.null(ystart)) { # ystart only, i.e. no ystop
     if(!is.numeric(ystart)) {stop("Start year (ystart) must be a 4-digit year")}
     if(.is.even(ystart)) {
-      df <- df[(df$EndYear >= ystart),]
+      df <- subset(df, EndYear >= ystart)
     } else {
-      df <- df[(df$Begin.Year >= ystart),]
+      df <- subset(df, Begin.Year >= ystart)
     }
   }
   
@@ -402,7 +404,7 @@ nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerd
   if(namesonly) {
     return( unique(df$Data.File.Name) )
   }
-  df$Variable.Description <- str_sub(df$Variable.Description, 1, nchar)
+  df$Variable.Description <- substring(df$Variable.Description, 1, nchar)
   return(df)
 }
 

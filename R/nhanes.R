@@ -44,7 +44,7 @@ nhanes <- function(nh_table, includelabels = FALSE, translated = TRUE, nchar = 1
   nht <- tryCatch({    
     nh_year <- .get_year_from_nh_table(nh_table)
     
-    if(length(grep('^Y_', nh_table)) > 0) {
+    if(startsWith(nh_table, "Y_")) {
       url <- paste0('https://wwwn.cdc.gov/Nchs/', nh_year, '/', nh_table, '.XPT')
     } else {
       url <- paste0(nhanesTableURL, nh_year, '/', nh_table, '.XPT')
@@ -237,7 +237,7 @@ nhanesAttr <- function(nh_table) {
 
     nh_year <- .get_year_from_nh_table(nh_table)
     
-    if(length(grep('^Y_', nh_table)) > 0) {
+    if(startsWith(nh_table, "Y_")) {
       url <- paste0('https://wwwn.cdc.gov/Nchs/', nh_year, '/', nh_table, '.XPT')
     } else {
       url <- paste0(nhanesTableURL, nh_year, '/', nh_table, '.XPT')
@@ -298,8 +298,7 @@ nhanesAttr <- function(nh_table) {
 #' 
 #' The browser may be directed to a specific year, survey, or table.
 #' 
-#' @importFrom stringr str_to_title str_split str_sub
-#'   str_extract_all
+#' @importFrom stringr str_split str_extract_all
 #' @importFrom utils browseURL
 #' @param year The year in yyyy format where 1999 <= yyyy.
 #' @param data_group The type of survey (DEMOGRAPHICS, DIETARY,
@@ -348,13 +347,13 @@ browseNHANES <- function(year = NULL, data_group = NULL, nh_table = NULL,
     if(!is.null(data_group)) {
       nh_year <- .get_nh_survey_years(year)
       url <- paste0(nhanesURL, 'Search/DataPage.aspx?Component=', 
-                    str_to_title(as.character(nhanes_group[data_group])),
-                    '&CycleBeginYear=', unlist(str_split(as.character(nh_year), '-'))[[1]])
+                    nhanes_group[data_group],
+                    '&CycleBeginYear=', unlist(str_split(nh_year, '-'))[[1]])
       handleURL(url)
     } else { # Go to the two year survey page 
       nh_year <- .get_nh_survey_years(year)
 #      nh_year <- str_c(str_sub(unlist(str_extract_all(nh_year,"[[:digit:]]{4}")),3,4),collapse='_')
-      nh_year <- unlist(str_extract_all(nh_year,"[[:digit:]]{4}"))[1]
+      nh_year <- unlist(str_extract_all(nh_year, "[[:digit:]]{4}"))[1]
       url <- paste0(nhanesURL, 'continuousnhanes/default.aspx?BeginYear=', nh_year)
       handleURL(url)
     }

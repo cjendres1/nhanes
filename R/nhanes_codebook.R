@@ -6,7 +6,7 @@
 #' Returns full NHANES codebook including Variable Name, SAS Label, English Text, Target,
 #' and Value distribution.
 #' 
-#' @importFrom stringr str_sub str_remove_all str_trim
+#' @importFrom stringr str_remove_all str_trim
 #' @importFrom rvest html_elements html_table html_text2
 #'  
 #' @param nh_table The name of the NHANES table that contains the desired variable.
@@ -38,15 +38,16 @@ nhanesCodebook <- function(nh_table, colname=NULL, dxa=FALSE) {
   
   if(dxa) {
     url <- "https://wwwn.cdc.gov/nchs/data/nhanes/dxa/dxx_d.htm"
-  } else {  nh_year <- .get_year_from_nh_table(nh_table)
-  if(is.null(nh_year)) {
-    return(NULL)
-  }
-  if(nh_year == "Nnyfs"){
-    url <- paste0("https://wwwn.cdc.gov/Nchs/", nh_year, '/', nh_table, '.htm')
   } else {
-    url <- paste0(nhanesTableURL, nh_year, '/', nh_table, '.htm')
-  }
+    nh_year <- .get_year_from_nh_table(nh_table)
+    if(anyNA(nh_year)) {
+      return(NULL)
+    }
+    if(nh_year == "Nnyfs"){
+      url <- paste0("https://wwwn.cdc.gov/Nchs/", nh_year, '/', nh_table, '.htm')
+    } else {
+      url <- paste0(nhanesTableURL, nh_year, '/', nh_table, '.htm')
+    }
   }
   hurl <- .checkHtml(url)
   ##will be NA if the CDC handled a page not found error - then try restricted
