@@ -5,13 +5,15 @@
 \title{Download and parse the entire NHANES manifest}
 \usage{
 nhanesManifest(
-  which = c("public", "limitedaccess"),
-  sizes = TRUE,
+  which = c("public", "limitedaccess", "variables"),
+  sizes = FALSE,
   verbose = getOption("verbose")
 )
 }
 \arguments{
-\item{which}{Either "public" or "limitedaccess"}
+\item{which}{Either "public" or "limitedaccess" to get a manifest
+of available tables, or "variables" to get a manifest of
+available variables.}
 
 \item{sizes}{Logical, whether to compute data file sizes (as
 reported by the server) and include them in the result.}
@@ -20,11 +22,15 @@ reported by the server) and include them in the result.}
 progress should be reported.}
 }
 \value{
-When "Tables" is specified it returns a data.frame with
-    one row for each NHANES data table, with columns "Table",
-    "DocURL", "DataURL", "Years", "Date.Published". If \code{sizes
-    = TRUE}, an additional column "DataSize" giving the data file
-    sizes in bytes (as reported by the server) is included.
+A data frame, with columns that depend on
+  \code{which}. For a manifest of tables, columns are "Table",
+  "DocURL", "DataURL", "Years", "Date.Published". If \code{sizes =
+  TRUE}, an additional column "DataSize" giving the data file
+  sizes in bytes (as reported by the server) is included. For
+  limited access tables, the "DataURL" and "DataSize" columns are
+  omitted. For a manifest of variables, columns are "VarName",
+  "VarDesc", "Table", "TableDesc", "BeginYear",
+  "EndYear", "Component", and "UseConstraints".
 }
 \description{
 Downloads and parses the NHANES manifest available at

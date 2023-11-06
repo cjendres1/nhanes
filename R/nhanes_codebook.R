@@ -1,4 +1,6 @@
-# FUNCTION nhanesCodebook
+# FUNCTIONS
+#     nhanesCodebook
+#     nhanesParseCodeBook
 #
 #------------------------------------------------------------------------------
 #' Display codebook for selected variable.
@@ -176,3 +178,5 @@ nhanesParseCodeBook <- function(url) {
      return(NULL)
   }
 }
+
+

@@ -2,6 +2,7 @@
 # Christopher J. Endres 09/14/2023
 # FUNCTIONS:
 #   nhanes
+#   nhanesFromURL
 #   nhanesDXA
 #   nhanesAttr
 #   browseNHANES
