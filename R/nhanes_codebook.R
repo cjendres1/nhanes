@@ -172,7 +172,7 @@ nhanesParseCodeBook <- function(url) {
     } else {
       codebook <- codetext
     }
-    return(as.list(codebook))
+    return(codebook)
   } else { 
      warning(c('Column "', colname, '" not found'), collapse='')
      return(NULL)

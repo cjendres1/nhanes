@@ -382,22 +382,16 @@ variableSummary_data <- function(x) {
              unique = !anyDuplicated(x))
 }
 
-nhanesAttr_data <- function(nh_table, src = nhanes(nh_table, ...), ...)
+nhanesSummary_data <- function(nh_table, src = nhanes(nh_table, ...), ...)
 {
   ## start by getting data, delegating details to nhanes()
   df <- src
   var_info <- lapply(df, variableSummary_data)
   nhtatt <- Reduce(rbind, var_info)
-  ## labels may not be available
-  getVarLabel <- function(x) {
-    ans <- attr(x, "label")
-    if (length(ans) == 1) as.character(ans)
-    else NA_character_
-  }
-  nhtatt <- cbind(names = names(df),
-                  labels = vapply(df, getVarLabel, ""),
+  nhtatt <- cbind(varname = names(df),
                   nhtatt)
   rownames(nhtatt) <- NULL
+  if (!missing(nh_table)) nhtatt <- cbind(table = nh_table, nhtatt)
   return(nhtatt)
 }
 
@@ -411,10 +405,12 @@ nhanesAttr_data <- function(nh_table, src = nhanes(nh_table, ...), ...)
 variableSummary_codebook <- function(x) {
   varName <- x[["Variable Name:"]]
   sasLabel <- x[["SAS Label:"]]
-  varInfo <- x[[varName]] # may be NULL (e.g. for SEQN)
+  varInfo <- if (is.list(x)) x[[varName]] # may be NULL (e.g. for SEQN)
+             else NULL
   varSummary <-
-    if (!is.null(varInfo)) {## consistency checks
-      with(varInfo,
+    if (!is.null(varInfo)) {  # consistency checks
+      colnames(varInfo) <- make.names(colnames(varInfo))
+      with(varInfo, # convert to 'fix' names
       {
         n1 <- sum(Count)
         n2 <- Cumulative[[length(Cumulative)]]
@@ -424,27 +420,56 @@ variableSummary_codebook <- function(x) {
         stopifnot(length(nmissing) == 1, is.finite(nmissing))
         looksLikeNumeric <- "Range of Values" %in% `Value.Description`
         numLevels <- length(Count) # should be 2 for numeric
-        data.frame(names = varName, label = sasLabel,
+        data.frame(varname = varName, label = sasLabel,
                    nobs = n1, na = nmissing,
                    num = looksLikeNumeric, nlevels = numLevels,
                    skip = skip)
       })
     } else 
-      data.frame(names = varName, label = sasLabel,
+      data.frame(varname = varName, label = sasLabel,
                  nobs = NA, na = NA,
                  num = NA, nlevels = NA,
                  skip = NA)
 }
 
 
-nhanesAttr_codebook <- function(nh_table, src = nhanesCodebook(nh_table, ...), ...)
+nhanesSummary_codebook <- function(nh_table, src = nhanesCodebook(nh_table, ...), ...)
 {
   ## start by getting codebook. This is a list, not data.frame, with
   ## one component for each variable
   df <- src
   var_info <- lapply(df, variableSummary_codebook)
   nhtatt <- Reduce(rbind, var_info)
+  if (!missing(nh_table)) nhtatt <- cbind(table = nh_table, nhtatt)
   return(nhtatt)
+}
+
+##' Summarize a NHANES table
+##'
+##' Returns a per-variable summary of a NHANES table either using the
+##' actual data or its corresponding codebook
+##' @title Summarize NHANES table
+##' @param nh_table the name of a valid NHANES table
+##' @param use character string, whether to create a summary from the
+##'   data itself or the codebook, which respectively use either the
+##'   NHANES SAS data files or the HTML documentation files.
+##' @param ... additional arguments, usually passed on to either
+##'   \code{\link{nhanes}} or \code{\link{nhanesCodebook}} as
+##'   appropriate. Alternatively, the \code{src} argument can be used
+##'   to pass on an already available data frame or codebook, but this
+##'   must be consistent with the \code{use} argument.
+##' @return A data frame with one row per variable, with columns
+##'   depending on the value of the \code{use} argument.
+##' @examples
+##' \donttest{nhanesSummary('DEMO_D', use = "data")}
+##' \donttest{nhanesSummary('DEMO_D', use = "codebook")}
+##' @export
+nhanesSummary <- function(nh_table, use = c("data", "codebook"), ...)
+{
+  use <- match.arg(use)
+  switch(use,
+         data = nhanesSummary_data(nh_table, ...),
+         codebook = nhanesSummary_codebook(nh_table, ...))
 }
 
 

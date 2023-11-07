@@ -193,29 +193,285 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128,
 ## NHANES website or from the DB
 
 
-raw2translated <- function(df, codebook)
+## numeric variables sometimes have 'codes' which have special
+## meaning. Often these indicate left or right censoring (e.g., age >=
+## 80 is coded as 80), or some special kind of missingness (e.g.,
+## refused / don't know). Sometimes these need to be handled on a case
+## by case basis.
+
+## Converting these to numerical values inevitably lose information,
+## but we need to do _something_. The following table is a (possibly
+## incomplete) list of special codes that come up in the context of
+## numeric variables, with an indication of how we plan to handle
+## them.
+
+
+specialNumericCodes <-
+    c(Missing = "NA",            # already NA
+      "Don't know" = "NA",
+      Refused = "NA",
+      "0" = "unknown",
+      "No Lab Result" = "unknown",
+      "Since birth" = "unknown",
+      Refuse = "NA",
+      "Fill Value of Limit of Detection" = "unknown",
+      None = "unknown",
+      Never = "unknown",
+      "No lab specimen" = "unknown",
+      "Compliance <= 0.2" = "unknown",
+      "Could not obtain" = "NA",
+      "900 +" = "censored",
+      "Less than 1 month" = "censored",
+      "Day 1 dietary recall not done/incomplete" = "unknown",
+      "Day 2 dietary recall not done/incomplete" = "unknown",
+      "95 cigarettes or more" = "censored",
+      "Below Limit of Detection" = "unknown",
+      "Provider did not specify goal" = "unknown",
+      "2000 or more" = "censored",
+      "1 cigarette or less" = "censored",
+      "Never on a daily basis" = "unknown",
+      "Participants 6+ years with no lab specimen" = "unknown",
+      "3 or More" = "censored",
+      "Don't Know" = "NA",
+      "Value greater than or equal to 5.00" = "censored",
+      "7 or more" = "censored",
+      "80 years or older" = "censored",
+      "1-14 minutes" = "interval",
+      "70 or more" = "censored",
+      "8400 and over" = "censored",
+      "First Below Detection Limit Fill Value" = "unknown",
+      "Never smoked cigarettes regularly" = "unknown",
+      "No modification" = "unknown",
+      "No time spent outdoors" = "unknown",
+      "Non-Respondent" = "NA",
+      "Second Below Detection Limit Fill Value" = "unknown",
+      "Still breastfeeding" = "unknown",
+      "Still drinking formula" = "unknown",
+      "100 or more" = "censored",
+      "Below Detection Limit Fill Value" = "unknown",
+      "More than 21 meals per week" = "censored",
+      "No Lab Specimen" = "NA",
+      "3 or more" = "censored",
+      "DON'T KNOW" = "NA",
+      "Less than 1 year" = "censored",
+      "Less than one hour" = "censored",
+      "1 month or less" = "censored",
+      "13 pounds or more" = "censored",
+      "20 or more times" = "censored",
+      "6 years or less" = "censored",
+      "7 or more people in the Household" = "censored",
+      "85 years or older" = "censored",
+      "Don't know/not sure" = "NA",
+      "First Fill Value of Limit of Detection" = "unknown",
+      "Second Fill Value of Limit of Detection" = "unknown",
+      "100 +" = "censored",
+      "11 or more" = "censored",
+      "11 years or under" = "censored",
+      "19 years or under" = "censored",
+      "60 years or older" = "censored",
+      "At or below detection limit fill value" = "unknown",
+      "Dont Know" = "NA",
+      "More than 1095 days (3-year) old" = "unknown",
+      "Never had cholesterol test" = "unknown",
+      "Never heard of LDL" = "unknown",
+      "Never smoked a whole cigarette" = "unknown",
+      "Participants 12+ years with no lab specimen" = "unknown",
+      "12 hours or more" = "censored",
+      "20 or more" = "censored",
+      "6 times or more" = "censored",
+      "6 years or under" = "censored",
+      "At work or at school 9 to 5 seven days a week" = "unknown",
+      "Does not work or go to school" = "unknown",
+      "Hasn't started yet" = "unknown",
+      REFUSED = "NA",
+      "12 years or younger" = "censored",
+      "13 or more" = "censored",
+      "40 or more" = "censored",
+      "7 or more people in the Family" = "censored",
+      "Current HH FS benefits recipient last receive" = "unknown",
+      "Less than weekly" = "unknown",
+      "More than 90 times in 30 days" = "censored",
+      "Non-current HH FS benefits recipient last rec" = "unknown",
+      "PIR value greater than or equal to 5.00" = "censored",
+      "Since Birth" = "unknown",
+      Ungradable = "unknown",
+      "11 or More" = "censored",
+      "40 or More" = "censored",
+      "50 years or more" = "censored",
+      "85 or older" = "censored",
+      "95 or more" = "censored",
+      English = "categorical",
+      "English and Spanish" = "categorical",
+      "Less than one year" = "unknown",
+      "More than 1 year unspecified" = "unknown",
+      "Never smoked a pipe regularly" = "unknown",
+      "Never smoked cigars regularly" = "unknown",
+      "Never used chewing tobacco regularly" = "unknown",
+      "Never used snuff regularly" = "unknown",
+      "No Lab Result or Not Fasting for 8 to <24 hou" = "NA",
+      "No lab samples" = "NA",
+      "Not MEC Examined" = "NA",
+      Other = "NA",
+      Spanish = "categorical",
+      "Unable to do activity (blind)" = "NA",
+      "11 pounds or more" = "censored",
+      "13 or More" = "censored",
+      "14 hours or more" = "censored",
+      "15 drinks or more" = "censored",
+      "20 years or older" = "censored",
+      "3 pounds or less" = "censored",
+      "480 Months or more" = "censored",
+      "500 mg or higher" = "censored",
+      "60 minutes or more" = "censored",
+      "600 Months or more" = "censored",
+      "70 to 150" = "interval",
+      "80 Hours or more" = "censored",
+      "85 or greater years" = "censored",
+      "Below First Limit of Detection" = "unknown",
+      "Below Second Limit of Detection" = "unknown",
+      "Don't know what is 'whole grain'" = "unknown",
+      "Less than monthly" = "unknown",
+      "Less then 3 hours" = "censored",
+      "More than $1000" = "censored",
+      "More than 21" = "censored",
+      "More than 300 days" = "censored",
+      "More than 365 days (1-year) old" = "unknown",
+      "More than 730 days (2-year) old" = "unknown",
+      "Never heard of A1C test" = "unknown",
+      "No Lab samples" = "unknown",
+      "Not tested in last 12 months" = "unknown",
+      "Participants 3+ years with no lab specimen" = "unknown",
+      refused = "NA",
+      "Single person family" = "unknown",
+      "0-5 Months" = "interval",
+      "1 year or less" = "censored",
+      "1-5 Hours" = "interval",
+      "20 days or more" = "censored",
+      "20 to 150" = "interval",
+      "4 or more" = "censored",
+      "400 and over" = "censored",
+      "60 or more months" = "censored",
+      "7 years or less" = "censored",
+      "80 or greater years" = "censored",
+      "9 or fewer" = "censored",
+      "Less than 10 years of age" = "censored",
+      "Less than one day" = "censored",
+      "More than 20 times a month" = "censored",
+      "More than 21 times per week" = "censored",
+      "No lab result" = "NA",
+      "No lab Result" = "NA",
+      "Participants 3+ years with no Lab Result" = "unknown",
+      "Participants 3+ years with no surplus lab spe" = "unknown",
+      "Participants 6+ years with no Lab Result" = "unknown",
+      "Participants 6+ years with no lab specimen." = "unknown",
+      "Third Fill Value of Limit of Detection" = "unknown"
+      )
+
+
+
+
+
+## convert 'raw' codes to either numeric or string (categorical)
+## values using codebook
+
+code2numeric <- function(x, cb)
 {
-    cb_info <- nhanesAttr_codebook(src = codebook)
-
-
+    ## x is numeric codes (which may alread include NAs from '.')
+    ## cb is a data frame with columns Code.or.Value and Value.Description
+    ##
+    ## The codes corresponding to special Value.Description-s need to be handled
+    cb <- subset(cb, !(Value.Description %in% c("Range of Values", "Missing")))
+    if (nrow(cb) == 0) return(x)
+    map <- with(cb, structure(as.numeric(Code.or.Value), names = Value.Description))
+    ## For now, we will only
+    ## - convert the 'NA' values to NA
+    ## - complain if we see 'categorical' values
+    missingDesc <- names(which(specialNumericCodes == "NA"))
+    categoricalDesc <- names(which(specialNumericCodes == "categorical"))
+    ## are any remaining values to be mapped to NA
+    wmissing <- names(map) %in% missingDesc
+    if (any(wmissing)) {
+        x[ x %in% map[wmissing] ] <- NA_real_
+    }
+    if (any(names(map) %in% categoricalDesc)) {
+        warning('non-numeric descriptions found in apparently numeric variable: ',
+                paste(map[ names(map) %in% categoricalDesc ], collapse = ", "))
+    }
+    x
 }
 
+code2categorical <- function(x, cb) {
+    map <- with(cb, structure(Value.Description, names = as.character(Code.or.Value)))
+    map[as.character(x)]
+}
 
-checkAmbiguous <- function(nh_table, force = FALSE)
+translateVariable <- function(x, cb) {
+    colnames(cb) <- make.names(colnames(cb)) # 'fix' names if needed
+    ## decide if 'numeric'
+    if ("Range of Values" %in% cb$Value.Description)
+        code2numeric(x, cb)
+    else
+        code2categorical(x, cb)
+}
+
+raw2translated <- function(rawdf, codebook)
 {
-    if (!force && !isTRUE(nhanesOptions("use.db")))
-        stop("DB not available. Use 'force = TRUE' to download source files")
-    ## data <- nhanes(nh_table)
+    vars <- names(rawdf)
+    vars <- vars[vars != "SEQN"] # keep unchanged; anything else?
+    for (v in vars) {
+        names(codebook[[v]]) <- toupper(names(codebook[[v]]))
+        if (is.null(codebook[[v]][[v]])) {
+            warning("Codebook not available, skipping translation for variable: ", v)
+        }
+        else
+            rawdf[[v]] <- translateVariable(rawdf[[v]], codebook[[v]][[v]])
+    }
+    rawdf
+}
+
+##' Alternative implementation for translating raw NHANES data
+##'
+##' Similar to \code{\link{nhanes}} but with an alternative approach
+##' approach to translate raw variables. Specifically, numeric
+##' variables, which are kept largely unchanged by \code{nhanes}, are
+##' translated more aggressively by converting some special numeric
+##' codes to missing values by matching them to a curated list of
+##' special values in the codebook; examples include but are not
+##' limited to the codes corresponding to \code{"Don't know"} and
+##' \code{"Refused"}.
+##' 
+##' @title Translate raw NHANES data using corresponding codebook
+##' @param nh_table the name of a valid NHANES table
+##' @return A data frame containing suitably translated data
+##' @examples
+##' \donttest{countNA <- function(x) sum(is.na(x))}
+##' \donttest{d1 <- nhanes("WHQ_B")}
+##' \donttest{d2 <- nhanesTranslateRaw("WHQ_B") # warnings about incomplete codebook}
+##' \donttest{d2 <- d2[names(d1)] # to ensure same order of columns}
+##' \donttest{subset(data.frame(na1 = sapply(d1, countNA),}
+##' \donttest{                  na2 = sapply(d2, countNA)),}
+##' \donttest{       na1 != na2)}
+##' @export
+nhanesTranslateRaw <- function(nh_table)
+{
+    d <- nhanes(nh_table, includelabels = FALSE, translated = FALSE)
     cb <- nhanesCodebook(nh_table)
-    cb_info <- nhanesAttr_codebook(src = cb)
-    ambiguous <- with(cb_info, num & nlevels != 2)
-    if (any(ambiguous, na.rm = TRUE)) {
-        return(lapply(cb[which(ambiguous)], function(x) x[[length(x)]]))
+    ## convert names to uppercase because NHANES is sometimes
+    ## inconsistent (and hope that there are no conflicts)
+    .checkDuplicated(names(d))
+    .checkDuplicated(names(cb))
+    names(d) <- toupper(names(d))
+    names(cb) <- toupper(names(cb))
+    raw2translated(d, cb)
+}
+
+.checkDuplicated <- function(x) {
+    ## raise error if duplicated are found upto case
+    X <- toupper(x)
+    w <- duplicated(X)
+    if (any(w)) {
+        problems <- x[X %in% X[w]]
+        stop("Duplicate variable names: ", paste(problems, collapse = ", "))
     }
     invisible()
 }
-
-
-
-
-
