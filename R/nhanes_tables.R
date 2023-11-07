@@ -30,28 +30,35 @@
 ##' (for limited access data) and returns it as a data frame.
 ##'
 ##' @title Download and parse the entire NHANES manifest
-##' @param which Either "public" or "limitedaccess"
+##' @param which Either "public" or "limitedaccess" to get a manifest
+##'   of available tables, or "variables" to get a manifest of
+##'   available variables.
 ##' @param sizes Logical, whether to compute data file sizes (as
-##'     reported by the server) and include them in the result.
+##'   reported by the server) and include them in the result.
 ##' @param verbose Logical flag indicating whether information on
-##'     progress should be reported.
-##' @return When "Tables" is specified it returns a data.frame with
-##'     one row for each NHANES data table, with columns "Table",
-##'     "DocURL", "DataURL", "Years", "Date.Published". If \code{sizes
-##'     = TRUE}, an additional column "DataSize" giving the data file
-##'     sizes in bytes (as reported by the server) is included.
+##'   progress should be reported.
+##' @return A data frame, with columns that depend on
+##'   \code{which}. For a manifest of tables, columns are "Table",
+##'   "DocURL", "DataURL", "Years", "Date.Published". If \code{sizes =
+##'   TRUE}, an additional column "DataSize" giving the data file
+##'   sizes in bytes (as reported by the server) is included. For
+##'   limited access tables, the "DataURL" and "DataSize" columns are
+##'   omitted. For a manifest of variables, columns are "VarName",
+##'   "VarDesc", "Table", "TableDesc", "BeginYear",
+##'   "EndYear", "Component", and "UseConstraints".
 ##' @examples
 ##' manifest <- nhanesManifest(sizes = FALSE)
 ##' dim(manifest)
 ##' 
 ##' @export
-nhanesManifest <- function(which = c("public", "limitedaccess"),
-                           sizes = TRUE, verbose = getOption("verbose"))
+nhanesManifest <- function(which = c("public", "limitedaccess", "variables"),
+                           sizes = FALSE, verbose = getOption("verbose"))
 {
   which <- match.arg(which)
   switch(which,
          public = nhanesManifest_public(sizes = sizes, verbose = verbose),
-         limitedaccess = nhanesManifest_limitedaccess(verbose = verbose))
+         limitedaccess = nhanesManifest_limitedaccess(verbose = verbose),
+         variables = nhanesManifest_variables(limitedaccess = TRUE, verbose = verbose))
 }
 
 
@@ -114,6 +121,33 @@ nhanesManifest_limitedaccess <- function(verbose)
   df = df[,c("Table", "DocURL", "Years", "Date.Published")]
   return(df)
 }
+
+nhanesManifest_variables <- function(limitedaccess = TRUE, verbose = TRUE)
+{
+  xpath <- '//*[@id="GridView1"]'
+  parseComponent <- function(url)
+  {
+    if (verbose) message("Downloading ", url)
+    hurl <- .checkHtml(url)
+    if(!is.null(hurl)) {
+      tab <- hurl |> html_elements(xpath = xpath)
+      df <- tab |> html_table() |> as.data.frame()
+      if (nrow(df) > 0) return(df)
+      stop("Failed to parse URL: ", url)
+    }
+  }
+  if (limitedaccess)
+    varURLs <-
+      c(varURLs,
+        "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=LimitedAccess")
+  df <- Reduce(rbind, lapply(varURLs, parseComponent))
+  names(df) <- c("VarName", "VarDesc", "Table", "TableDesc",
+                 "BeginYear", "EndYear", "Component",
+                 "UseConstraints")
+  df
+}
+
+
 
 
 
