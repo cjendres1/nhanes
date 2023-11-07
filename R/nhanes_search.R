@@ -212,7 +212,6 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
     return(NULL)
   }
   df <- data.frame(hurl |> html_elements(xpath=xpath) |> html_table())
-
   df <- subset(df, Doc.File %in% grep(paste(pattern,collapse="|"), Doc.File, value=TRUE))
   if(nrow(df)==0) {return(NULL)}
   if(!includerdc) {

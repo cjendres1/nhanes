@@ -362,3 +362,90 @@ browseNHANES <- function(year = NULL, data_group = NULL, nh_table = NULL,
   }
 }
 #------------------------------------------------------------------------------
+
+
+
+## Alternative approaches to get attributes of a NHANES table: either
+## use the actual data, or use the codebook. Ideally these should
+## match (to the extent that the codebook has the relevant
+## information).
+
+## The first one is similar to nhanesAttr() but does not use the XPT file directly
+
+variableSummary_data <- function(x) {
+  data.frame(nobs = length(x),
+             na = sum(is.na(x)),
+             size = object.size(x),
+             num = is.numeric(x),
+             cat = is.factor(x) || is.character(x),
+             unique = !anyDuplicated(x))
+}
+
+nhanesAttr_data <- function(nh_table, src = nhanes(nh_table, ...), ...)
+{
+  ## start by getting data, delegating details to nhanes()
+  df <- src
+  var_info <- lapply(df, variableSummary_data)
+  nhtatt <- Reduce(rbind, var_info)
+  ## labels may not be available
+  getVarLabel <- function(x) {
+    ans <- attr(x, "label")
+    if (length(ans) == 1) as.character(ans)
+    else NA_character_
+  }
+  nhtatt <- cbind(names = names(df),
+                  labels = vapply(df, getVarLabel, ""),
+                  nhtatt)
+  rownames(nhtatt) <- NULL
+  return(nhtatt)
+}
+
+## We can get much of the same information from the codebook, and it
+## can be useful to check for inconsistencies. The codebook has one
+## entry for each variable in it, and the following helper function
+## summarizes it. It can be typically called on the entry for a
+## variable within the list returned by nhanesCodebook(). E.g.,
+## nhanesCodebook("FOLATE_F")$LBDFOL |> variableSummary()
+
+variableSummary_codebook <- function(x) {
+  varName <- x[["Variable Name:"]]
+  sasLabel <- x[["SAS Label:"]]
+  varInfo <- x[[varName]] # may be NULL (e.g. for SEQN)
+  varSummary <-
+    if (!is.null(varInfo)) {## consistency checks
+      with(varInfo,
+      {
+        n1 <- sum(Count)
+        n2 <- Cumulative[[length(Cumulative)]]
+        stopifnot(n1 == n2)
+        skip <- any(!is.na(`Skip.to.Item`))
+        nmissing <- Count[`Value.Description` == "Missing"]
+        stopifnot(length(nmissing) == 1, is.finite(nmissing))
+        looksLikeNumeric <- "Range of Values" %in% `Value.Description`
+        numLevels <- length(Count) # should be 2 for numeric
+        data.frame(names = varName, label = sasLabel,
+                   nobs = n1, na = nmissing,
+                   num = looksLikeNumeric, nlevels = numLevels,
+                   skip = skip)
+      })
+    } else 
+      data.frame(names = varName, label = sasLabel,
+                 nobs = NA, na = NA,
+                 num = NA, nlevels = NA,
+                 skip = NA)
+}
+
+
+nhanesAttr_codebook <- function(nh_table, src = nhanesCodebook(nh_table, ...), ...)
+{
+  ## start by getting codebook. This is a list, not data.frame, with
+  ## one component for each variable
+  df <- src
+  var_info <- lapply(df, variableSummary_codebook)
+  nhtatt <- Reduce(rbind, var_info)
+  return(nhtatt)
+}
+
+
+
+

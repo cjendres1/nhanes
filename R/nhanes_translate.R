@@ -186,3 +186,36 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128,
   }
 }
 
+
+
+## alternative translate interface: given input (raw) data and input
+## codebook. The intent is for this to work with data either from the
+## NHANES website or from the DB
+
+
+raw2translated <- function(df, codebook)
+{
+    cb_info <- nhanesAttr_codebook(src = codebook)
+
+
+}
+
+
+checkAmbiguous <- function(nh_table, force = FALSE)
+{
+    if (!force && !isTRUE(nhanesOptions("use.db")))
+        stop("DB not available. Use 'force = TRUE' to download source files")
+    ## data <- nhanes(nh_table)
+    cb <- nhanesCodebook(nh_table)
+    cb_info <- nhanesAttr_codebook(src = cb)
+    ambiguous <- with(cb_info, num & nlevels != 2)
+    if (any(ambiguous, na.rm = TRUE)) {
+        return(lapply(cb[which(ambiguous)], function(x) x[[length(x)]]))
+    }
+    invisible()
+}
+
+
+
+
+
