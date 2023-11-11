@@ -429,35 +429,41 @@ raw2translated <- function(rawdf, codebook)
     rawdf
 }
 
-##' Alternative implementation for translating raw NHANES data
+
+### Documentation may be useful when this is exported, but skip for now
+
+
+## -' Alternative implementation for translating raw NHANES data
 ##'
-##' Similar to \code{\link{nhanes}} but with an alternative approach
-##' approach to translate raw variables. Specifically, numeric
-##' variables, which are kept largely unchanged by \code{nhanes}, are
-##' translated more aggressively by converting some special numeric
-##' codes to missing values by matching them to a curated list of
-##' special values in the codebook; examples include but are not
-##' limited to the codes corresponding to \code{"Don't know"} and
-##' \code{"Refused"}.
-##' 
-##' @title Translate raw NHANES data using corresponding codebook
-##' @param nh_table the name of a valid NHANES table
-##' @return A data frame containing suitably translated data
-##' @examples
-##' \donttest{countNA <- function(x) sum(is.na(x))}
-##' \donttest{d1 <- nhanes("WHQ_B")}
-##' \donttest{d2 <- nhanesTranslateRaw("WHQ_B") # warnings about incomplete codebook}
-##' \donttest{d2 <- d2[names(d1)] # to ensure same order of columns}
-##' \donttest{subset(data.frame(na1 = sapply(d1, countNA),}
-##' \donttest{                  na2 = sapply(d2, countNA)),}
-##' \donttest{       na1 != na2)}
-##' @export
+## -' Similar to \code{\link{nhanes}} but with an alternative approach
+## -' approach to translate raw variables. Specifically, numeric
+## -' variables, which are kept largely unchanged by \code{nhanes}, are
+## -' translated more aggressively by converting some special numeric
+## -' codes to missing values by matching them to a curated list of
+## -' special values in the codebook; examples include but are not
+## -' limited to the codes corresponding to \code{"Don't know"} and
+## -' \code{"Refused"}.
+## -' 
+## -' @title Translate raw NHANES data using corresponding codebook
+## -' @param nh_table the name of a valid NHANES table
+## -' @return A data frame containing suitably translated data
+## -' @examples
+## -' \donttest{countNA <- function(x) sum(is.na(x))}
+## -' \donttest{d1 <- nhanes("WHQ_B")}
+## -' \donttest{d2 <- nhanesTranslateRaw("WHQ_B") # warnings about incomplete codebook}
+## -' \donttest{d2 <- d2[names(d1)] # to ensure same order of columns}
+## -' \donttest{subset(data.frame(na1 = sapply(d1, countNA),}
+## -' \donttest{                  na2 = sapply(d2, countNA)),}
+## -' \donttest{       na1 != na2)}
+
+
 nhanesTranslateRaw <- function(nh_table)
 {
     d <- nhanes(nh_table, includelabels = FALSE, translated = FALSE)
     cb <- nhanesCodebook(nh_table)
     ## convert names to uppercase because NHANES is sometimes
-    ## inconsistent (and hope that there are no conflicts)
+    ## inconsistent (e.g., see variables WHD100* in WHQ_B), and check
+    ## that there are no conflicts
     .checkDuplicated(names(d))
     .checkDuplicated(names(cb))
     names(d) <- toupper(names(d))
