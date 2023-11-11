@@ -60,7 +60,7 @@
     {
       # when "try" is successful, 'tryCatch()' returns the html 
       if (isTRUE(nhanesOptions("log.access"))) message("Downloading: ", url)
-      xml2::read_html(.wrapURL(url))
+      xml2::read_html(.wrapURL(url, prefix = ""))
     },
     error=function(cond) {
       # If there is an error, determine if it's a timeout error or URL error 
@@ -94,9 +94,9 @@
 # .wrapURL(url) allows cache-ing downloaded files using
 # BiocFileCache. Supported by nhanesOptions(use.cache = FALSE)
 
-.wrapURL <- function(url) {
-  if (isTRUE(nhanesOptions(use.cache)) && requireNamespace("BiocFileCache"))
-    bfcrpath(BiocFileCache(), url)
+.wrapURL <- function(url, prefix = "file://") {
+  if (isTRUE(nhanesOptions("use.cache")) && requireNamespace("BiocFileCache", quietly = TRUE))
+    paste0(prefix, BiocFileCache::bfcrpath(BiocFileCache::BiocFileCache(), url))
   else
     url
 }
