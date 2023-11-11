@@ -53,7 +53,7 @@ nhanes <- function(nh_table, includelabels = FALSE, translated = TRUE, nchar = 1
     
     tf <- tempfile()
     if (isTRUE(nhanesOptions("log.access"))) message("Downloading: ", url)
-    download.file(url, tf, mode = "wb", quiet = TRUE)
+    download.file(.wrapURL(url), tf, mode = "wb", quiet = TRUE)
     
     nh_df <- read.xport(tf)
 
@@ -114,7 +114,7 @@ nhanesFromURL <- function(url, translated = TRUE, nchar = 128)
   tryCatch({    
     tf <- tempfile()
     if (isTRUE(nhanesOptions("log.access"))) message("Downloading: ", url)
-    download.file(url, tf, mode = "wb", quiet = TRUE)
+    download.file(.wrapURL(url), tf, mode = "wb", quiet = TRUE)
     nh_df <- read.xport(tf)
     if (translated) {
       ## guess table name
@@ -184,7 +184,8 @@ nhanesDXA <- function(year, suppl=FALSE, destfile=NULL) {
       url <- paste0(dxaURL, fname, '.xpt')
       if (isTRUE(nhanesOptions("log.access"))) message("Downloading: ", url)
       if(!is.null(destfile)) {
-        ok <- suppressWarnings(tryCatch({download.file(url, destfile, mode="wb", quiet=TRUE)},
+        ok <- suppressWarnings(tryCatch({download.file(.wrapURL(url), destfile,
+                                                       mode="wb", quiet=TRUE)},
                                         error=function(cond){message(cond); return(NULL)}))         
         return(ok)
       } else {
@@ -246,7 +247,7 @@ nhanesAttr <- function(nh_table) {
     
     tf <- tempfile()
     if (isTRUE(nhanesOptions("log.access"))) message("Downloading: ", url)
-    download.file(url, tf, mode = "wb", quiet = TRUE)
+    download.file(.wrapURL(url), tf, mode = "wb", quiet = TRUE)
     
 #    tmp <- read.xport(tf)
     xport_struct <- lookup.xport(tf)
