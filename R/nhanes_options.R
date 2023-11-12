@@ -13,9 +13,11 @@
 ##' currently set options are returned as a list.
 ##'
 ##' Options currently used in the package are 'use.db' (logical flag
-##' controlling whether a database should be used if available), and
-##' 'log.access', a logical flag that logs any attempted URL access by
-##' printing the URL).
+##' controlling whether a database should be used if available),
+##' 'use.cache' (logical flag controlling whether the BiocFileCache
+##' (Bioconductor) package should be used, if available, to cache
+##' downloaded files), and 'log.access', a logical flag that logs any
+##' attempted URL access by printing the URL).
 ##' @title Options for the nhanesA package
 ##' @param ... either one or more named arguments giving options to be
 ##'     set (in the form \code{key = value}), or a single unnamed

@@ -21,10 +21,8 @@ also be used: (DEMO, DIET, EXAM, LAB, Q).}
 
 \item{nh_table}{The name of an NHANES table.}
 
-\item{local}{logical flag. If \code{TRUE}, and a local or
-alternative source was specificed using the environment variable
-\code{NHANES_TABLE_BASE}, this will be used in preference to the
-CDC website at \url{https://wwwn.cdc.gov} for named tables.}
+\item{local}{logical flag. If \code{TRUE}, and local cacheing is enabled, then the
+cached file will be shown instead of the one in the NHANES website.}
 
 \item{browse}{logical flag, indicating whether the specific NHANES
 site should be opened using a browser (which is the default
