@@ -456,8 +456,7 @@ raw2translated <- function(rawdf, codebook)
 ## -' \donttest{                  na2 = sapply(d2, countNA)),}
 ## -' \donttest{       na1 != na2)}
 
-
-nhanesTranslateRaw <- function(nh_table)
+.nhanesTranslate_with_cleansing <- function(nh_table)
 {
     d <- nhanes(nh_table, includelabels = FALSE, translated = FALSE)
     cb <- nhanesCodebook(nh_table)

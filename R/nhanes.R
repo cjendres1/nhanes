@@ -5,7 +5,7 @@
 #   nhanesFromURL
 #   nhanesDXA
 #   nhanesAttr
-#   nhanesSummary
+#   nhanesTableSummary
 #   browseNHANES
 
 #------------------------------------------------------------------------------
@@ -478,10 +478,10 @@ nhanesSummary_codebook <- function(nh_table, src = nhanesCodebook(nh_table, ...)
 ##' @return A data frame with one row per variable, with columns
 ##'   depending on the value of the \code{use} argument.
 ##' @examples
-##' \donttest{nhanesSummary('DEMO_D', use = "data")}
-##' \donttest{nhanesSummary('DEMO_D', use = "codebook")}
+##' \donttest{nhanesTableSummary('DEMO_D', use = "data")}
+##' \donttest{nhanesTableSummary('DEMO_D', use = "codebook")}
 ##' @export
-nhanesSummary <- function(nh_table, use = c("data", "codebook", "both"), ...)
+nhanesTableSummary <- function(nh_table, use = c("data", "codebook", "both"), ...)
 {
   use <- match.arg(use)
   switch(use,
