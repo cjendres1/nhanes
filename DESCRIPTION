@@ -40,6 +40,7 @@ Suggests:
     DBI,
     rmarkdown,
     survey,
-    ggplot2
+    ggplot2,
+    BiocFileCache
 VignetteBuilder: knitr
 RoxygenNote: 7.2.3

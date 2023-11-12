@@ -73,12 +73,6 @@ validTables <- function() .dbEnv$validTables
 .onLoad = function(libname, pkgname)
 {
   nhanesOptions(use.db = .init_db())
-  makeActiveBinding(sym = "nhanesManifestPrefix",
-                    fun = ab_nhanesManifestPrefix,
-                    env = environment(ab_nhanesManifestPrefix))
-  makeActiveBinding(sym = "nhanesTableURL",
-                    fun = ab_nhanesTableURL,
-                    env = environment(ab_nhanesTableURL))
   ## declare 'global' variables used in subset() to make codetools happy 
   utils::globalVariables(c("Begin.Year", "Component", "Data.File",
                            "Data.File.Name", "Date.Published", "Doc.File",

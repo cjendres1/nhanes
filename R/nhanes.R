@@ -307,10 +307,8 @@ nhanesAttr <- function(nh_table) {
 #'   EXAMINATION, LABORATORY, QUESTIONNAIRE).  Abbreviated terms may
 #'   also be used: (DEMO, DIET, EXAM, LAB, Q).
 #' @param nh_table The name of an NHANES table.
-#' @param local logical flag. If \code{TRUE}, and a local or
-#'   alternative source was specificed using the environment variable
-#'   \code{NHANES_TABLE_BASE}, this will be used in preference to the
-#'   CDC website at \url{https://wwwn.cdc.gov} for named tables.
+#' @param local logical flag. If \code{TRUE}, and local cacheing is enabled, then the
+#'   cached file will be shown instead of the one in the NHANES website. 
 #' @param browse logical flag, indicating whether the specific NHANES
 #'   site should be opened using a browser (which is the default
 #'   behaviour).
@@ -341,8 +339,8 @@ browseNHANES <- function(year = NULL, data_group = NULL, nh_table = NULL,
       handleURL("https://wwwn.cdc.gov/nchs/nhanes/dxa/dxa.aspx")
     } else {
       nh_year <- .get_year_from_nh_table(nh_table)
-      url <- paste0(if (local) nhanesTableURL else nhanesURL,
-                   nh_year, '/', nh_table, '.htm')
+      url <- paste0(nhanesURL, nh_year, '/', nh_table, '.htm')
+      if (local) url <- .wrapURL(url)
       handleURL(url)
     }
   } else if(!is.null(year)) {

@@ -1,27 +1,7 @@
 # nhanes_constants.R
 
-## The two 'constants' nhanesTableURL and nhanesManifestPrefix are
-## designed to be changed dynamically (currently by setting an
-## environment variable) to allow <table>.htm and <table>.xpt files
-## to be accessed from a location other than the NHANES website (e.g.,
-## from a local copy). To keep the implementing functions see them as
-## regular character variables, we implement them as active bindings
-## (see .onLoad() in zzz.R).
-
-## nhanesTableURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/'
-## nhanesManifestPrefix <- 'https://wwwn.cdc.gov'
-
-ab_nhanesTableURL <- function(x) {
-    if (!missing(x)) stop("Invalid assignment")
-    paste0(Sys.getenv("NHANES_TABLE_BASE", unset = "https://wwwn.cdc.gov"),
-           "/Nchs/Nhanes/")
-}
-
-ab_nhanesManifestPrefix <- function(x) {
-    if (!missing(x)) stop("Invalid assignment")
-    Sys.getenv("NHANES_TABLE_BASE", unset = "https://wwwn.cdc.gov")
-}
-
+nhanesTableURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/'
+nhanesManifestPrefix <- 'https://wwwn.cdc.gov'
 
 nhanesURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/'
 dataURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx'
