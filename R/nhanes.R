@@ -5,6 +5,7 @@
 #   nhanesFromURL
 #   nhanesDXA
 #   nhanesAttr
+#   nhanesTableSummary
 #   browseNHANES
 
 #------------------------------------------------------------------------------
@@ -363,3 +364,141 @@ browseNHANES <- function(year = NULL, data_group = NULL, nh_table = NULL,
   }
 }
 #------------------------------------------------------------------------------
+
+
+
+## Alternative approaches to get attributes of a NHANES table: either
+## use the actual data, or use the codebook. Ideally these should
+## match (to the extent that the codebook has the relevant
+## information).
+
+## The first one is similar to nhanesAttr() but does not use the XPT file directly
+
+variableSummary_data <- function(x) {
+  data.frame(nobs_data = length(x),
+             na_data = sum(is.na(x)),
+             size = object.size(x),
+             num = is.numeric(x),
+             cat = is.factor(x) || is.character(x),
+             unique = !anyDuplicated(x))
+}
+
+nhanesSummary_data <- function(nh_table, src = nhanes(nh_table, ...), ...)
+{
+  ## start by getting data, delegating details to nhanes()
+  df <- src
+  var_info <- lapply(df, variableSummary_data)
+  nhtatt <- Reduce(rbind, var_info)
+  nhtatt <- cbind(varname = names(df),
+                  nhtatt)
+  rownames(nhtatt) <- NULL
+  if (!missing(nh_table)) nhtatt <- cbind(table = nh_table, nhtatt)
+  return(nhtatt)
+}
+
+## We can get much of the same information from the codebook, and it
+## can be useful to check for inconsistencies. The codebook has one
+## entry for each variable in it, and the following helper function
+## summarizes it. It can be typically called on the entry for a
+## variable within the list returned by nhanesCodebook(). E.g.,
+## nhanesCodebook("FOLATE_F")$LBDFOL |> variableSummary()
+
+variableSummary_codebook <- function(x) {
+  varName <- x[["Variable Name:"]]
+  sasLabel <- x[["SAS Label:"]]
+  varInfo <- if (is.list(x)) x[[varName]] # may be NULL (e.g. for SEQN)
+             else NULL
+  varSummary <-
+    if (!is.null(varInfo)) {  # consistency checks
+      colnames(varInfo) <- make.names(colnames(varInfo))
+      ## In a very few tables, the 'varInfo' table has duplicate rows
+      if (anyDuplicated(varInfo)) {
+        warning("Duplicate codebook rows in variable ", varName)
+        varInfo <- varInfo[!duplicated(varInfo), ]
+      }
+      with(varInfo, # convert to 'fix' names
+      {
+        n1 <- sum(Count)
+        n2 <- Cumulative[[length(Cumulative)]]
+        if (n1 != n2) {
+          stop("Inconsistent observation counts in ", varName, "(", n1, ", ", n2, ")")
+        }
+        skip <- any(!is.na(`Skip.to.Item`))
+        ## some tables (like DRXFCD_* food tables) have NA instead of
+        ## "Missing" in Value.Description. 
+        nmissing <- Count[`Value.Description` == "Missing" | is.na(`Value.Description`)]
+        ## A very few instances have no 'Missing' code: warn for them
+        stopifnot(length(nmissing) <= 1)
+        if (length(nmissing) == 0 || !is.finite(nmissing)) {
+          warning("No 'Missing' code in variable ", varName)
+          nmissing <- NA_real_
+        }
+        looksLikeNumeric <- "Range of Values" %in% `Value.Description`
+        numLevels <- length(Count) # should be 2 for numeric
+        data.frame(varname = varName, label = sasLabel,
+                   nobs_cb = n1, na_cb = nmissing,
+                   has_range = looksLikeNumeric, nlevels = numLevels,
+                   skip = skip)
+      })
+    } else 
+      data.frame(varname = varName, label = sasLabel,
+                 nobs_cb = NA, na_cb = NA,
+                 has_range = NA, nlevels = NA,
+                 skip = NA)
+}
+
+
+nhanesSummary_codebook <- function(nh_table, src = nhanesCodebook(nh_table, ...), ...)
+{
+  ## start by getting codebook. This is a list, not data.frame, with
+  ## one component for each variable
+  df <- src
+  var_info <- lapply(df, variableSummary_codebook)
+  nhtatt <- Reduce(rbind, var_info)
+  if (!missing(nh_table)) nhtatt <- cbind(table = nh_table, nhtatt)
+  return(nhtatt)
+}
+
+##' Summarize a NHANES table
+##'
+##' Returns a per-variable summary of a NHANES table either using the
+##' actual data or its corresponding codebook
+##' @title Summarize NHANES table
+##' @param nh_table the name of a valid NHANES table
+##' @param use character string, whether to create a summary from the
+##'   data itself or the codebook, which respectively use either the
+##'   NHANES SAS data files or the HTML documentation files. If
+##'   \code{use = "both"} then both are computed as merged; the
+##'   \code{src} and \code{...} arguments are ignored in this case.
+##' @param ... additional arguments, usually passed on to either
+##'   \code{\link{nhanes}} or \code{\link{nhanesCodebook}} as
+##'   appropriate. Alternatively, the \code{src} argument can be used
+##'   to pass on an already available data frame or codebook, but this
+##'   must be consistent with the \code{use} argument.
+##' @return A data frame with one row per variable, with columns
+##'   depending on the value of the \code{use} argument.
+##' @examples
+##' \donttest{nhanesTableSummary('DEMO_D', use = "data")}
+##' \donttest{nhanesTableSummary('DEMO_D', use = "codebook")}
+##' @export
+nhanesTableSummary <- function(nh_table, use = c("data", "codebook", "both"), ...)
+{
+  use <- match.arg(use)
+  switch(use,
+         data = nhanesSummary_data(nh_table, ...),
+         codebook = nhanesSummary_codebook(nh_table, ...),
+         both = {
+           info_cb <- nhanesSummary_codebook(nh_table)
+           info_data <- nhanesSummary_data(nh_table)
+           ## merge them, but be careful because they may not be in
+           ## same order (esp in the database)
+           rownames(info_data) <- info_data$varname
+           ans <- cbind(info_cb, info_data[info_cb$varname, -c(1, 2)])
+           rownames(ans) <- NULL
+           ans
+         })
+}
+
+
+
+
