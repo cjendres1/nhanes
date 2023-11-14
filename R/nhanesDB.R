@@ -95,7 +95,7 @@
                      FROM [Metadata].[QuestionnaireVariables] 
                      WHERE TableName = '",nh_table,"'")
   nh_table = .convertTranslatedTable(nh_table,translated)
-  sql = paste0("SELECT * FROM ",nh_table," ORDER BY SEQN")
+  sql = paste0("SELECT * FROM ",nh_table)
   nh_df = .nhanesQuery(sql)
   if(includelabels){
     var_label = .nhanesQuery(label_sql)
