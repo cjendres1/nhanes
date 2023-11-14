@@ -211,8 +211,7 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
     message("Error occurred during read. No table names returned")
     return(NULL)
   }
-  df <- data.frame(hurl |> html_elements(xpath=xpath) |> html_table())
-
+  df <- hurl |> html_elements(xpath=xpath) |> html_table() |> data.frame()
   df <- subset(df, Doc.File %in% grep(paste(pattern,collapse="|"), Doc.File, value=TRUE))
   if(nrow(df)==0) {return(NULL)}
   if(!includerdc) {

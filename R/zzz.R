@@ -83,9 +83,9 @@ validTables <- function() .dbEnv$validTables
   utils::globalVariables(c("Begin.Year", "Component", "Data.File",
                            "Data.File.Name", "Date.Published", "Doc.File",
                            "EndYear", "Use.Constraints",
-                           "Variable.Description"),
+                           "Variable.Description", "Value.Description"),
                          package = "nhanesA", add = FALSE)
-  }
+}
 
 .onUnload <- function(libpath)
 {
