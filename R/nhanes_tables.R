@@ -44,8 +44,14 @@
 ##'   sizes in bytes (as reported by the server) is included. For
 ##'   limited access tables, the "DataURL" and "DataSize" columns are
 ##'   omitted. For a manifest of variables, columns are "VarName",
-##'   "VarDesc", "Table", "TableDesc", "BeginYear",
-##'   "EndYear", "Component", and "UseConstraints".
+##'   "VarDesc", "Table", "TableDesc", "BeginYear", "EndYear",
+##'   "Component", and "UseConstraints".
+##' @note Duplicate rows removed from the result. Most of these
+##'   duplicates arise from duplications in the source tables for
+##'   multi-year tables (which are repeated once for each cycle). One
+##'   special case is the WHQ table which has two variables, WHD120
+##'   and WHQ030, duplicated with differing variable
+##'   descriptions. These are removed explicitly.
 ##' @examples
 ##' manifest <- nhanesManifest(sizes = FALSE)
 ##' dim(manifest)
@@ -58,7 +64,8 @@ nhanesManifest <- function(which = c("public", "limitedaccess", "variables"),
   switch(which,
          public = nhanesManifest_public(sizes = sizes, verbose = verbose),
          limitedaccess = nhanesManifest_limitedaccess(verbose = verbose),
-         variables = nhanesManifest_variables(limitedaccess = TRUE, verbose = verbose))
+         variables = nhanesManifest_variables(verbose = verbose)) |>
+      unique()
 }
 
 
@@ -74,19 +81,22 @@ nhanesManifest_public <- function(sizes, verbose)
   xpath <- '//*[@id="GridView1"]'
   tab1 <- hurl |> html_elements(xpath=xpath)
   ##pull out all the hrefs
-  tab2 = tab1 |> html_nodes("a") |> html_attr("href")
+  hrefs <- tab1 |> html_nodes("a") |> html_attr("href") |> parseRedirect()
+  ## There's a spurious # which needs to be removed
+  hrefs <- hrefs[hrefs != "#"]
+  df <- tab1 |> html_table() |> as.data.frame()
+  df$Table <- sub(" Doc", "", df$Doc.File)
   ## PAHS_H was withdrawn - only one entry in the table
-  ## so add in one
-  tab2 = c(tab2[1:2413], tab2[2413:length(tab2)])
-  ##whenever they update we need to error out and then fix it
-  if(length(tab2) != 3026) stop("CDC updated data manifest")
-  htmNames = tab2[seq(1, 3025, by=2)]
-  xptNames = tab2[seq(2, 3026, by=2)]
-  df = tab1 |> html_table() |> as.data.frame()
-  df$Table = sub(" Doc", "", df$Doc.File)
-  df$DocURL = parseRedirect(htmNames)
-  df$DataURL = parseRedirect(xptNames)
-  df = df[,c("Table", "DocURL", "DataURL", "Years", "Date.Published")]
+  ## The corresponding row has no useful HREFs, so there is a length mismatch
+  ## subset(df, Date.Published == "Withdrawn")
+  df <- subset(df, Date.Published != "Withdrawn")
+  ## make sure lengths now match
+  if (nrow(df) * 2 != length(hrefs)) stop("Wrong number of URLs in table manifest")
+  df$DocURL <- hrefs[c(TRUE, FALSE)]
+  df$DataURL <- hrefs[c(FALSE, TRUE)]
+  ## subset(df, tools::file_ext(DataURL) != "XPT")
+  df <- subset(df, startsWith(DataURL, "/") & endsWith(toupper(DataURL), ".XPT"))
+  df <- df[c("Table", "DocURL", "DataURL", "Years", "Date.Published")]
   if (sizes) {
     if (verbose) message("Checking data file sizes...")
     s <- sapply(df$DataURL, .get_content_length, verbose = verbose)
@@ -122,7 +132,7 @@ nhanesManifest_limitedaccess <- function(verbose)
   return(df)
 }
 
-nhanesManifest_variables <- function(limitedaccess = TRUE, verbose = TRUE)
+nhanesManifest_variables <- function(verbose = TRUE)
 {
   xpath <- '//*[@id="GridView1"]'
   parseComponent <- function(url)
@@ -136,14 +146,24 @@ nhanesManifest_variables <- function(limitedaccess = TRUE, verbose = TRUE)
       stop("Failed to parse URL: ", url)
     }
   }
-  if (limitedaccess)
-    varURLs <-
-      c(varURLs,
-        "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=LimitedAccess")
   df <- Reduce(rbind, lapply(varURLs, parseComponent))
   names(df) <- c("VarName", "VarDesc", "Table", "TableDesc",
                  "BeginYear", "EndYear", "Component",
                  "UseConstraints")
+  ## WHQ has TWO variables (WHD120 and WHQ030) which are duplicated;
+  ## these are not removed when we retain unique rows later because
+  ## the VarDesc column is different. We handle this as a special case
+  ## and omit them here.
+  WHQ_WHD120_dup <- with(df, which(Table == "WHQ" & VarName == "WHD120"))
+  if (length(WHQ_WHD120_dup) > 1) { # retain first occurrence only
+      drop_rows <- WHQ_WHD120_dup[-1]
+      df <- df[ -drop_rows, ]
+  }
+  WHQ_WHQ030_dup <- with(df, which(Table == "WHQ" & VarName == "WHQ030"))
+  if (length(WHQ_WHQ030_dup) > 1) { # retain first occurrence only
+      drop_rows <- WHQ_WHQ030_dup[-1]
+      df <- df[ -drop_rows, ]
+  }
   df
 }
 
