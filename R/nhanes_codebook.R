@@ -90,7 +90,7 @@ nhanesCodebookFromURL <- function(url) {
     stop(paste0("could not find a web page at: ", url))
   }
   colname = .getVarNames(hurl)$VarNames
-  lapply(colname, .codeBookHelper, hurl)
+  sapply(colname, .codeBookHelper, hurl, simplify = FALSE)
 } 
 
 
