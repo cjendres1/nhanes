@@ -2,7 +2,7 @@
 % Please edit documentation in R/nhanes_tables.R
 \name{nhanesManifest}
 \alias{nhanesManifest}
-\title{Download and parse the entire NHANES manifest}
+\title{Download and parse NHANES manifests}
 \usage{
 nhanesManifest(
   which = c("public", "limitedaccess", "variables"),
@@ -29,15 +29,27 @@ A data frame, with columns that depend on
   sizes in bytes (as reported by the server) is included. For
   limited access tables, the "DataURL" and "DataSize" columns are
   omitted. For a manifest of variables, columns are "VarName",
-  "VarDesc", "Table", "TableDesc", "BeginYear",
-  "EndYear", "Component", and "UseConstraints".
+  "VarDesc", "Table", "TableDesc", "BeginYear", "EndYear",
+  "Component", and "UseConstraints".
 }
 \description{
-Downloads and parses the NHANES manifest available at
-\url{https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx} (for
-public data) or
-\url{https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx?Component=LimitedAccess}
-(for limited access data) and returns it as a data frame.
+Downloads and parses NHANES manifests for public data
+(available at
+\url{https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx}),
+limited access data
+(\url{https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx?Component=LimitedAccess}),
+and variables
+(\url{https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Demographics}, etc.),
+and returns them as data frames.
+}
+\note{
+Duplicate rows are removed from the result. Most of these
+  duplicates arise from duplications in the source tables for
+  multi-cycle tables (which are repeated once for each cycle). One
+  special case is the WHQ table which has two variables, WHD120
+  and WHQ030, duplicated with differing variable
+  descriptions. These are removed explicitly, keeping only the
+  first occurrence.
 }
 \examples{
 manifest <- nhanesManifest(sizes = FALSE)

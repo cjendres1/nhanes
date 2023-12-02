@@ -1,6 +1,6 @@
 # FUNCTIONS
 #     nhanesCodebook
-#     nhanesParseCodeBook
+#     nhanesCodebookFromURL
 #
 #------------------------------------------------------------------------------
 #' Display codebook for selected variable.
@@ -74,14 +74,14 @@ nhanesCodebook <- function(nh_table, colname=NULL, dxa=FALSE) {
 } 
 
 
-##' Download and parse an NHANES doc file
+##' Download and parse an NHANES doc file from a URL
 ##'
 ##' Downloads and parses an NHANES doc file from a URL and returns it as a list
 ##' @title Parse NHANES doc URL
 ##' @param url URL to be downloaded
 ##' @return list with one element for each variable
 ##' @export
-nhanesParseCodeBook <- function(url) {
+nhanesCodebookFromURL <- function(url) {
   if (length(url) != 1) stop("'url' must have length 1")
   if (startsWith(tolower(url), "/nchs/nhanes"))
     url <- paste0(nhanesManifestPrefix, url)

@@ -23,13 +23,16 @@
     else NA_real_
 }
 
-##' Downloads and parses the NHANES manifest available at
-##' \url{https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx} (for
-##' public data) or
-##' \url{https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx?Component=LimitedAccess}
-##' (for limited access data) and returns it as a data frame.
+##' Downloads and parses NHANES manifests for public data
+##' (available at
+##' \url{https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx}),
+##' limited access data
+##' (\url{https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx?Component=LimitedAccess}),
+##' and variables
+##' (\url{https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Demographics}, etc.),
+##' and returns them as data frames.
 ##'
-##' @title Download and parse the entire NHANES manifest
+##' @title Download and parse NHANES manifests
 ##' @param which Either "public" or "limitedaccess" to get a manifest
 ##'   of available tables, or "variables" to get a manifest of
 ##'   available variables.
@@ -46,12 +49,13 @@
 ##'   omitted. For a manifest of variables, columns are "VarName",
 ##'   "VarDesc", "Table", "TableDesc", "BeginYear", "EndYear",
 ##'   "Component", and "UseConstraints".
-##' @note Duplicate rows removed from the result. Most of these
+##' @note Duplicate rows are removed from the result. Most of these
 ##'   duplicates arise from duplications in the source tables for
-##'   multi-year tables (which are repeated once for each cycle). One
+##'   multi-cycle tables (which are repeated once for each cycle). One
 ##'   special case is the WHQ table which has two variables, WHD120
 ##'   and WHQ030, duplicated with differing variable
-##'   descriptions. These are removed explicitly.
+##'   descriptions. These are removed explicitly, keeping only the
+##'   first occurrence.
 ##' @examples
 ##' manifest <- nhanesManifest(sizes = FALSE)
 ##' dim(manifest)
