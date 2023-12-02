@@ -80,7 +80,7 @@ validTables <- function() .dbEnv$validTables
                     fun = ab_nhanesTableURL,
                     env = environment(ab_nhanesTableURL))
   ## declare 'global' variables used in subset() to make codetools happy 
-  utils::globalVariables(c("Begin.Year", "Component", "Data.File",
+  utils::globalVariables(c("DataURL", "Begin.Year", "Component", "Data.File",
                            "Data.File.Name", "Date.Published", "Doc.File",
                            "EndYear", "Use.Constraints",
                            "Variable.Description", "Value.Description"),
