@@ -6,7 +6,7 @@
 #' Returns code translations for categorical variables, 
 #' which appear in most NHANES tables.
 #' 
-#' @importFrom stringr str_locate str_sub 
+#' @importFrom stringr str_locate str_sub
 #' @importFrom rvest html_elements html_table
 #' @importFrom xml2 read_html
 #' @importFrom plyr mapvalues
@@ -25,7 +25,9 @@
 #'   information is displayed (default=FALSE).
 #' @param dxa If TRUE then the 2005-2006 DXA translation table will be
 #'   used (default=FALSE).
-#'
+#' @param cleanse_numeric Logical flag. If \code{TRUE}, some special
+#'   codes in numeric variables, such as \sQuote{Refused} and
+#'   \sQuote{Don't know} will be converted to \code{NA}.
 #' @return The code translation table (or translated data frame when
 #'   data is defined). Returns NULL upon error.
 #' @details Most NHANES data tables have encoded values. E.g. 1 =
@@ -47,8 +49,9 @@
 #' @export
 #' 
 nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128, 
-                            mincategories = 2, details=FALSE, dxa=FALSE) {
-
+                            mincategories = 2, details=FALSE, dxa=FALSE,
+                            cleanse_numeric = FALSE)
+{
   if(isFALSE(dxa) && !grepl("^(P_|Y_)\\w+", nh_table) && .useDB()) {
     return(.nhanesTranslateDB(nh_table, colnames,data,nchar,mincategories,details))
   }
@@ -58,7 +61,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128,
   #   return(NULL)
   # }
   
-  if(!is.null(data) & details == TRUE) {
+  if(!is.null(data) && details == TRUE) {
     details = FALSE
     warning("When a data table is passed to nhanesTranslate, the details variable is ignored")
   }
@@ -156,20 +159,33 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128,
         idx <- grep(sstr, names(data)) 
         if(length(idx)>0) { ## The column is present. Next we need to decide if it should be translated.
           if(length(levels(as.factor(data[[idx]]))) >= mincategories) {
-               # If we reached this point then yes we are translating
-               # Check for SAS label attribute
+            # If we reached this point then yes we are translating
+            # Check for SAS label attribute
             idx_label <- attr(data[[idx]],"label")
             data[[idx]] <- as.factor(data[[idx]])
-              data[[idx]] <-
-                  suppressMessages(
-                      plyr::mapvalues(data[[idx]],
-                                      from = translations[[cname]][['Code.or.Value']], 
-                                      to = str_sub(translations[[cname]][['Value.Description']], 1, nchar)))
+            data[[idx]] <-
+              suppressMessages(
+                plyr::mapvalues(data[[idx]],
+                                from = translations[[cname]][['Code.or.Value']], 
+                                to = str_sub(translations[[cname]][['Value.Description']], 1, nchar)))
             if(!is.null(idx_label)) {
               attr(data[[idx]],"label") <- idx_label
-              }
+            }
             translated <- c(translated, cname) }
         } else {
+          notfound <- c(notfound, cname)
+        }
+      }
+      else if (isTRUE(cleanse_numeric)) {
+        cname <- unlist(colnames[i])
+        sstr <- paste0('^', cname, '$') # Construct the search string
+        idx <- grep(sstr, names(data)) 
+        if (length(idx) > 0 && !is.null(translations[[cname]])) {
+          ## The column is present.
+            data[[idx]] <- code2numeric(data[[idx]], translations[[cname]])
+            translated <- c(translated, cname)
+        }
+        else {
           notfound <- c(notfound, cname)
         }
       }
@@ -372,10 +388,13 @@ specialNumericCodes <-
 
 
 ## convert 'raw' codes to either numeric or string (categorical)
-## values using codebook
+## values using codebook. For now, we will only
+## - convert the 'NA' values to NA
+## - complain if we see 'categorical' values
 
-code2numeric <- function(x, cb)
+code2numeric <- function(x, cb, cleanse = TRUE)
 {
+    if (isFALSE(cleanse)) return(x)
     ## x is numeric codes (which may alread include NAs from '.')
     ## cb is a data frame with columns Code.or.Value and Value.Description
     ##
@@ -383,9 +402,6 @@ code2numeric <- function(x, cb)
     cb <- subset(cb, !(Value.Description %in% c("Range of Values", "Missing")))
     if (nrow(cb) == 0) return(x)
     map <- with(cb, structure(as.numeric(Code.or.Value), names = Value.Description))
-    ## For now, we will only
-    ## - convert the 'NA' values to NA
-    ## - complain if we see 'categorical' values
     missingDesc <- names(which(specialNumericCodes == "NA"))
     categoricalDesc <- names(which(specialNumericCodes == "categorical"))
     ## are any remaining values to be mapped to NA
@@ -405,78 +421,43 @@ code2categorical <- function(x, cb) {
     map[as.character(x)]
 }
 
-translateVariable <- function(x, cb) {
+translateVariable <- function(x, cb, cleanse_numeric = TRUE) {
     colnames(cb) <- make.names(colnames(cb)) # 'fix' names if needed
     ## decide if 'numeric'
     if ("Range of Values" %in% cb$Value.Description)
-        code2numeric(x, cb)
+        code2numeric(x, cb, cleanse = cleanse_numeric)
     else
         code2categorical(x, cb)
 }
 
-raw2translated <- function(rawdf, codebook)
+raw2translated <- function(rawdf, codebook, cleanse_numeric = TRUE)
 {
     vars <- names(rawdf)
-    vars <- vars[vars != "SEQN"] # keep unchanged; anything else?
+    vars <- vars[!(vars %in% c("SEQN", "SAMPLEID"))] # keep these as-is; anything else?
+    ## codebook can be NULL if no codebook info present (e.g., for diet / food variables)
+    if (!is.null(codebook))
+        names(codebook) <- toupper(names(codebook))
     for (v in vars) {
-        names(codebook[[v]]) <- toupper(names(codebook[[v]]))
-        if (is.null(codebook[[v]][[v]])) {
-            warning("Codebook not available, skipping translation for variable: ", v)
+        ## most variables are coded as numbers, but some are
+        ## character. We do not make a distinction, but we may want to
+        ## alert about character variables because they are rare
+        if (is.null(codebook) && is.character(rawdf[[v]])) {
+            warning("Skipping translation for character variable with missing codebook: ", v)
         }
-        else
-            rawdf[[v]] <- translateVariable(rawdf[[v]], codebook[[v]][[v]])
+        else if (is.null(codebook[[v]])) {
+            warning("Variable not found in codebook, skipping translation for variable: ", v)
+        }
+        else {
+            names(codebook[[v]]) <- toupper(names(codebook[[v]]))
+            if (!is.list(codebook[[v]]) || is.null(codebook[[v]][[v]])) {
+                warning("Missing codebook table, skipping translation for variable: ", v)
+            }
+            else {
+                rawdf[[v]] <- translateVariable(rawdf[[v]], codebook[[v]][[v]],
+                                                cleanse_numeric = cleanse_numeric)
+            }
+        }
     }
     rawdf
 }
 
-
-### Documentation may be useful when this is exported, but skip for now
-
-
-## -' Alternative implementation for translating raw NHANES data
-##'
-## -' Similar to \code{\link{nhanes}} but with an alternative approach
-## -' approach to translate raw variables. Specifically, numeric
-## -' variables, which are kept largely unchanged by \code{nhanes}, are
-## -' translated more aggressively by converting some special numeric
-## -' codes to missing values by matching them to a curated list of
-## -' special values in the codebook; examples include but are not
-## -' limited to the codes corresponding to \code{"Don't know"} and
-## -' \code{"Refused"}.
-## -' 
-## -' @title Translate raw NHANES data using corresponding codebook
-## -' @param nh_table the name of a valid NHANES table
-## -' @return A data frame containing suitably translated data
-## -' @examples
-## -' \donttest{countNA <- function(x) sum(is.na(x))}
-## -' \donttest{d1 <- nhanes("WHQ_B")}
-## -' \donttest{d2 <- nhanesTranslateRaw("WHQ_B") # warnings about incomplete codebook}
-## -' \donttest{d2 <- d2[names(d1)] # to ensure same order of columns}
-## -' \donttest{subset(data.frame(na1 = sapply(d1, countNA),}
-## -' \donttest{                  na2 = sapply(d2, countNA)),}
-## -' \donttest{       na1 != na2)}
-
-.nhanesTranslate_with_cleansing <- function(nh_table)
-{
-    d <- nhanes(nh_table, includelabels = FALSE, translated = FALSE)
-    cb <- nhanesCodebook(nh_table)
-    ## convert names to uppercase because NHANES is sometimes
-    ## inconsistent (e.g., see variables WHD100* in WHQ_B), and check
-    ## that there are no conflicts
-    .checkDuplicated(names(d))
-    .checkDuplicated(names(cb))
-    names(d) <- toupper(names(d))
-    names(cb) <- toupper(names(cb))
-    raw2translated(d, cb)
-}
-
-.checkDuplicated <- function(x) {
-    ## raise error if duplicated are found upto case
-    X <- toupper(x)
-    w <- duplicated(X)
-    if (any(w)) {
-        problems <- x[X %in% X[w]]
-        stop("Duplicate variable names: ", paste(problems, collapse = ", "))
-    }
-    invisible()
-}

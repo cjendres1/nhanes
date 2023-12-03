@@ -4,7 +4,13 @@
 \alias{nhanes}
 \title{Download an NHANES table and return as a data frame.}
 \usage{
-nhanes(nh_table, includelabels = FALSE, translated = TRUE, nchar = 128)
+nhanes(
+  nh_table,
+  includelabels = FALSE,
+  translated = TRUE,
+  cleanse_numeric = FALSE,
+  nchar = 128
+)
 }
 \arguments{
 \item{nh_table}{The name of the specific table to retrieve.}
@@ -13,6 +19,10 @@ nhanes(nh_table, includelabels = FALSE, translated = TRUE, nchar = 128)
 attribute (default = FALSE).}
 
 \item{translated}{translated whether the variables are translated.}
+
+\item{cleanse_numeric}{Logical flag. If \code{TRUE}, some special
+codes in numeric variables, such as \sQuote{Refused} and
+\sQuote{Don't know} will be converted to \code{NA}.}
 
 \item{nchar}{Maximum length of translated string (default =
 128). Ignored if translated=FALSE.}

@@ -4,12 +4,16 @@
 \alias{nhanesFromURL}
 \title{Parse NHANES doc URL}
 \usage{
-nhanesFromURL(url, translated = TRUE, nchar = 128)
+nhanesFromURL(url, translated = TRUE, cleanse_numeric = TRUE, nchar = 128)
 }
 \arguments{
 \item{url}{URL of XPT file to be downloaded}
 
 \item{translated}{logical, whether variable codes should be translated}
+
+\item{cleanse_numeric}{Logical flag. If \code{TRUE}, some special
+codes in numeric variables, such as \sQuote{Refused} and
+\sQuote{Don't know} will be converted to \code{NA}.}
 
 \item{nchar}{integer, labels are truncated after this}
 }

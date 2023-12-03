@@ -18,6 +18,9 @@
 #' @param includelabels If TRUE, then include SAS labels as variable
 #'   attribute (default = FALSE).
 #' @param translated translated whether the variables are translated.
+#' @param cleanse_numeric Logical flag. If \code{TRUE}, some special
+#'   codes in numeric variables, such as \sQuote{Refused} and
+#'   \sQuote{Don't know} will be converted to \code{NA}.
 #' @param nchar Maximum length of translated string (default =
 #'   128). Ignored if translated=FALSE.
 #' @return The table is returned as a data frame.
@@ -37,7 +40,9 @@
 #' \donttest{dim(folate_f)}
 #' @export
 #' 
-nhanes <- function(nh_table, includelabels = FALSE, translated = TRUE, nchar = 128) {
+nhanes <- function(nh_table, includelabels = FALSE,
+                   translated = TRUE, cleanse_numeric = FALSE, nchar = 128)
+{
 
   if(!grepl("^(Y_)\\w+", nh_table) && .useDB()){
     return(.nhanesDB(nh_table, includelabels, translated))
@@ -60,8 +65,11 @@ nhanes <- function(nh_table, includelabels = FALSE, translated = TRUE, nchar = 1
 
     if(translated){
       # suppress warning because there will be a warning and the function returns NULL when no columns need to translated.
-      suppressWarnings(suppressMessages({nh_df = 
-        nhanesTranslate(nh_table,colnames = colnames(nh_df)[2:ncol(nh_df)],data = nh_df, nchar=nchar)}))
+      suppressWarnings(suppressMessages({nh_df <-
+        nhanesTranslate(nh_table,colnames = colnames(nh_df)[2:ncol(nh_df)], 
+                        data = nh_df, nchar = nchar,
+                        cleanse_numeric = cleanse_numeric)
+      }))
     }
     
     if(includelabels) {
@@ -104,39 +112,36 @@ nhanes <- function(nh_table, includelabels = FALSE, translated = TRUE, nchar = 1
 ##' @importFrom tools file_path_sans_ext
 ##' @param url URL of XPT file to be downloaded
 ##' @param translated logical, whether variable codes should be translated
+##' @param cleanse_numeric Logical flag. If \code{TRUE}, some special
+##'   codes in numeric variables, such as \sQuote{Refused} and
+##'   \sQuote{Don't know} will be converted to \code{NA}.
 ##' @param nchar integer, labels are truncated after this
 ##' @return data frame
 ##' @export
-nhanesFromURL <- function(url, translated = TRUE, nchar = 128)
+nhanesFromURL <- function(url, translated = TRUE, cleanse_numeric = TRUE, nchar = 128)
 {
   if (length(url) != 1) stop("'url' must have length 1")
   if (startsWith(tolower(url), "/nchs/nhanes"))
     url <- paste0(nhanesManifestPrefix, url)
-  tryCatch({    
-    tf <- tempfile()
-    if (isTRUE(nhanesOptions("log.access"))) message("Downloading: ", url)
-    download.file(url, tf, mode = "wb", quiet = TRUE)
-    nh_df <- read.xport(tf)
-    if (translated) {
-      ## guess table name
-      nh_table <- file_path_sans_ext(basename(url))
-      ## suppress warning because there will be a warning and the
-      ## function returns NULL when no columns need to translated.
-      suppressWarnings(suppressMessages({
-        nh_df <- nhanesTranslate(nh_table,
-                                 colnames = colnames(nh_df)[2:ncol(nh_df)],
-                                 data = nh_df,
-                                 nchar=nchar)
-      }))
-    }
-    nh_df
-  },
-  error = function(cond) {
-    stop(paste0("could not find a XPT file at: ", url))
-  },
-  warning = function(cond) {
-    message(cond, '\n')
-  })
+  nh_df <-
+    tryCatch({    
+      tf <- tempfile()
+      if (isTRUE(nhanesOptions("log.access"))) message("Downloading: ", url)
+      download.file(url, tf, mode = "wb", quiet = TRUE)
+      nh_df <- read.xport(tf)
+    },
+    error = function(cond) {
+      stop(paste0("could not find a XPT file at: ", url))
+    },
+    warning = function(cond) {
+      warning(cond)
+    })
+  if (translated) {
+    cburl <- paste0(file_path_sans_ext(url), ".htm")
+    cb <- nhanesCodebookFromURL(cburl)
+    nh_df <- raw2translated(nh_df, cb, cleanse_numeric = cleanse_numeric)
+  }
+  nh_df
 } 
 
 

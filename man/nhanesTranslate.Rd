@@ -11,7 +11,8 @@ nhanesTranslate(
   nchar = 128,
   mincategories = 2,
   details = FALSE,
-  dxa = FALSE
+  dxa = FALSE,
+  cleanse_numeric = FALSE
 )
 }
 \arguments{
@@ -36,6 +37,10 @@ information is displayed (default=FALSE).}
 
 \item{dxa}{If TRUE then the 2005-2006 DXA translation table will be
 used (default=FALSE).}
+
+\item{cleanse_numeric}{Logical flag. If \code{TRUE}, some special
+codes in numeric variables, such as \sQuote{Refused} and
+\sQuote{Don't know} will be converted to \code{NA}.}
 }
 \value{
 The code translation table (or translated data frame when
