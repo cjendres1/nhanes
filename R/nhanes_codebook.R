@@ -89,8 +89,10 @@ nhanesCodebookFromURL <- function(url) {
   if (is.null(hurl) ||  is.na(hurl)) {
     stop(paste0("could not find a web page at: ", url))
   }
-  colname = .getVarNames(hurl)$VarNames
-  sapply(colname, .codeBookHelper, hurl, simplify = FALSE)
+  colnames <- try(.getVarNames(hurl)$VarNames, silent = TRUE)
+  ## return NULL if codebook page cannot be parsed (rather than error)
+  if (inherits(colnames, "try-error")) NULL
+  else sapply(colnames, .codeBookHelper, hurl, simplify = FALSE)
 } 
 
 
