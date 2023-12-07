@@ -73,23 +73,38 @@ given link.
 Start Docker on Mac or Linux
 
 ``` dockerfile
-docker run  --rm --name nhanes-workbench \
+docker \
+    run \
+        --rm \
+        --platform=linux/amd64 \
+        --name nhanes-workbench \
         -v <YOUR LOCAL PATH>:/mnt/ \
         -d \
         -p 8787:8787 \
         -p 2200:22 \
         -p 1433:1433 \
-        -e 'CONTAINER_USER_USERNAME=nhanes' \
-        -e 'CONTAINER_USER_PASSWORD=nhanes' \
+        -e 'CONTAINER_USER_USERNAME=USER' \
+        -e 'CONTAINER_USER_PASSWORD=PASSWORD' \
         -e 'ACCEPT_EULA=Y' \
         -e 'SA_PASSWORD=yourStrong(!)Password' \
-         hmsccb/nhanes-workbench:latest
+         hmsccb/nhanes-workbench:version-0.2.0
 ```
 
 Start Docker on Windows
 
 ``` dockerfile
-docker run  --rm --name nhanes-workbench -d  -v <YOUR LOCAL PATH>:/mnt/ -p 8787:8787 -p 2200:22 -p 1433:1433  -e 'CONTAINER_USER_USERNAME=nhanes'  -e 'CONTAINER_USER_PASSWORD=nhanes' -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=yourStrong(!)Password' hmsccb/nhanes-workbench:latest
+docker ^
+    run ^
+        --rm ^
+        --platform=linux/amd64 ^
+        --name nhanes-workbench ^
+  -v <YOUR LOCAL PATH>:/mnt/ ^
+  -p 8787:8787 -p 2200:22 -p 1433:1433 ^
+  -e "CONTAINER_USER_USERNAME=USER" ^
+  -e "CONTAINER_USER_PASSWORD=PASSWORD" ^
+  -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=yourStrong(!)Password" ^
+  hmsccb/nhanes-workbench:version-0.2.0
+
 ```
 
 **2. Log into Rstudio**
