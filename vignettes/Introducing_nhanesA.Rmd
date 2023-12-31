@@ -151,7 +151,7 @@ codelist
 ```
 
 ### Apply Code Translations
-As a default, the nhanes function will translate coded values. If desired, this default behavior can be turned off by setting translate = FALSE. You may then customize the translation of coded fields using nhanesTranslate.
+As a default, the nhanes function will translate coded values. To ensure proper interpretation of variables, it is recommended to always use ``` nhanes ``` with the default option of translate = TRUE. However, you may also customize the translation of coded fields manually using nhanesTranslate.
 Customized translation of coded fields is a three step process.
 1: Download the table using nhanes with translate = FALSE
 2: Select the table variables to translate
