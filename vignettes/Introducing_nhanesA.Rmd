@@ -349,28 +349,27 @@ nhanesSearchTableNames('HPVS', includerdc=TRUE, nchar=42, details=TRUE)
 ```{r nhanessearchtablenames4, echo=FALSE}
 df <- data.frame(
   Years=character(),
-  Data.File.Name=character(),
+#  Data.File.Name=character(),
   Doc.File=character(),
   Data.File=character(),
   Date.Published=character())
-df[1,] <- list('2009-2010', 'Human Papillomavirus (HPV) - 6, 11, 16 & 1', 'HPVSER_F Doc', 'HPVSER_F Data [XPT - 171.6 KB]','November 2013')
-df[2,] <- list('2005-2006', 'Human Papillomavirus (HPV) - 6, 11, 16 & 1', 'HPVS_D_R Doc', 'RDC Only', 'July 2013')
-df[3,] <- list('2007-2008', 'Human Papillomavirus (HPV) - 6, 11, 16 & 1', 'HPVSER_E Doc', 'HPVSER_E Data [XPT - 155.7 KB]         November 2013')
-df[4,] <- list('2005-2006', 'Human Papillomavirus (HPV) - 6, 11, 16 & 1', 'HPVSER_D Doc', 'HPVSER_D Data [XPT - 151.6 KB]             July 2013')
-df[5,] <- list('2005-2006', 'Human Papillomavirus (HPV) - Multiplexed 6', 'HPVSRM_D Doc', 'HPVSRM_D Data [XPT - 302.6 KB]          January 2015')
-df[6,] <- list('2005-2006', 'Human Papillomavirus (HPV) DNA - Vaginal S', 'HPVSWR_D Doc', 'HPVSWR_D Data [XPT - 694.4 KB]         November 2010')
-df[7,] <- list('2007-2008', 'Human Papillomavirus (HPV) DNA - Vaginal S', 'HPVSWR_E Doc', 'HPVSWR_E Data [XPT - 677.9 KB]           August 2012')
-df[8,] <- list('2009-2010', 'Human Papillomavirus (HPV) DNA - Vaginal S', 'HPVSWR_F Doc', 'HPVSWR_F Data [XPT - 725.2 KB]           August 2012')
-df[9,] <- list('2011-2012', 'Human Papillomavirus (HPV) DNA - Vaginal S', 'HPVSWR_G Doc', 'HPVSWR_G Data [XPT - 661.1 KB]            March 2015')
-df[10,] <- list('2005-2006', 'Human Papillomavirus (HPV) DNA - Vaginal S', 'HPVSWR_D Doc', 'HPVSWR_D Data [XPT - 694.4 KB] Updated November 2018')
-df[11,] <- list('2009-2010', 'Human Papillomavirus (HPV) DNA - Vaginal S', 'HPVS_F_R Doc', 'RDC Only', 'August 2012')
-df[12,] <- list('2011-2012', 'Human Papillomavirus (HPV) DNA - Vaginal S', 'HPVS_G_R Doc', 'RDC Only', 'March 2015')
-df[13,] <- list('2013-2014', 'Human Papillomavirus (HPV) DNA - Vaginal S', 'HPVSWR_H Doc', 'HPVSWR_H Data [XPT - 716.6 KB]         December 2016')
-df[14,] <- list('2013-2014', 'Human Papillomavirus (HPV) DNA - Vaginal S', 'HPVS_H_R Doc', 'RDC Only', 'December 2016')
-df[15,] <- list('2015-2016', 'Human Papillomavirus (HPV) DNA - Vaginal S', 'HPVSWC_I Doc', 'HPVSWC_I Data [XPT - 33.3 KB]         November 2018')
-df[16,] <- list('2015-2016', 'Human Papillomavirus (HPV) DNA - Vaginal S', 'HPVSWR_I Doc', 'HPVSWR_I Data [XPT - 667.5 KB]         November 2018')
-df[17,] <- list('2015-2016', 'Human Papillomavirus (HPV) DNA - Vaginal S', 'HPVS_I_R Doc', 'RDC Only', 'November 2018')
-df[18,] <- list('2017-2018', 'Human Papillomavirus (HPV) DNA - Vaginal S', 'HPVS_J_R Doc', 'RDC Only', 'December 2020')
+df[1,] <- list('2009-2010', 'HPVSER_F Doc', 'HPVSER_F Data [XPT - 171.6 KB]', 'November 2013')
+df[2,] <- list('2007-2008', 'HPVSER_E Doc', 'HPVSER_E Data [XPT - 155.7 KB]', 'November 2013')
+df[3,] <- list('2005-2006', 'HPVSER_D Doc', 'HPVSER_D Data [XPT - 151.6 KB]', 'July 2013')
+df[4,] <- list('2005-2006', 'HPVSRM_D Doc', 'HPVSRM_D Data [XPT - 302.6 KB]', 'January 2015')
+df[5,] <- list('2007-2008', 'HPVSWR_E Doc', 'HPVSWR_E Data [XPT - 677.9 KB]', 'August 2012')
+df[6,] <- list('2009-2010', 'HPVSWR_F Doc', 'HPVSWR_F Data [XPT - 725.2 KB]', 'August 2012')
+df[7,] <- list('2011-2012', 'HPVSWR_G Doc', 'HPVSWR_G Data [XPT - 661.1 KB]', 'March 2015')
+df[8,] <- list('2005-2006', 'HPVSWR_D Doc', 'HPVSWR_D Data [XPT - 694.4 KB]', 'Updated November 2018')
+df[9,] <- list('2013-2014', 'HPVSWR_H Doc', 'HPVSWR_H Data [XPT - 716.6 KB]', 'December 2016')
+df[10,] <- list('2015-2016', 'HPVSWC_I Doc', 'HPVSWC_I Data [XPT - 33.3 KB]', 'November 2018')
+df[11,] <- list('2015-2016', 'HPVSWR_I Doc', 'HPVSWR_I Data [XPT - 667.5 KB]', 'November 2018')
+df[12,] <- list('2005-2006', 'HPVS_D_R Doc', 'RDC Only', 'July 2013')
+df[13,] <- list('2009-2010', 'HPVS_F_R Doc', 'RDC Only', 'August 2012')
+df[14,] <- list('2011-2012', 'HPVS_G_R Doc', 'RDC Only', 'March 2015')
+df[15,] <- list('2013-2014', 'HPVS_H_R Doc', 'RDC Only', 'December 2016')
+df[16,] <- list('2015-2016', 'HPVS_I_R Doc', 'RDC Only', 'November 2018')
+df[17,] <- list('2017-2018', 'HPVS_J_R Doc', 'RDC Only', 'December 2020')
 df
 ```
 

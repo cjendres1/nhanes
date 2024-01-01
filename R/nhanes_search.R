@@ -172,7 +172,6 @@ nhanesSearch <- function(search_terms = NULL, exclude_terms = NULL,
 #' @param ystop  Four digit year of final survey included in search, where ystop >= ystart.
 #' @param includerdc If TRUE then RDC only tables are included (default=FALSE).
 #' @param includewithdrawn IF TRUE then withdrawn tables are included (default=FALSE).
-#' @param includeurl IF TRUE then return urls. Automatically sets details = TRUE. 
 #' @param nchar Truncates the variable description to a max length of nchar.
 #' @param details If TRUE then complete table information from the comprehensive
 #' data list is returned (default=FALSE).
@@ -185,14 +184,14 @@ nhanesSearch <- function(search_terms = NULL, exclude_terms = NULL,
 #' @examples
 #' \donttest{bmx = nhanesSearchTableNames('BMX')}
 #' \donttest{length(bmx)}
-#' \donttest{hepbd = nhanesSearchTableNames('HEPBD', includeurl=TRUE)}
+#' \donttest{hepbd = nhanesSearchTableNames('HEPBD')}
 #' \donttest{dim(hepbd)}
 #' \donttest{hpvs = nhanesSearchTableNames('HPVS', includerdc=TRUE, details=TRUE)}
 #' \donttest{dim(hpvs)}
 #' @export
 #' 
 nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includerdc=FALSE, 
-                                   includewithdrawn=FALSE, includeurl=FALSE, nchar=128, details=FALSE) {
+                                   includewithdrawn=FALSE, nchar=128, details=FALSE) {
   if(is.null(pattern)) {stop('No pattern was entered')}
 
   if(.useDB()){
@@ -212,37 +211,48 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
     return(NULL)
   }
   df <- hurl |> html_elements(xpath=xpath) |> html_table() |> data.frame()
-  df <- subset(df, Doc.File %in% grep(paste(pattern,collapse="|"), Doc.File, value=TRUE))
+  df <- subset(df, grepl(paste(pattern,collapse="|"), Doc.File))
+#  df <- subset(df, Doc.File %in% grep(paste(pattern,collapse="|"), Doc.File, value=TRUE))
   if(nrow(df)==0) {return(NULL)}
-  if(!includerdc) {
-    df <- subset(df, !(Data.File == 'RDC Only'))
+  if(includerdc) {
+#    df <- subset(df, !(Data.File == 'RDC Only'))
+    
+    lurl <- .checkHtml(ladDataURL)
+    if(is.null(lurl)) {
+      message("Error occurred during read. No limited access tables returned")
+      return(NULL)
+    }
+    ladf <- lurl |> html_elements(xpath=xpath) |> html_table() |> data.frame()
+    ladf <- subset(ladf, Doc.File %in% grep(paste(pattern,collapse="|"), Doc.File, value=TRUE))
+    ladf <- ladf[c(names(df))]
+    df <- rbind.data.frame(df,ladf)
   }
   if(!includewithdrawn) {
     df <- subset(df, !(Date.Published == 'Withdrawn'))
   }
-  if(includeurl) {
-    details <- TRUE
-    urls <- hurl |> html_elements(xpath=xpath) |> html_nodes("a") |> html_attr('href')
-    
-    docurl  <- sort(grep(paste0(pattern, ".*\\.htm"), urls, value = TRUE))
-    names(docurl) <- str_remove(sub('.*\\/', '', docurl),".htm")
-    dataurl <- sort(grep(paste0(pattern, ".*\\.XPT"), urls, value = TRUE))
-    names(dataurl) <- str_remove(sub('.*\\/', '', dataurl),".XPT")
-    row.names(df) <- str_remove(df$Doc.File, " Doc")
-    docurl <- docurl[names(docurl) %in% names(dataurl)]
-    
-    df <- df[row.names(df) %in% names(dataurl),]
-    
-    df$docurl <- ""
-    df$dataurl <- ""
-    
-    for(i in 1:nrow(df)) { # FIXME: use pmatch() instead?
-      df$docurl[i] <- paste0("https://wwwn.cdc.gov",
-                             docurl[match.arg(row.names(df)[i], names(docurl))])
-      df$dataurl[i] <- paste0("https://wwwn.cdc.gov",
-                              dataurl[match.arg(row.names(df)[i], names(dataurl))])
-    }
-  }
+#  if(includeurl) {
+#    details <- TRUE
+#    urls <- hurl |> html_elements(xpath=xpath) |> html_nodes("a") |> html_attr('href')
+#    
+#    docurl  <- sort(grep(paste0(pattern, ".*\\.htm"), urls, value = TRUE))
+#    names(docurl) <- str_remove(sub('.*\\/', '', docurl),".htm")
+#    dataurl <- sort(grep(paste0(pattern, ".*\\.XPT"), urls, value = TRUE))
+#    names(dataurl) <- str_remove(sub('.*\\/', '', dataurl),".XPT")
+#    row.names(df) <- str_remove(df$Doc.File, " Doc")
+#    docurl <- docurl[names(docurl) %in% names(dataurl)]
+#    
+#    df <- df[row.names(df) %in% names(dataurl),]
+#    
+#    df$docurl <- ""
+#    df$dataurl <- ""
+#    
+#    for(i in 1:nrow(df)) { # FIXME: use pmatch() instead?
+#      df$docurl[i] <- paste0("https://wwwn.cdc.gov",
+#                             docurl[match.arg(row.names(df)[i], names(docurl))])
+#      df$dataurl[i] <- paste0("https://wwwn.cdc.gov",
+#                              dataurl[match.arg(row.names(df)[i], names(dataurl))])
+#    }
+#  }
   
   if( !is.null(ystart) || !is.null(ystop) ) {
     # Use the first year of cycle (the odd year) for comparison

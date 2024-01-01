@@ -12,7 +12,7 @@
 
 <meta name="author" content="Christopher J. Endres" />
 
-<meta name="date" content="2023-09-27" />
+<meta name="date" content="2023-12-31" />
 
 <title>Introducing nhanesA</title>
 
@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Introducing nhanesA</h1>
 <h4 class="author">Christopher J. Endres</h4>
-<h4 class="date">2023-09-27</h4>
+<h4 class="date">2023-12-31</h4>
 
 
 
@@ -483,13 +483,14 @@ the gender field RIAGENDR in table DEMO_D.</p>
 </div>
 <div id="apply-code-translations" class="section level3">
 <h3>Apply Code Translations</h3>
-<p>As a default, the nhanes function will translate coded values. If
-desired, this default behavior can be turned off by setting translate =
-FALSE. You may then customize the translation of coded fields using
-nhanesTranslate. Customized translation of coded fields is a three step
-process. 1: Download the table using nhanes with translate = FALSE 2:
-Select the table variables to translate 3: Pass the table and variable
-list to nhanesTranslate</p>
+<p>As a default, the nhanes function will translate coded values. To
+ensure proper interpretation of variables, it is recommended to always
+use <code>nhanes</code> with the default option of translate = TRUE.
+However, you may also customize the translation of coded fields manually
+using nhanesTranslate. Customized translation of coded fields is a three
+step process. 1: Download the table using nhanes with translate = FALSE
+2: Select the table variables to translate 3: Pass the table and
+variable list to nhanesTranslate</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>bpx_d <span class="ot">&lt;-</span> <span class="fu">nhanes</span>(<span class="st">&#39;BPX_D&#39;</span>, <span class="at">translate=</span><span class="cn">FALSE</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">head</span>(bpx_d[,<span class="dv">6</span><span class="sc">:</span><span class="dv">11</span>])</span></code></pre></div>
 <pre><code>##   BPQ150A BPQ150B BPQ150C BPQ150D BPAARM BPACSZ

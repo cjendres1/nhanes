@@ -33,7 +33,7 @@ dietURL <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=
 examURL <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Examination"
 labURL  <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Laboratory"
 qURL    <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Questionnaire"
-# ladURL  <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=LimitedAccess"
+ladURL  <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=LimitedAccess"
 varURLs <- c(demoURL, dietURL, examURL, labURL, qURL) #, ladURL)
 
 
