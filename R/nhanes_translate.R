@@ -151,7 +151,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128,
     
     translated <- c() ## Let's keep track of columns that were translated
     notfound   <- c() ## Keep track of columns that were not found
-    nskip <- grep('Range', translations) ## 'Range' of values indicates the column is not coded
+    nskip <- grep('Range of Values', translations) ## 'Range' of values indicates the column is not coded
     for( i in 1:length(colnames) ) {
       if(!(i %in% nskip)) {
         cname <- unlist(colnames[i])
