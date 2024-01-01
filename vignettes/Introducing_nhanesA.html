@@ -677,44 +677,24 @@ nhanesSearchTableNames takes only a few seconds.</p>
 <pre><code>##  [1] &quot;BMX_D&quot; &quot;BMX&quot;   &quot;BMX_E&quot; &quot;BMX_C&quot; &quot;BMX_B&quot; &quot;BMX_F&quot; &quot;BMX_H&quot; &quot;BMX_G&quot; &quot;BMX_I&quot;
 ## [10] &quot;BMX_J&quot; &quot;P_BMX&quot;</code></pre>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="fu">nhanesSearchTableNames</span>(<span class="st">&#39;HPVS&#39;</span>, <span class="at">includerdc=</span><span class="cn">TRUE</span>, <span class="at">nchar=</span><span class="dv">42</span>, <span class="at">details=</span><span class="cn">TRUE</span>)</span></code></pre></div>
-<pre><code>##        Years                             Data.File.Name     Doc.File
-## 1  2009-2010 Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVSER_F Doc
-## 2  2005-2006 Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVS_D_R Doc
-## 3  2007-2008 Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVSER_E Doc
-## 4  2005-2006 Human Papillomavirus (HPV) - 6, 11, 16 &amp; 1 HPVSER_D Doc
-## 5  2005-2006 Human Papillomavirus (HPV) - Multiplexed 6 HPVSRM_D Doc
-## 6  2005-2006 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_D Doc
-## 7  2007-2008 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_E Doc
-## 8  2009-2010 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_F Doc
-## 9  2011-2012 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_G Doc
-## 10 2005-2006 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_D Doc
-## 11 2009-2010 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_F_R Doc
-## 12 2011-2012 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_G_R Doc
-## 13 2013-2014 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_H Doc
-## 14 2013-2014 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_H_R Doc
-## 15 2015-2016 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWC_I Doc
-## 16 2015-2016 Human Papillomavirus (HPV) DNA - Vaginal S HPVSWR_I Doc
-## 17 2015-2016 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_I_R Doc
-## 18 2017-2018 Human Papillomavirus (HPV) DNA - Vaginal S HPVS_J_R Doc
-##                                               Data.File Date.Published
-## 1                        HPVSER_F Data [XPT - 171.6 KB]  November 2013
-## 2                                              RDC Only      July 2013
-## 3  HPVSER_E Data [XPT - 155.7 KB]         November 2013      2007-2008
-## 4  HPVSER_D Data [XPT - 151.6 KB]             July 2013      2005-2006
-## 5  HPVSRM_D Data [XPT - 302.6 KB]          January 2015      2005-2006
-## 6  HPVSWR_D Data [XPT - 694.4 KB]         November 2010      2005-2006
-## 7  HPVSWR_E Data [XPT - 677.9 KB]           August 2012      2007-2008
-## 8  HPVSWR_F Data [XPT - 725.2 KB]           August 2012      2009-2010
-## 9  HPVSWR_G Data [XPT - 661.1 KB]            March 2015      2011-2012
-## 10 HPVSWR_D Data [XPT - 694.4 KB] Updated November 2018      2005-2006
-## 11                                             RDC Only    August 2012
-## 12                                             RDC Only     March 2015
-## 13 HPVSWR_H Data [XPT - 716.6 KB]         December 2016      2013-2014
-## 14                                             RDC Only  December 2016
-## 15  HPVSWC_I Data [XPT - 33.3 KB]         November 2018      2015-2016
-## 16 HPVSWR_I Data [XPT - 667.5 KB]         November 2018      2015-2016
-## 17                                             RDC Only  November 2018
-## 18                                             RDC Only  December 2020</code></pre>
+<pre><code>##        Years     Doc.File                      Data.File        Date.Published
+## 1  2009-2010 HPVSER_F Doc HPVSER_F Data [XPT - 171.6 KB]         November 2013
+## 2  2007-2008 HPVSER_E Doc HPVSER_E Data [XPT - 155.7 KB]         November 2013
+## 3  2005-2006 HPVSER_D Doc HPVSER_D Data [XPT - 151.6 KB]             July 2013
+## 4  2005-2006 HPVSRM_D Doc HPVSRM_D Data [XPT - 302.6 KB]          January 2015
+## 5  2007-2008 HPVSWR_E Doc HPVSWR_E Data [XPT - 677.9 KB]           August 2012
+## 6  2009-2010 HPVSWR_F Doc HPVSWR_F Data [XPT - 725.2 KB]           August 2012
+## 7  2011-2012 HPVSWR_G Doc HPVSWR_G Data [XPT - 661.1 KB]            March 2015
+## 8  2005-2006 HPVSWR_D Doc HPVSWR_D Data [XPT - 694.4 KB] Updated November 2018
+## 9  2013-2014 HPVSWR_H Doc HPVSWR_H Data [XPT - 716.6 KB]         December 2016
+## 10 2015-2016 HPVSWC_I Doc  HPVSWC_I Data [XPT - 33.3 KB]         November 2018
+## 11 2015-2016 HPVSWR_I Doc HPVSWR_I Data [XPT - 667.5 KB]         November 2018
+## 12 2005-2006 HPVS_D_R Doc                       RDC Only             July 2013
+## 13 2009-2010 HPVS_F_R Doc                       RDC Only           August 2012
+## 14 2011-2012 HPVS_G_R Doc                       RDC Only            March 2015
+## 15 2013-2014 HPVS_H_R Doc                       RDC Only         December 2016
+## 16 2015-2016 HPVS_I_R Doc                       RDC Only         November 2018
+## 17 2017-2018 HPVS_J_R Doc                       RDC Only         December 2020</code></pre>
 <div id="please-send-any-feedback-or-requests-to-cjendres1gmail.com.-hope-you-enjoy-your-experience-with-nhanesa" class="section level4">
 <h4>Please send any feedback or requests to <a href="mailto:cjendres1@gmail.com" class="email">cjendres1@gmail.com</a>.
 Hope you enjoy your experience with nhanesA!</h4>
