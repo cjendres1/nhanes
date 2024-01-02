@@ -40,6 +40,11 @@
 ##'   reported by the server) and include them in the result.
 ##' @param verbose Logical flag indicating whether information on
 ##'   progress should be reported.
+##' @param use_cache Logical flag indicating whether a cached version
+##'   (from a previous download in the same session) should be used.
+##' @param max_age Maximum allowed age of the cache in seconds
+##'   (defaults to 24 hours). Cached versions that are older are
+##'   ignored, even if available.
 ##' @return A data frame, with columns that depend on
 ##'   \code{which}. For a manifest of tables, columns are "Table",
 ##'   "DocURL", "DataURL", "Years", "Date.Published". If \code{sizes =
@@ -62,15 +67,32 @@
 ##' 
 ##' @export
 nhanesManifest <- function(which = c("public", "limitedaccess", "variables"),
-                           sizes = FALSE, verbose = getOption("verbose"))
+                           sizes = FALSE, verbose = getOption("verbose"),
+                           use_cache = TRUE, max_age = 24 * 60 * 60)
 {
   which <- match.arg(which)
-  switch(which,
-         public = nhanesManifest_public(sizes = sizes, verbose = verbose),
-         limitedaccess = nhanesManifest_limitedaccess(verbose = verbose),
-         variables = nhanesManifest_variables(verbose = verbose)) |>
+  cache_key <- if (which == "public" && isTRUE(sizes)) "public+sizes"
+               else which
+  if (isTRUE(use_cache)) {
+    cache_val <- .nhanesCacheEnv[[ cache_key ]]
+    if (!is.null(cache_val) && as.numeric(Sys.time() - cache_val$timestamp) < max_age) {
+      if (verbose) message("Using previously cached version of manifest")
+      return(cache_val$manifest)
+    }
+  }
+  ## otherwise, fresh download
+  ans <- 
+    switch(which,
+           public = nhanesManifest_public(sizes = sizes, verbose = verbose),
+           limitedaccess = nhanesManifest_limitedaccess(verbose = verbose),
+           variables = nhanesManifest_variables(verbose = verbose)) |>
       unique()
+  .nhanesCacheEnv[[ cache_key ]] <- list(manifest = ans, timestamp = Sys.time())
+  ans
 }
+
+
+.nhanesCacheEnv <- new.env(parent = emptyenv())
 
 
 nhanesManifest_public <- function(sizes, verbose)
