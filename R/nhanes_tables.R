@@ -88,6 +88,7 @@ nhanesManifest <- function(which = c("public", "limitedaccess", "variables"),
            variables = nhanesManifest_variables(verbose = verbose)) |>
       unique()
   .nhanesCacheEnv[[ cache_key ]] <- list(manifest = ans, timestamp = Sys.time())
+  ans
 }
 
 
