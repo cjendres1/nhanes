@@ -7,7 +7,9 @@
 nhanesManifest(
   which = c("public", "limitedaccess", "variables"),
   sizes = FALSE,
-  verbose = getOption("verbose")
+  verbose = getOption("verbose"),
+  use_cache = TRUE,
+  max_age = 24 * 60 * 60
 )
 }
 \arguments{
@@ -20,6 +22,13 @@ reported by the server) and include them in the result.}
 
 \item{verbose}{Logical flag indicating whether information on
 progress should be reported.}
+
+\item{use_cache}{Logical flag indicating whether a cached version
+(from a previous download in the same session) should be used.}
+
+\item{max_age}{Maximum allowed age of the cache in seconds
+(defaults to 24 hours). Cached versions that are older are
+ignored, even if available.}
 }
 \value{
 A data frame, with columns that depend on
