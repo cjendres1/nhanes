@@ -4,7 +4,7 @@
 \alias{nhanesDXA}
 \title{Import Dual Energy X-ray Absorptiometry (DXA) data.}
 \usage{
-nhanesDXA(year, suppl = FALSE, destfile = NULL)
+nhanesDXA(year, suppl = FALSE, destfile = NULL, adjust_timeout = TRUE)
 }
 \arguments{
 \item{year}{The year of the data to import, where 1999<=year<=2006.}
@@ -13,6 +13,13 @@ nhanesDXA(year, suppl = FALSE, destfile = NULL)
 
 \item{destfile}{The name of a destination file. If NULL then the data are imported 
 into the R environment but no file is created.}
+
+\item{adjust_timeout}{Typically a logical flag indicating whether
+the default \code{\link{download.file}} timeout option should be
+adjusted by taking into account the size of the file to be
+downloaded, as reported by the server. The value can also be a
+positive numeric value, in which case it is used as a further
+multiplicative factor for the default calculation.}
 }
 \value{
 By default the table is returned as a data frame. When downloading to file, the return argument
