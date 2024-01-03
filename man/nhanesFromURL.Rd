@@ -4,7 +4,13 @@
 \alias{nhanesFromURL}
 \title{Parse NHANES doc URL}
 \usage{
-nhanesFromURL(url, translated = TRUE, cleanse_numeric = TRUE, nchar = 128)
+nhanesFromURL(
+  url,
+  translated = TRUE,
+  cleanse_numeric = TRUE,
+  nchar = 128,
+  adjust_timeout = TRUE
+)
 }
 \arguments{
 \item{url}{URL of XPT file to be downloaded}
@@ -16,6 +22,13 @@ codes in numeric variables, such as \sQuote{Refused} and
 \sQuote{Don't know} will be converted to \code{NA}.}
 
 \item{nchar}{integer, labels are truncated after this}
+
+\item{adjust_timeout}{Typically a logical flag indicating whether
+the default \code{\link{download.file}} timeout option should be
+adjusted by taking into account the size of the file to be
+downloaded, as reported by the server. The value can also be a
+positive numeric value, in which case it is used as a further
+multiplicative factor for the default calculation.}
 }
 \value{
 data frame

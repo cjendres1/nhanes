@@ -23,6 +23,12 @@
 #'   \sQuote{Don't know} will be converted to \code{NA}.
 #' @param nchar Maximum length of translated string (default =
 #'   128). Ignored if translated=FALSE.
+#' @param adjust_timeout Typically a logical flag indicating whether
+#'   the default \code{\link{download.file}} timeout option should be
+#'   adjusted by taking into account the size of the file to be
+#'   downloaded, as reported by the server. The value can also be a
+#'   positive numeric value, in which case it is used as a further
+#'   multiplicative factor for the default calculation.
 #' @return The table is returned as a data frame.
 #' @details Downloads a table from the NHANES website as is, i.e. in
 #'   its entirety with no modification or cleansing. If the
@@ -41,7 +47,8 @@
 #' @export
 #' 
 nhanes <- function(nh_table, includelabels = FALSE,
-                   translated = TRUE, cleanse_numeric = FALSE, nchar = 128)
+                   translated = TRUE, cleanse_numeric = FALSE, nchar = 128,
+                   adjust_timeout = TRUE)
 {
 
   if(!grepl("^(Y_)\\w+", nh_table) && .useDB()){
@@ -56,7 +63,12 @@ nhanes <- function(nh_table, includelabels = FALSE,
     } else {
       url <- paste0(nhanesTableURL, nh_year, '/', nh_table, '.XPT')
     }
-    
+    ## ask server for file size and adjust options("timeout") accordingly
+    min_timeout <- estimate_timeout(url, factor = adjust_timeout)
+    if (is.finite(min_timeout) && min_timeout > 0) {
+        oopt <- options(timeout = max(min_timeout, getOption("timeout")))
+        on.exit(options(oopt))
+    }
     tf <- tempfile()
     if (isTRUE(nhanesOptions("log.access"))) message("Downloading: ", url)
     download.file(url, tf, mode = "wb", quiet = TRUE)
@@ -116,13 +128,26 @@ nhanes <- function(nh_table, includelabels = FALSE,
 ##'   codes in numeric variables, such as \sQuote{Refused} and
 ##'   \sQuote{Don't know} will be converted to \code{NA}.
 ##' @param nchar integer, labels are truncated after this
+##' @param adjust_timeout Typically a logical flag indicating whether
+##'   the default \code{\link{download.file}} timeout option should be
+##'   adjusted by taking into account the size of the file to be
+##'   downloaded, as reported by the server. The value can also be a
+##'   positive numeric value, in which case it is used as a further
+##'   multiplicative factor for the default calculation.
 ##' @return data frame
 ##' @export
-nhanesFromURL <- function(url, translated = TRUE, cleanse_numeric = TRUE, nchar = 128)
+nhanesFromURL <- function(url, translated = TRUE, cleanse_numeric = TRUE,
+                          nchar = 128, adjust_timeout = TRUE)
 {
   if (length(url) != 1) stop("'url' must have length 1")
   if (startsWith(tolower(url), "/nchs/nhanes"))
     url <- paste0(nhanesManifestPrefix, url)
+  ## ask server for file size and adjust options("timeout") accordingly
+  min_timeout <- estimate_timeout(url, factor = adjust_timeout)
+  if (is.finite(min_timeout) && min_timeout > 0) {
+      oopt <- options(timeout = max(min_timeout, getOption("timeout")))
+      on.exit(options(oopt))
+  }
   nh_df <-
     tryCatch({    
       tf <- tempfile()
@@ -158,6 +183,12 @@ nhanesFromURL <- function(url, translated = TRUE, cleanse_numeric = TRUE, nchar 
 #' @param suppl If TRUE then retrieve the supplemental data (default=FALSE).
 #' @param destfile The name of a destination file. If NULL then the data are imported 
 #' into the R environment but no file is created.
+#' @param adjust_timeout Typically a logical flag indicating whether
+#'   the default \code{\link{download.file}} timeout option should be
+#'   adjusted by taking into account the size of the file to be
+#'   downloaded, as reported by the server. The value can also be a
+#'   positive numeric value, in which case it is used as a further
+#'   multiplicative factor for the default calculation.
 #' @return By default the table is returned as a data frame. When downloading to file, the return argument
 #' is the integer code from download.file where 0 means success and non-zero indicates failure to download.
 #' @details  Provide destfile in order to write the data to file. If destfile is not provided then
@@ -167,7 +198,7 @@ nhanesFromURL <- function(url, translated = TRUE, cleanse_numeric = TRUE, nchar 
 #' \donttest{dxa_c_s <- nhanesDXA(2003, suppl=TRUE)}
 #' \dontrun{dxa = nhanesDXA(1999, destfile="dxx.xpt")}
 #' @export
-nhanesDXA <- function(year, suppl=FALSE, destfile=NULL) {
+nhanesDXA <- function(year, suppl=FALSE, destfile=NULL, adjust_timeout = TRUE) {
 
   dxa_fname <- function(year, suppl) {
     fname <- 
@@ -188,6 +219,12 @@ nhanesDXA <- function(year, suppl=FALSE, destfile=NULL) {
     } else {
       fname <- dxa_fname(year, suppl)
       url <- paste0(dxaURL, fname, '.xpt')
+      ## ask server for file size and adjust options("timeout") accordingly
+      min_timeout <- estimate_timeout(url, factor = adjust_timeout)
+      if (is.finite(min_timeout) && min_timeout > 0) {
+          oopt <- options(timeout = max(min_timeout, getOption("timeout")))
+          on.exit(options(oopt))
+      }
       if (isTRUE(nhanesOptions("log.access"))) message("Downloading: ", url)
       if(!is.null(destfile)) {
         ok <- suppressWarnings(tryCatch({download.file(url, destfile, mode="wb", quiet=TRUE)},

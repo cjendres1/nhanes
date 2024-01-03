@@ -9,7 +9,8 @@ nhanes(
   includelabels = FALSE,
   translated = TRUE,
   cleanse_numeric = FALSE,
-  nchar = 128
+  nchar = 128,
+  adjust_timeout = TRUE
 )
 }
 \arguments{
@@ -26,6 +27,13 @@ codes in numeric variables, such as \sQuote{Refused} and
 
 \item{nchar}{Maximum length of translated string (default =
 128). Ignored if translated=FALSE.}
+
+\item{adjust_timeout}{Typically a logical flag indicating whether
+the default \code{\link{download.file}} timeout option should be
+adjusted by taking into account the size of the file to be
+downloaded, as reported by the server. The value can also be a
+positive numeric value, in which case it is used as a further
+multiplicative factor for the default calculation.}
 }
 \value{
 The table is returned as a data frame.

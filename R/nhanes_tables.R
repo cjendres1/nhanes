@@ -4,15 +4,9 @@
 #   nhanesTableVars
 #------------------------------------------------------------------------------
 
-.get_content_length <- function(url, verbose = FALSE)
+
+.nhanesFileSize <- function(url)
 {
-    url_base <- "https://wwwn.cdc.gov"
-    if (!startsWith(url, "/Nchs/Nhanes")) {
-        if (verbose) message("SKIPPING ", url)
-        return(NA_real_)
-    }
-    url <- paste0(url_base, url)
-    if (verbose) message(url)
     h <- tolower(curlGetHeaders(url))
     ok <- startsWith(h, "content-length")
     if (any(ok)) {
@@ -22,6 +16,29 @@
     }
     else NA_real_
 }
+
+estimate_timeout <- function(url, factor = 1, perMB = 10)
+{
+    ## By default, estimate at 10 sec / MB, and multiply by factor
+    if (factor > 0) {
+        fsize <- .nhanesFileSize(url)
+        factor * perMB * (fsize / 1e6)
+    }
+    else NA_real_
+}
+
+
+.get_content_length <- function(url, verbose = FALSE)
+{
+    url_base <- "https://wwwn.cdc.gov"
+    if (!startsWith(url, "/Nchs/Nhanes")) {
+        if (verbose) message("SKIPPING ", url)
+        return(NA_real_)
+    }
+    url <- paste0(url_base, url)
+    if (verbose) message(url)
+    .nhanesFileSize(url)
+ }
 
 ##' Downloads and parses NHANES manifests for public data
 ##' (available at
