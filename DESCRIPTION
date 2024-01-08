@@ -1,6 +1,6 @@
 Package: nhanesA
-Version: 0.9.2
-Date: 2024-01-03
+Version: 1.0
+Date: 2024-01-08
 Title: NHANES Data Retrieval
 Authors@R:
     c(person(given = "Christopher",
@@ -18,7 +18,7 @@ Authors@R:
              email= "robert_gentleman@g.harvard.edu"),
       person(given="Deepayan", 
              family="Sarkar",
-             role = "ctb", 
+             role = "aut", 
              email="deepayan.sarkar@gmail.com"))
 BugReports: https://github.com/cjendres1/nhanes/issues
 Depends:
