@@ -10,7 +10,6 @@ vignette: >
 ---
 
 ## Background
-<img align="right" width="120" height="120" src="../man/figures/nhanesAsticker.png" alt="drawing" style="border:0px">
 The nhanesA R package was developed to allow investigators to easily explore and retrieve data from the National Health and Nutrition Examination Survey (NHANES). The survey assesses overall health and nutrition of adults and children in the United States, and is conducted by the National Center for Health Statistics (NCHS). NHANES data are publicly available at: https://www.cdc.gov/nchs/nhanes.htm and are reported in thousands of peer-reviewed journal publications every year.
 
 ## NHANES Data

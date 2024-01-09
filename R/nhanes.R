@@ -272,8 +272,10 @@ nhanesDXA <- function(year, suppl=FALSE, destfile=NULL, adjust_timeout = TRUE) {
 #'   instead of \url{https://wwwn.cdc.gov} (this allows the use of a
 #'   local or alternative mirror of the CDC data).
 #' @examples 
-#' nhanesAttr('BPX_E')
-#' nhanesAttr('FOLATE_F')
+#' \donttest{bpx_e = nhanesAttr('BPX_E')}
+#' \donttest{length(bpx_e)}
+#' \donttest{folate_f = nhanesAttr('FOLATE_F')}
+#' \donttest{length(folate_f)}
 #' @export
 #' 
 nhanesAttr <- function(nh_table) {

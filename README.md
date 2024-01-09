@@ -43,22 +43,22 @@ Docker is as follows:
 
 **Standard nhanesA:**
 
--   When used outside of Docker, the `nhanesA` functions scrape data
-    directly from the CDC website each time they are invoked.
--   The advantage is simplicity; users only need to install the
-    `nhanesA` package without any additional setup.
--   However, the response time is contingent upon internet speed and the
-    size of the requested data.
+- When used outside of Docker, the `nhanesA` functions scrape data
+  directly from the CDC website each time they are invoked.
+- The advantage is simplicity; users only need to install the `nhanesA`
+  package without any additional setup.
+- However, the response time is contingent upon internet speed and the
+  size of the requested data.
 
 **Docker-enhanced nhanesA:**
 
--   The Docker container locally hosts most of the NHANES data, allowing
-    for significantly faster data access and manipulation.
--   Initial setup requires Docker installation and downloading the
-    Docker image.
--   Pre-pandemic tables, DXA and the youth survey, are also not present
-    in the Docker database and would similarly be fetched from the CDC
-    website.
+- The Docker container locally hosts most of the NHANES data, allowing
+  for significantly faster data access and manipulation.
+- Initial setup requires Docker installation and downloading the Docker
+  image.
+- Pre-pandemic tables, DXA and the youth survey, are also not present in
+  the Docker database and would similarly be fetched from the CDC
+  website.
 
 In essence, while the Docker-enhanced version offers blazing-fast access
 to a majority of the data, it will fetch data in the standard `nhanesA`
@@ -105,14 +105,14 @@ docker ^
   -e "ACCEPT_EULA=Y" ^
   -e "SA_PASSWORD=yourStrong(!)Password" ^
   hmsccb/nhanes-workbench:version-0.2.0
-
 ```
 
 **2. Log into Rstudio**
 
 Log into RStudio via: <http://localhost:8787> and using the username set
 in the command above. In the above command, the username and password
-are set as `USER` and `PASSWORD`,respectively, but you can modify them if you prefer.
+are set as `USER` and `PASSWORD`,respectively, but you can modify them
+if you prefer.
 
 More details about the [NHANES
 Docker](https://github.com/ccb-hms/NHANES).

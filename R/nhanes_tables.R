@@ -79,8 +79,8 @@ estimate_timeout <- function(url, factor = 1, perMB = 10)
 ##'   descriptions. These are removed explicitly, keeping only the
 ##'   first occurrence.
 ##' @examples
-##' manifest <- nhanesManifest(sizes = FALSE)
-##' dim(manifest)
+##' \donttest{manifest <- nhanesManifest(sizes = FALSE)}
+##' \donttest{dim(manifest)}
 ##' 
 ##' @export
 nhanesManifest <- function(which = c("public", "limitedaccess", "variables"),
