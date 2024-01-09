@@ -216,8 +216,7 @@ Furthermore, there are surveys conducted
 outside the scope of the continuous survey, but that are provided in a similar
 format such that nhanesA can be readily adapted to retrieve their data. Note 
 that nhanesA cannot be used to handle accelerometer data from 2003-2006. For
-those data, please see packages nhanesaccel https://r-forge.r-project.org/R/?group_id=1733 and 
-accelerometry https://cran.r-project.org/package=accelerometry.
+those data, please see package [accelerometry](https://cran.r-project.org/package=accelerometry).
 
 ### Pre-pandemic data
 Due to COVID, data collection for the 2019-2020 cycle was not completed. In order to make 
