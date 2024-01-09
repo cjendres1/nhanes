@@ -36,6 +36,8 @@ nhanesAttr allows one to check the size and other
   local or alternative mirror of the CDC data).
 }
 \examples{
-nhanesAttr('BPX_E')
-nhanesAttr('FOLATE_F')
+\donttest{bpx_e = nhanesAttr('BPX_E')}
+\donttest{length(bpx_e)}
+\donttest{folate_f = nhanesAttr('FOLATE_F')}
+\donttest{length(folate_f)}
 }

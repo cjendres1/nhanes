@@ -61,7 +61,7 @@ Duplicate rows are removed from the result. Most of these
   first occurrence.
 }
 \examples{
-manifest <- nhanesManifest(sizes = FALSE)
-dim(manifest)
+\donttest{manifest <- nhanesManifest(sizes = FALSE)}
+\donttest{dim(manifest)}
 
 }
