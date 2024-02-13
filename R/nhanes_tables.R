@@ -31,7 +31,7 @@ estimate_timeout <- function(url, factor = 1, perMB = 10)
 .get_content_length <- function(url, verbose = FALSE)
 {
     url_base <- "https://wwwn.cdc.gov"
-    if (!startsWith(url, "/Nchs/Nhanes")) {
+    if (!startsWith(tolower(url), "/nchs/")) {
         if (verbose) message("SKIPPING ", url)
         return(NA_real_)
     }
@@ -84,11 +84,13 @@ estimate_timeout <- function(url, factor = 1, perMB = 10)
 ##' 
 ##' @export
 nhanesManifest <- function(which = c("public", "limitedaccess", "variables"),
-                           sizes = FALSE, verbose = getOption("verbose"),
+                           sizes = FALSE, dxa = TRUE,
+                           verbose = getOption("verbose"),
                            use_cache = TRUE, max_age = 24 * 60 * 60)
 {
   which <- match.arg(which)
-  cache_key <- if (which == "public" && isTRUE(sizes)) "public+sizes"
+  cache_key <- if (which == "public")
+                   paste(c("public", "sizes", "dxa")[c(TRUE, sizes, dxa)], collapse = "+")
                else which
   if (isTRUE(use_cache)) {
     cache_val <- .nhanesCacheEnv[[ cache_key ]]
@@ -100,7 +102,9 @@ nhanesManifest <- function(which = c("public", "limitedaccess", "variables"),
   ## otherwise, fresh download
   ans <- 
     switch(which,
-           public = nhanesManifest_public(sizes = sizes, verbose = verbose),
+           public = if (dxa) rbind(nhanesManifest_public(sizes = sizes, verbose = verbose),
+                                   nhanesManifest_DXA(sizes = sizes, verbose = verbose))
+                    else nhanesManifest_public(sizes = sizes, verbose = verbose),
            limitedaccess = nhanesManifest_limitedaccess(verbose = verbose),
            variables = nhanesManifest_variables(verbose = verbose)) |>
       unique()
@@ -147,6 +151,39 @@ nhanesManifest_public <- function(sizes, verbose)
   }
   return(df)
 }
+
+
+nhanesManifest_DXA <- function(sizes, verbose)
+{
+  if (verbose) message("Downloading ", dxaTablesURL)
+  hurl <- .checkHtml(dxaTablesURL)
+  if(is.null(hurl)) {
+    message("Error occurred during read. No tables returned")
+    return(NULL)
+  }
+  ##get to the table
+  xpath <- '//*[@id="GridView1"]'
+  tab1 <- hurl |> html_elements(xpath=xpath)
+  ##pull out all the hrefs
+  hrefs <- tab1 |> html_nodes("a") |> html_attr("href")
+  df <- tab1 |> html_table() |> as.data.frame()
+  df$Table <- sub(" Doc", "", df$Doc.File)
+  ## make sure lengths now match
+  if (nrow(df) * 2 != length(hrefs)) stop("Wrong number of URLs in table manifest")
+  df$DocURL <- hrefs[c(TRUE, FALSE)]
+  df$DataURL <- hrefs[c(FALSE, TRUE)]
+  ## subset(df, tools::file_ext(DataURL) != "XPT")
+  df <- subset(df, startsWith(DataURL, "/") & endsWith(toupper(DataURL), ".XPT"))
+  df <- df[c("Table", "DocURL", "DataURL", "Years", "Date.Published")]
+  if (sizes) {
+    if (verbose) message("Checking data file sizes...")
+    s <- sapply(df$DataURL, .get_content_length, verbose = verbose)
+    df$DataSize <- s
+  }
+  return(df)
+}
+
+
 
 nhanesManifest_limitedaccess <- function(verbose)
 {
@@ -231,6 +268,7 @@ parseRedirect <- function(s, prefix = "../vitamind/analyticalnote.aspx?")
 {
   ans <- s
   tofix <- startsWith(tolower(s), tolower(prefix))
+  if (!any(tofix)) return(s)
   ss <- substring(s[tofix], 1 + nchar(prefix), 999)
   ss <- sapply(ss, string2url)
   ans[tofix] <- ss
