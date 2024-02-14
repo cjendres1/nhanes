@@ -7,6 +7,7 @@
 nhanesManifest(
   which = c("public", "limitedaccess", "variables"),
   sizes = FALSE,
+  dxa = TRUE,
   verbose = getOption("verbose"),
   use_cache = TRUE,
   max_age = 24 * 60 * 60
@@ -19,6 +20,10 @@ available variables.}
 
 \item{sizes}{Logical, whether to compute data file sizes (as
 reported by the server) and include them in the result.}
+
+\item{dxa}{Logical, whether to include information on DXA tables.
+These tables contain imputed imputed Dual Energy X-ray Absorptiometry
+measurements, and are listed separately, not in the main listing.}
 
 \item{verbose}{Logical flag indicating whether information on
 progress should be reported.}

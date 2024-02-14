@@ -73,7 +73,7 @@ nhanes <- function(nh_table, includelabels = FALSE,
     if (isTRUE(nhanesOptions("log.access"))) message("Downloading: ", url)
     download.file(url, tf, mode = "wb", quiet = TRUE)
     
-    nh_df <- read.xport(tf)
+    nh_df <- read.xport(tf, check.names = FALSE)
 
     if(translated){
       # suppress warning because there will be a warning and the function returns NULL when no columns need to translated.
@@ -140,7 +140,7 @@ nhanesFromURL <- function(url, translated = TRUE, cleanse_numeric = TRUE,
                           nchar = 128, adjust_timeout = TRUE)
 {
   if (length(url) != 1) stop("'url' must have length 1")
-  if (startsWith(tolower(url), "/nchs/nhanes"))
+  if (startsWith(tolower(url), "/nchs/"))
     url <- paste0(nhanesManifestPrefix, url)
   ## ask server for file size and adjust options("timeout") accordingly
   min_timeout <- estimate_timeout(url, factor = adjust_timeout)
@@ -153,7 +153,7 @@ nhanesFromURL <- function(url, translated = TRUE, cleanse_numeric = TRUE,
       tf <- tempfile()
       if (isTRUE(nhanesOptions("log.access"))) message("Downloading: ", url)
       download.file(url, tf, mode = "wb", quiet = TRUE)
-      nh_df <- read.xport(tf)
+      nh_df <- read.xport(tf, check.names = FALSE)
     },
     error = function(cond) {
       stop(paste0("could not find a XPT file at: ", url))
@@ -235,7 +235,7 @@ nhanesDXA <- function(year, suppl=FALSE, destfile=NULL, adjust_timeout = TRUE) {
         ok <- suppressWarnings(tryCatch({download.file(url, tf, mode="wb", quiet=TRUE)},
                                         error=function(cond){message(cond); return(NULL)}))
         if(!is.null(ok)) {
-          return(read.xport(tf))
+          return(read.xport(tf)) # check.names = FALSE ? Will change X_MULT_ to MULT_
         } else { return(NULL) }
       }
     }
@@ -299,7 +299,7 @@ nhanesAttr <- function(nh_table) {
     column_names  <- xport_struct[[1]]$name
     column_labels <- xport_struct[[1]]$label
     names(column_labels) <- column_names
-    nh_df <- read.xport(tf)
+    nh_df <- read.xport(tf, check.names = FALSE)
     
     nhtatt <- attributes(nh_df)
     nhtatt$row.names <- NULL

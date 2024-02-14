@@ -55,6 +55,9 @@ estimate_timeout <- function(url, factor = 1, perMB = 10)
 ##'   available variables.
 ##' @param sizes Logical, whether to compute data file sizes (as
 ##'   reported by the server) and include them in the result.
+##' @param dxa Logical, whether to include information on DXA tables.
+##'   These tables contain imputed imputed Dual Energy X-ray Absorptiometry
+##'   measurements, and are listed separately, not in the main listing.
 ##' @param verbose Logical flag indicating whether information on
 ##'   progress should be reported.
 ##' @param use_cache Logical flag indicating whether a cached version
@@ -103,7 +106,7 @@ nhanesManifest <- function(which = c("public", "limitedaccess", "variables"),
   ans <- 
     switch(which,
            public = if (dxa) rbind(nhanesManifest_public(sizes = sizes, verbose = verbose),
-                                   nhanesManifest_DXA(sizes = sizes, verbose = verbose))
+                                   nhanesManifest_DXA_hardcoded(sizes))
                     else nhanesManifest_public(sizes = sizes, verbose = verbose),
            limitedaccess = nhanesManifest_limitedaccess(verbose = verbose),
            variables = nhanesManifest_variables(verbose = verbose)) |>
@@ -153,6 +156,15 @@ nhanesManifest_public <- function(sizes, verbose)
 }
 
 
+## We can use the following function to get the DXA table details from
+## https://wwwn.cdc.gov/Nchs/Nhanes/Dxa/Dxa.aspx. However, one problem
+## with this approach is that the Doc files for DXA, DXA_B, and DXA_C
+## are PDF files which we cannot parse, and only the DXA_D doc is
+## HTML. The workaround is to use the DXA_D doc / codebook for all
+## four. We do this by maintaining a hard-coded version of the result,
+## assuming that the information will not change going forward (the
+## last update happened in 2016).
+
 nhanesManifest_DXA <- function(sizes, verbose)
 {
   if (verbose) message("Downloading ", dxaTablesURL)
@@ -183,7 +195,24 @@ nhanesManifest_DXA <- function(sizes, verbose)
   return(df)
 }
 
-
+nhanesManifest_DXA_hardcoded <- function(sizes, verbose)
+{
+    keep <- if (isTRUE(sizes)) 1:6 else 1:5
+    ## manually edited from nhanesManifest_DXA(sizes = TRUE)
+    data.frame(Table = c("DXX_D", "DXX_C", "DXX_B", "DXX"),
+               DocURL = rep("/nchs/data/nhanes/dxa/dxx_d.htm", 4),
+               DataURL = c("/nchs/data/nhanes/dxa/dxx_d.xpt", 
+                           "/nchs/data/nhanes/dxa/dxx_c.xpt",
+                           "/nchs/data/nhanes/dxa/dxx_b.xpt", 
+                           "/nchs/data/nhanes/dxa/dxx.xpt"),
+               Years = c("2005-2006", "2003-2004", 
+                         "2001-2002", "1999-2000"),
+               Date.Published = c("Updated December 2016", 
+                                  "Updated March 2010",
+                                  "Updated March 2010",
+                                  "Updated March 2010"),
+               DataSize = c(29517840, 30371680, 32695200, 24737440))[keep]
+}
 
 nhanesManifest_limitedaccess <- function(verbose)
 {
