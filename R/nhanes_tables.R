@@ -87,7 +87,7 @@ estimate_timeout <- function(url, factor = 1, perMB = 10)
 ##' 
 ##' @export
 nhanesManifest <- function(which = c("public", "limitedaccess", "variables"),
-                           sizes = FALSE, dxa = TRUE,
+                           sizes = FALSE, dxa = FALSE,
                            verbose = getOption("verbose"),
                            use_cache = TRUE, max_age = 24 * 60 * 60)
 {

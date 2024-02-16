@@ -7,7 +7,7 @@
 nhanesManifest(
   which = c("public", "limitedaccess", "variables"),
   sizes = FALSE,
-  dxa = TRUE,
+  dxa = FALSE,
   verbose = getOption("verbose"),
   use_cache = TRUE,
   max_age = 24 * 60 * 60
