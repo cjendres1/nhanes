@@ -421,11 +421,24 @@ code2categorical <- function(x, cb) {
     map[as.character(x)]
 }
 
+## some variables are already character strings, but they may also
+## have 'special' codes that need to be translated. code2categorical
+## will not handle them because unrecognized codes become NA
+char2categorical <- function(x, cb) {
+    if (!is.character(x)) stop("Expected character, found ", typeof(x))
+    map <- with(cb, structure(Value.Description, names = as.character(Code.or.Value)))
+    i <- which(x %in% names(map)) # should be relatively few
+    x[i] <- map[x[i]]
+    x
+}
+
 translateVariable <- function(x, cb, cleanse_numeric = TRUE) {
     colnames(cb) <- make.names(colnames(cb)) # 'fix' names if needed
     ## decide if 'numeric'
     if ("Range of Values" %in% cb$Value.Description)
         code2numeric(x, cb, cleanse = cleanse_numeric)
+    else if ("Value was recorded" %in% cb$Value.Description)
+        char2categorical(x, cb)
     else
         code2categorical(x, cb)
 }
