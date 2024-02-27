@@ -34,7 +34,7 @@ nhanesCodebook <- function(nh_table, colname=NULL, dxa=FALSE) {
 ##  if(is.null(colname)) 
 ##    colname = nhanesAttr(nh_table)$names
 
-  if(isFALSE(dxa) && !grepl("^(P_|Y_)\\w+", nh_table) && .useDB()) {
+  if(isFALSE(dxa) && !grepl("^(Y_)\\w+", nh_table) && .useDB()) {
     return(.nhanesCodebookDB(nh_table, colname))
   }
   
