@@ -52,7 +52,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128,
                             mincategories = 2, details=FALSE, dxa=FALSE,
                             cleanse_numeric = FALSE)
 {
-  if(isFALSE(dxa) && !grepl("^(P_|Y_)\\w+", nh_table) && .useDB()) {
+  if(isFALSE(dxa) && !grepl("^(Y_)\\w+", nh_table) && .useDB()) {
     return(.nhanesTranslateDB(nh_table, colnames,data,nchar,mincategories,details))
   }
 
