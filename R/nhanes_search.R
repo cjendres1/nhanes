@@ -230,30 +230,7 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
   if(!includewithdrawn) {
     df <- subset(df, !(Date.Published == 'Withdrawn'))
   }
-#  if(includeurl) {
-#    details <- TRUE
-#    urls <- hurl |> html_elements(xpath=xpath) |> html_nodes("a") |> html_attr('href')
-#    
-#    docurl  <- sort(grep(paste0(pattern, ".*\\.htm"), urls, value = TRUE))
-#    names(docurl) <- str_remove(sub('.*\\/', '', docurl),".htm")
-#    dataurl <- sort(grep(paste0(pattern, ".*\\.XPT"), urls, value = TRUE))
-#    names(dataurl) <- str_remove(sub('.*\\/', '', dataurl),".XPT")
-#    row.names(df) <- str_remove(df$Doc.File, " Doc")
-#    docurl <- docurl[names(docurl) %in% names(dataurl)]
-#    
-#    df <- df[row.names(df) %in% names(dataurl),]
-#    
-#    df$docurl <- ""
-#    df$dataurl <- ""
-#    
-#    for(i in 1:nrow(df)) { # FIXME: use pmatch() instead?
-#      df$docurl[i] <- paste0("https://wwwn.cdc.gov",
-#                             docurl[match.arg(row.names(df)[i], names(docurl))])
-#      df$dataurl[i] <- paste0("https://wwwn.cdc.gov",
-#                              dataurl[match.arg(row.names(df)[i], names(dataurl))])
-#    }
-#  }
-  
+
   if( !is.null(ystart) || !is.null(ystop) ) {
     # Use the first year of cycle (the odd year) for comparison
     year1 <- as.integer(matrix(unlist(strsplit(df$Years, '-')), ncol=2, byrow=TRUE)[,1])
@@ -289,6 +266,7 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
   if(nrow(df)==0) {return(NULL)}
   row.names(df) <- NULL
   if(isTRUE(details)) {
+    df <- df[order(df$Doc.File), ]
     df$Data.File <- substring(df$Data.File, 1, nchar)
     return(df)
   } else {
@@ -413,6 +391,7 @@ nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerd
   if(namesonly) {
     return( sort(unique(df$Data.File.Name)) )
   }
+  df <- df[order(df$Data.File.Name), ]
   df$Variable.Description <- substring(df$Variable.Description, 1, nchar)
   return(df)
 }
