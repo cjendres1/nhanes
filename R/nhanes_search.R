@@ -155,7 +155,7 @@ nhanesSearch <- function(search_terms = NULL, exclude_terms = NULL,
   }
   row.names(df) <- NULL
   if(namesonly) {
-    return(unique(df$Data.File.Name))
+    return(sort(unique(df$Data.File.Name)))
   }
   df$Variable.Description <- substring(df$Variable.Description, 1, nchar)
   return(df)
@@ -292,7 +292,7 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
     df$Data.File <- substring(df$Data.File, 1, nchar)
     return(df)
   } else {
-    return(unlist(strsplit(df$Doc.File, " Doc")))
+    return(sort(unlist(strsplit(df$Doc.File, " Doc"))))
   }
 }
 #------------------------------------------------------------------------------
@@ -411,7 +411,7 @@ nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerd
   row.names(df) <- NULL
   if(nrow(df)==0) { return(NULL) }
   if(namesonly) {
-    return( unique(df$Data.File.Name) )
+    return( sort(unique(df$Data.File.Name)) )
   }
   df$Variable.Description <- substring(df$Variable.Description, 1, nchar)
   return(df)
