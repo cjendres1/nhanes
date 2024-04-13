@@ -156,6 +156,7 @@ nhanesFromURL <- function(url, translated = TRUE, cleanse_numeric = TRUE,
       download.file(url, tf, mode = "wb", quiet = TRUE)
       nh_df <- read.xport(tf, check.names = FALSE)
       unlink(tf)
+      nh_df
     },
     error = function(cond) {
       stop(paste0("could not find a XPT file at: ", url))
