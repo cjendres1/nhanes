@@ -22,14 +22,14 @@
                 CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS Component,
                 BeginYear AS 'Begin.Year', EndYear
                 FROM
-                Metadata.QuestionnaireDescriptions where DataGroup='",
+                NhanesMetadata.QuestionnaireDescriptions where DataGroup='",
                   data_group, "' and BeginYear=", if (EVEN) year-1 else year)
 
   if(details==FALSE){
     tables = paste0("SELECT TableName AS 'Data.File.Name',
                 Description as 'Data.File.Description'
                 FROM
-                Metadata.QuestionnaireDescriptions where DataGroup='",
+                NhanesMetadata.QuestionnaireDescriptions where DataGroup='",
                     data_group, "' and BeginYear=",ifelse(EVEN, year-1, year))
   }
 
@@ -70,8 +70,8 @@
                        SUBSTRING(Q.[Description],1,",nchar,") AS 'Data.File.Description',
                        BeginYear AS 'Begin.Year', EndYear,
                        CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS Component
-                  FROM Metadata.QuestionnaireDescriptions Q
-                  JOIN Metadata.QuestionnaireVariables V ON V.TableName = Q.TableName
+                  FROM NhanesMetadata.QuestionnaireDescriptions Q
+                  JOIN NhanesMetadata.QuestionnaireVariables V ON V.TableName = Q.TableName
                   WHERE V.TableName = '",nh_table,"'")
   if(!is.null(data_group)){
     sql = paste0(sql," AND DataGroup LIKE '",data_group,"%'")
@@ -92,7 +92,7 @@
 {
   .checkTableNames(nh_table)
   label_sql = paste0("SELECT Variable,Description 
-                     FROM [Metadata].[QuestionnaireVariables] 
+                     FROM [NhanesMetadata].[QuestionnaireVariables] 
                      WHERE TableName = '",nh_table,"'")
   nh_table = .convertTranslatedTable(nh_table,translated)
   sql = paste0("SELECT * FROM ",nh_table)
@@ -132,8 +132,8 @@
                        SUBSTRING(Q.[Description],1,",nchar,") AS 'Data.File.Description',
                        BeginYear AS 'Begin.Year', EndYear,
                        CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS Component
-                  FROM Metadata.QuestionnaireDescriptions Q
-                  JOIN Metadata.QuestionnaireVariables V ON V.TableName = Q.TableName
+                  FROM NhanesMetadata.QuestionnaireDescriptions Q
+                  JOIN NhanesMetadata.QuestionnaireVariables V ON V.TableName = Q.TableName
                   WHERE V.Variable IN (", toString(sprintf("'%s'", varnames)),")")
 
 
@@ -172,7 +172,7 @@
 
   sql <- paste0("SELECT DISTINCT TableName,
                         CONCAT(Q.BeginYear, '-', Q.EndYear) AS Years
-                      FROM Metadata.QuestionnaireDescriptions Q
+                      FROM NhanesMetadata.QuestionnaireDescriptions Q
                   WHERE TableName LIKE '%",pattern,"%'"
   )
   if(!is.null(ystart)){
@@ -216,10 +216,10 @@
   if(details){
     sql = "SELECT Variable,CodeOrValue AS 'Code.or.Value',ValueDescription AS 'Value.Description',
             Count,Cumulative,SkipToItem AS 'Skip.to.Item'
-            FROM Metadata.VariableCodebook WHERE TableName='"
+            FROM NhanesMetadata.VariableCodebook WHERE TableName='"
   } else {
     sql = "SELECT Variable,CodeOrValue AS 'Code.or.Value',ValueDescription AS 'Value.Description'
-             FROM Metadata.VariableCodebook WHERE TableName='"
+             FROM NhanesMetadata.VariableCodebook WHERE TableName='"
   }
   sql = paste0(sql,nh_table,"'")
   if(!is.null(colnames))
@@ -249,8 +249,8 @@
                        SUBSTRING(Q.[Description],1,",nchar,") AS 'Data.File.Description',
                        BeginYear AS 'Begin.Year', EndYear,
                        CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS Component
-                  FROM Metadata.QuestionnaireDescriptions Q
-                  JOIN Metadata.QuestionnaireVariables V ON V.TableName = Q.TableName
+                  FROM NhanesMetadata.QuestionnaireDescriptions Q
+                  JOIN NhanesMetadata.QuestionnaireVariables V ON V.TableName = Q.TableName
                   WHERE (V.Description COLLATE SQL_Latin1_General_CP1_CS_AS LIKE '%")
 
   # COLLATE SQL_Latin1_General_CP1_CS_AS  : is to make case sensitive pattern match
@@ -317,7 +317,7 @@
                        SasLabel AS 'SAS Label:',
                        Description AS 'English Text:',
                        Target AS 'Target:'
-                       FROM Metadata.QuestionnaireVariables WHERE TableName='",nh_table,"'")
+                       FROM NhanesMetadata.QuestionnaireVariables WHERE TableName='",nh_table,"'")
   
   if(!is.null(colname))
     sql = paste0(sql," AND Variable IN (", toString(sprintf("'%s'", colname)),")")
