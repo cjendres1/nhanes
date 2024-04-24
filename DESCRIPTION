@@ -1,6 +1,6 @@
 Package: nhanesA
-Version: 1.0.2
-Date: 2024-02-26
+Version: 1.0.4
+Date: 2024-04-08
 Title: NHANES Data Retrieval
 Authors@R:
     c(person(given = "Christopher",
@@ -42,4 +42,4 @@ Suggests:
     survey,
     ggplot2
 VignetteBuilder: knitr
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
