@@ -27,22 +27,28 @@ validTables <- function() .dbEnv$validTables
   if (!nzchar(.dbEnv$container_version) || is.na(.dbEnv$collection_date)) {
     return(FALSE) # no DB available for use 
   }
-  if (!requireNamespace("DBI", quietly = TRUE) || !requireNamespace("odbc", quietly = TRUE)) {
+  if (!requireNamespace("DBI", quietly = TRUE) || !requireNamespace("RPostgres", quietly = TRUE)) {
     ## can't use DB because required packages not available
-    warning("Packages 'DBI' and 'odbc' unavailable but required to use database")
+    warning("Packages 'DBI' and 'RPostgres' unavailable but required to use database")
     return(FALSE)
   }
   ## suppress warning from DBI::dbConnect()
   before <- getTaskCallbackNames()
   .dbEnv$cn <-
     DBI::dbConnect(
-      odbc::odbc(),
-      uid = Sys.getenv("EPICONDUCTOR_DB_UID", unset = "sa"),
-      pwd = Sys.getenv("SA_PASSWORD", unset = "yourStrong(!)Password"),
-      server = Sys.getenv("EPICONDUCTOR_DB_SERVER", unset = "localhost"),
-      port = as.integer(Sys.getenv("EPICONDUCTOR_DB_PORT", unset = "1433")),
-      database = Sys.getenv("EPICONDUCTOR_DB_DATABASE", unset = "NhanesLandingZone"),
-      driver = Sys.getenv("EPICONDUCTOR_DB_DRIVER", unset = "ODBC Driver 17 for SQL Server")
+      RPostgres::Postgres(),
+      dbname = "NhanesLandingZone",
+      host = "localhost",
+      port = 5432L,
+      password = "NHAN35",
+      user = "sa")
+
+      
+      user = Sys.getenv("EPICONDUCTOR_DB_UID", unset = "sa"),
+      password = Sys.getenv("SA_PASSWORD", unset = "NHAN35"),
+      host = Sys.getenv("EPICONDUCTOR_DB_SERVER", unset = "localhost"),
+      port = as.integer(Sys.getenv("EPICONDUCTOR_DB_PORT", unset = "5432")),
+      dbname = Sys.getenv("EPICONDUCTOR_DB_DATABASE", unset = "NhanesLandingZone")
     )
     after <- getTaskCallbackNames()
     removeTaskCallback(which(!after %in% before))
@@ -53,7 +59,8 @@ validTables <- function() .dbEnv$validTables
 {
   if (isTRUE(.dbEnv$ok)) return(TRUE) # already set up
   ## otherwise try to set it up
-  if (.dbEnv$ok <- .connect_db()) {
+  status <- isTRUE(try(.connect_db(), silent = TRUE))
+  if (.dbEnv$ok <- status) {
     .dbEnv$translatedTables <-
       .nhanesQuery(
         "SELECT DISTINCT TABLE_NAME
