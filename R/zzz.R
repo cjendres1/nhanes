@@ -37,13 +37,6 @@ validTables <- function() .dbEnv$validTables
   .dbEnv$cn <-
     DBI::dbConnect(
       RPostgres::Postgres(),
-      dbname = "NhanesLandingZone",
-      host = "localhost",
-      port = 5432L,
-      password = "NHAN35",
-      user = "sa")
-
-      
       user = Sys.getenv("EPICONDUCTOR_DB_UID", unset = "sa"),
       password = Sys.getenv("SA_PASSWORD", unset = "NHAN35"),
       host = Sys.getenv("EPICONDUCTOR_DB_SERVER", unset = "localhost"),
