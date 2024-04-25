@@ -54,16 +54,15 @@ validTables <- function() .dbEnv$validTables
   ## otherwise try to set it up
   status <- isTRUE(try(.connect_db(), silent = TRUE))
   if (.dbEnv$ok <- status) {
-    .dbEnv$translatedTables <-
-      .nhanesQuery(
-        "SELECT DISTINCT TABLE_NAME
-         FROM INFORMATION_SCHEMA.TABLES
-         WHERE TABLE_TYPE = 'BASE TABLE'
-         AND TABLE_CATALOG='NhanesLandingZone'
-         AND TABLE_SCHEMA = 'Translated'")$TABLE_NAME
+    allDBTables <- .nhanesQuery(paste("SELECT DISTINCT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES", 
+                                      "WHERE TABLE_TYPE = 'BASE TABLE' AND ", 
+                                      "TABLE_CATALOG = 'NhanesLandingZone'"))$table_name
+    trTables <- allDBTables[startsWith(allDBTables, "Translated.")]
+    .dbEnv$translatedTables <- gsub("Translated.", "", trTables, fixed = TRUE)
     .dbEnv$validTables <- 
       .nhanesQuery(
-        "SELECT DISTINCT TableName FROM Metadata.QuestionnaireVariables;")$TableName
+#        'SELECT DISTINCT "TableName" FROM Metadata.QuestionnaireVariables;')$TableName
+        'SELECT DISTINCT "Table" FROM "Metadata.QuestionnaireVariables";')$Table
   }
   return(.dbEnv$ok)
 }
