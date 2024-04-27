@@ -61,7 +61,7 @@ validTables <- function() .dbEnv$validTables
     .dbEnv$translatedTables <- gsub("Translated.", "", trTables, fixed = TRUE)
     .dbEnv$validTables <- 
       .nhanesQuery(
-        'SELECT DISTINCT TableName FROM Metadata.QuestionnaireVariables;')$TableName
+        'SELECT DISTINCT TableName FROM "Metadata.QuestionnaireVariables";')$tablename
   }
   return(.dbEnv$ok)
 }
