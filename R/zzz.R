@@ -40,6 +40,7 @@ validTables <- function() .dbEnv$validTables
       user = Sys.getenv("EPICONDUCTOR_DB_UID", unset = "sa"),
       password = Sys.getenv("SA_PASSWORD", unset = "NHAN35"),
       host = Sys.getenv("EPICONDUCTOR_DB_SERVER", unset = "localhost"),
+      ## host = Sys.getenv("EPICONDUCTOR_DB_SERVER", unset = "0.0.0.0"),
       port = as.integer(Sys.getenv("EPICONDUCTOR_DB_PORT", unset = "5432")),
       dbname = Sys.getenv("EPICONDUCTOR_DB_DATABASE", unset = "NhanesLandingZone")
     )

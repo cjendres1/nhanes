@@ -95,7 +95,7 @@
                      FROM [Metadata].[QuestionnaireVariables] 
                      WHERE TableName = '",nh_table,"'")
   nh_table = .convertTranslatedTable(nh_table,translated)
-  sql = paste0("SELECT * FROM ",nh_table)
+  sql = paste0('SELECT * FROM "', nh_table, '"')
   nh_df = .nhanesQuery(sql)
   if(includelabels){
     var_label = .nhanesQuery(label_sql)
@@ -135,8 +135,6 @@
                   FROM Metadata.QuestionnaireDescriptions Q
                   JOIN Metadata.QuestionnaireVariables V ON V.TableName = Q.TableName
                   WHERE V.Variable IN (", toString(sprintf("'%s'", varnames)),")")
-
-
 
   if(!is.null(ystart)){
     sql <- paste(sql,"AND Q.BeginYear >=",ystart)
@@ -313,12 +311,13 @@
   # FIXME: we need handle multiple targets once DB is updated!
   .checkTableNames(nh_table)
 
-  sql = paste0("SELECT Variable AS 'Variable Name:',
-                       SasLabel AS 'SAS Label:',
-                       Description AS 'English Text:',
-                       Target AS 'Target:'
-                       FROM Metadata.QuestionnaireVariables WHERE TableName='",nh_table,"'")
-  
+  sql = paste0('SELECT Variable AS "Variable Name:",
+                       SasLabel AS "SAS Label:",
+                       Description AS "English Text:",
+                       Target AS "Target:"
+                       FROM "Metadata.QuestionnaireVariables" WHERE TableName = \'',
+               nh_table, '\'')
+    
   if(!is.null(colname))
     sql = paste0(sql," AND Variable IN (", toString(sprintf("'%s'", colname)),")")
 
