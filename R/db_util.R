@@ -68,18 +68,20 @@
   ## suppress warning from DBI::dbConnect()
   before <- getTaskCallbackNames()
   .dbEnv$cn <-
-    DBI::dbConnect(
-      odbc::odbc(),
-      uid = Sys.getenv("EPICONDUCTOR_DB_UID", unset = "sa"),
-      pwd = Sys.getenv("SA_PASSWORD", unset = "yourStrong(!)Password"),
-      server = Sys.getenv("EPICONDUCTOR_DB_SERVER", unset = "localhost"),
-      port = as.integer(Sys.getenv("EPICONDUCTOR_DB_PORT", unset = "1433")),
-      database = Sys.getenv("EPICONDUCTOR_DB_DATABASE", unset = "NhanesLandingZone"),
-      driver = Sys.getenv("EPICONDUCTOR_DB_DRIVER", unset = "ODBC Driver 17 for SQL Server")
-    )
-    after <- getTaskCallbackNames()
-    removeTaskCallback(which(!after %in% before))
-  return(TRUE)
+    try(
+      DBI::dbConnect(
+        odbc::odbc(),
+        uid = Sys.getenv("EPICONDUCTOR_DB_UID", unset = "sa"),
+        pwd = Sys.getenv("SA_PASSWORD", unset = "yourStrong(!)Password"),
+        server = Sys.getenv("EPICONDUCTOR_DB_SERVER", unset = "localhost"),
+        port = as.integer(Sys.getenv("EPICONDUCTOR_DB_PORT", unset = "1433")),
+        database = Sys.getenv("EPICONDUCTOR_DB_DATABASE", unset = "NhanesLandingZone"),
+        driver = Sys.getenv("EPICONDUCTOR_DB_DRIVER", unset = "ODBC Driver 17 for SQL Server")
+      ),
+      silent = TRUE)
+  after <- getTaskCallbackNames()
+  removeTaskCallback(which(!after %in% before))
+  return(is(.dbEnv$cn, "DBIConnection"))
 }
 
 .connect_db_mariadb <- function()
@@ -100,17 +102,19 @@
   ## suppress warning from DBI::dbConnect()
   before <- getTaskCallbackNames()
   .dbEnv$cn <-
-    DBI::dbConnect(
-      RMariaDB::MariaDB(),
-      username = Sys.getenv("EPICONDUCTOR_DB_UID", unset = "admin"),
-      password = Sys.getenv("SA_PASSWORD", unset = "C0lumnStore!"),
-      host = Sys.getenv("EPICONDUCTOR_DB_SERVER", unset = "localhost"),
-      port = as.integer(Sys.getenv("EPICONDUCTOR_DB_PORT", unset = "3306")),
-      mysql = FALSE
-    )
-    after <- getTaskCallbackNames()
-    removeTaskCallback(which(!after %in% before))
-  return(TRUE)
+    try(
+      DBI::dbConnect(
+        RMariaDB::MariaDB(),
+        username = Sys.getenv("EPICONDUCTOR_DB_UID", unset = "admin"),
+        password = Sys.getenv("SA_PASSWORD", unset = "C0lumnStore!"),
+        host = Sys.getenv("EPICONDUCTOR_DB_SERVER", unset = "localhost"),
+        port = as.integer(Sys.getenv("EPICONDUCTOR_DB_PORT", unset = "3306")),
+        mysql = FALSE
+      ),
+      silent = TRUE)
+  after <- getTaskCallbackNames()
+  removeTaskCallback(which(!after %in% before))
+  return(is(.dbEnv$cn, "DBIConnection"))
 }
 
 
@@ -137,6 +141,8 @@
       .nhanesQuery(
         "SELECT DISTINCT TableName FROM Metadata.QuestionnaireVariables;")$TableName
   }
+  if (inherits(.dbEnv$cn, "try-error"))
+    warning("Unable to connect to DB, falling back to online downloads")
   return(.dbEnv$ok)
 }
 
