@@ -211,21 +211,18 @@
   }
 
   if(length(nh_table) > 1 ) stop("you can only select one table")
-  if(details){
-    sql = "SELECT Variable,CodeOrValue AS 'Code.or.Value',ValueDescription AS 'Value.Description',
-            Count,Cumulative,SkipToItem AS 'Skip.to.Item'
-            FROM Metadata.VariableCodebook WHERE TableName='"
+  if(details) {
+    sql = 'SELECT Variable as "Variable", CodeOrValue AS "Code.or.Value", ValueDescription AS "Value.Description", Count AS "Count", Cumulative AS "Cumulative", SkipToItem AS "Skip.to.Item" FROM "Metadata.VariableCodebook" WHERE TableName=\''
   } else {
-    sql = "SELECT Variable,CodeOrValue AS 'Code.or.Value',ValueDescription AS 'Value.Description'
-             FROM Metadata.VariableCodebook WHERE TableName='"
+    sql = 'SELECT Variable as "Variable", CodeOrValue AS "Code.or.Value", ValueDescription AS "Value.Description" FROM "Metadata.VariableCodebook" WHERE TableName=\''
   }
   sql = paste0(sql,nh_table,"'")
-  if(!is.null(colnames))
-    sql = paste0(sql," AND Variable IN (", toString(sprintf("'%s'", colnames)),")")
+  if(!is.null(colnames)) # FIXME: check if this needs to be adjusted
+    sql = paste0(sql, " AND Variable IN (", toString(sprintf("'%s'", colnames)),")")
 
   df =.nhanesQuery(sql)
-  ans=split(df[-which(names(df)=="Variable")], df$Variable)
-  ans=lapply(ans,function(x){row.names(x)=NULL;x}) # reset row names
+  ans = split(df[-which(names(df)=="Variable")], df$Variable)
+  ans = lapply(ans,function(x){row.names(x)=NULL;x}) # reset row names
   ans
 }
 
@@ -333,7 +330,7 @@
   res.list = lapply(res.list, as.list)
   names(res.list) = colname
 
-  trans = nhanesTranslate(nh_table, colname,details = TRUE)
+  trans = nhanesTranslate(nh_table, colname, details = TRUE)
 
   for (code in names(res.list)){
     if(code %in% names(trans)){
