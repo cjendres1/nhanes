@@ -1,0 +1,10 @@
+bibentry(
+  bibtype  = "Article",
+  title    = "nhanesA: achieving transparency and reproducibility in NHANES research",
+  author   = "Laha Ale and Robert Gentleman and Teresa Filshtein Sonmez and Deepayan Sarkar and Christopher Endres",
+  journal  = "Database",
+  year     = "2024",
+  volume   = "Apr 15",
+  doi      = "10.1093/database/baae028",
+  url      = "https://doi.org/10.1093/database/baae028"
+)

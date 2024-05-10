@@ -72,6 +72,7 @@ nhanes <- function(nh_table, includelabels = FALSE,
     tf <- tempfile()
     if (isTRUE(nhanesOptions("log.access"))) message("Downloading: ", url)
     download.file(url, tf, mode = "wb", quiet = TRUE)
+    on.exit(unlink(tf), add = TRUE)
     
     nh_df <- read.xport(tf, check.names = FALSE)
 
@@ -154,6 +155,8 @@ nhanesFromURL <- function(url, translated = TRUE, cleanse_numeric = TRUE,
       if (isTRUE(nhanesOptions("log.access"))) message("Downloading: ", url)
       download.file(url, tf, mode = "wb", quiet = TRUE)
       nh_df <- read.xport(tf, check.names = FALSE)
+      unlink(tf)
+      nh_df
     },
     error = function(cond) {
       stop(paste0("could not find a XPT file at: ", url))
@@ -232,6 +235,7 @@ nhanesDXA <- function(year, suppl=FALSE, destfile=NULL, adjust_timeout = TRUE) {
         return(ok)
       } else {
         tf <- tempfile()
+        on.exit(unlink(tf), add = TRUE)
         ok <- suppressWarnings(tryCatch({download.file(url, tf, mode="wb", quiet=TRUE)},
                                         error=function(cond){message(cond); return(NULL)}))
         if(!is.null(ok)) {
@@ -290,6 +294,7 @@ nhanesAttr <- function(nh_table) {
     }
     
     tf <- tempfile()
+    on.exit(unlink(tf), add = TRUE)
     if (isTRUE(nhanesOptions("log.access"))) message("Downloading: ", url)
     download.file(url, tf, mode = "wb", quiet = TRUE)
     
