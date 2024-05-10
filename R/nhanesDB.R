@@ -1,5 +1,6 @@
 # nhanesDB - retrieve nhanes data from the local container
 # Laha Ale and Robert Gentleman 06/08/2023
+# With updates by Deepayan Sarkar (May 2024)
 
 .nhanesTablesDB <-
     function(data_group, year,
@@ -88,16 +89,21 @@
 }
 
 
-.nhanesDB <- function(nh_table, includelabels = FALSE, translated=TRUE)
+.nhanesDB <- function(nh_table, includelabels = FALSE, translated = TRUE)
 {
   .checkTableNames(nh_table)
-  label_sql = paste0("SELECT Variable,Description 
-                     FROM [NhanesMetadata].[QuestionnaireVariables] 
-                     WHERE TableName = '",nh_table,"'")
-  nh_table = .convertTranslatedTable(nh_table,translated)
-  sql = paste0("SELECT * FROM ",nh_table)
+
+  label_sql = paste0('SELECT Variable, Description ',
+                     sprintf('  FROM %s ', MetadataTable("QuestionnaireVariables")),
+                     sprintf('  WHERE TableName = \'%s\'', nh_table))
+
+  ## label_sql = paste0("SELECT Variable,Description 
+  ##                    FROM [NhanesMetadata].[QuestionnaireVariables] 
+  ##                    WHERE TableName = '",nh_table,"'")
+  nh_table = .convertTranslatedTable(nh_table, translated)
+  sql = sprintf('SELECT * FROM %s', nh_table)
   nh_df = .nhanesQuery(sql)
-  if(includelabels){
+  if(includelabels) {
     var_label = .nhanesQuery(label_sql)
     column_labels = var_label$Description
     column_names = var_label$Variable
@@ -112,9 +118,7 @@
       message(paste0("Column names and labels are not consistent for table ", nh_table, ". No labels added"))
     }
   }
-  
   nh_df
-  
 }
 
 
@@ -213,21 +217,32 @@
   }
 
   if(length(nh_table) > 1 ) stop("you can only select one table")
-  if(details){
-    sql = "SELECT Variable,CodeOrValue AS 'Code.or.Value',ValueDescription AS 'Value.Description',
-            Count,Cumulative,SkipToItem AS 'Skip.to.Item'
-            FROM NhanesMetadata.VariableCodebook WHERE TableName='"
-  } else {
-    sql = "SELECT Variable,CodeOrValue AS 'Code.or.Value',ValueDescription AS 'Value.Description'
-             FROM NhanesMetadata.VariableCodebook WHERE TableName='"
+  sql <-
+    if(details) {
+      paste0('SELECT Variable AS "Variable", ', 
+             '       CodeOrValue AS "Code.or.Value", ',
+             '       ValueDescription AS "Value.Description", ',
+             '       Count AS "Count", ',
+             '       Cumulative AS "Cumulative", ',
+             '       SkipToItem AS "Skip.to.Item" ',
+             sprintf('  FROM %s ', MetadataTable("VariableCodebook")),
+             sprintf('  WHERE TableName = \'%s\'', nh_table))
+    } else {
+      paste0('SELECT Variable AS "Variable", ', 
+             '       CodeOrValue AS "Code.or.Value", ',
+             '       ValueDescription AS "Value.Description" ',
+             sprintf('  FROM %s ', MetadataTable("VariableCodebook")),
+             sprintf('  WHERE TableName = \'%s\'', nh_table))
   }
-  sql = paste0(sql,nh_table,"'")
   if(!is.null(colnames))
-    sql = paste0(sql," AND Variable IN (", toString(sprintf("'%s'", colnames)),")")
+    sql = paste0(sql,
+                 ' AND Variable IN (',
+                 toString(sprintf("'%s'", colnames)),
+                 ')')
 
-  df =.nhanesQuery(sql)
-  ans=split(df[-which(names(df)=="Variable")], df$Variable)
-  ans=lapply(ans,function(x){row.names(x)=NULL;x}) # reset row names
+  df  = .nhanesQuery(sql)
+  ans = split(df[-which(names(df)=="Variable")], df$Variable)
+  ans = lapply(ans,function(x){row.names(x)=NULL;x}) # reset row names
   ans
 }
 
@@ -313,19 +328,29 @@
   # FIXME: we need handle multiple targets once DB is updated!
   .checkTableNames(nh_table)
 
-  sql = paste0("SELECT Variable AS 'Variable Name:',
-                       SasLabel AS 'SAS Label:',
-                       Description AS 'English Text:',
-                       Target AS 'Target:'
-                       FROM NhanesMetadata.QuestionnaireVariables WHERE TableName='",nh_table,"'")
+  sql = paste0('SELECT Variable AS "Variable Name:", ',
+               '       SasLabel AS "SAS Label:", ',
+               '       Description AS "English Text:", ',
+               '       Target AS "Target:" ',
+               sprintf('  FROM %s ', MetadataTable("QuestionnaireVariables")),
+               sprintf('  WHERE TableName = \'%s\'', nh_table))
+ 
+  
+  ## sql = paste0("SELECT Variable AS 'Variable Name:',
+  ##                      SasLabel AS 'SAS Label:',
+  ##                      Description AS 'English Text:',
+  ##                      Target AS 'Target:'
+  ##                      FROM NhanesMetadata.QuestionnaireVariables WHERE TableName='",nh_table,"'")
   
   if(!is.null(colname))
-    sql = paste0(sql," AND Variable IN (", toString(sprintf("'%s'", colname)),")")
+    sql = paste0(sql,
+                 ' AND Variable IN (', toString(sprintf("'%s'", colname)),
+                 ' )')
 
   # res = as.list(t(.nhanesQuery(sql)))
   res = .nhanesQuery(sql)
 
-  if(length(res[[1]])==0){
+  if(length(res[[1]]) == 0){
     stop(paste0("The variable \"",colname,"\" is not found in the data file/table \"",nh_table,"\".
                 Please check the table and variable name!"))
   }
@@ -334,7 +359,8 @@
   res.list = lapply(res.list, as.list)
   names(res.list) = colname
 
-  trans = nhanesTranslate(nh_table, colname,details = TRUE)
+  str(list(nh_table = nh_table, colname = colname))
+  trans = nhanesTranslate(nh_table, colname, details = TRUE)
 
   for (code in names(res.list)){
     if(code %in% names(trans)){

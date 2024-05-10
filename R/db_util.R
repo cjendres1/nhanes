@@ -1,4 +1,29 @@
 
+
+## Abstraction for DB access to hide backend-specific implementation
+## details.
+
+## We assume that we have three types of tables (in three schemas when
+## schemas are supported): Metadata, Raw, Translated. Naming
+## conventions may be different for different backends. We use
+## constructor functions to determine suitably quoted identifiers.
+
+.constructId <- function(conn, schema, table)
+{
+    backend <- class(conn) |> attr("package")
+    switch(backend,
+           odbc = sprintf('"%s"."%s"', schema, table),
+           RPostgres = sprintf('"%s.%s"', schema, table),
+           RMariaDB = sprintf('Nhanes%s.%s', schema, table),
+           stop("Unsupported DB backend: ", backend))
+}
+
+MetadataTable <- function(x, conn = cn()) .constructId(conn, "Metadata", x)
+RawTable <- function(x, conn = cn()) .constructId(conn, "Raw", x)
+TranslatedTable <- function(x, conn = cn()) .constructId(conn, "Translated", x)
+
+
+
 ## Query data from the Docker database
 ## examples: nhanesQuery("SELECT TOP(50) * FROM QuestionnaireVariables;")
 
@@ -32,19 +57,17 @@
 .convertTranslatedTable <- function(table_name, translated)
 {
   if (!.dbEnv$ok) stop("no database available for use")
-  prefix <-
-    if (translated)
+  if (translated)
+  {
+    ok <- (table_name %in% translatedTables()) # whether translated tables exist
+    if (any(!ok))
     {
-      ok <- (table_name %in% translatedTables()) # whether translated tables exist
-      if (any(!ok))
-      {
-        warning("Table(s) ", paste(table_name[!ok], collapse = ", "),
-                " missing from Translated schema, using Raw schema instead.")
-      }
-      ifelse(ok, "NhanesTranslated.", "NhanesRaw.")
+      warning("Table(s) ", paste(table_name[!ok], collapse = ", "),
+              " missing from Translated schema, using Raw schema instead.")
     }
-    else "NhanesRaw."
-  paste0(prefix, table_name)
+    ifelse(ok, TranslatedTable(table_name), RawTable(table_name))
+  }
+  else RawTable(table_name)
 }
 
 
@@ -125,9 +148,9 @@
   if (.dbEnv$ok <- .connect_db_mariadb()) {
     .dbEnv$translatedTables <-
       .nhanesQuery("SHOW TABLES FROM NhanesTranslated")[[1]]
-    .dbEnv$validTables <- 
-      .nhanesQuery(
-        "SELECT DISTINCT TableName FROM NhanesMetadata.QuestionnaireVariables;")$TableName
+    ## .dbEnv$validTables <- 
+    ##   .nhanesQuery(
+    ##     "SELECT DISTINCT TableName FROM NhanesMetadata.QuestionnaireVariables;")$TableName
   }
   else if (.dbEnv$ok <- .connect_db_mssql()) {
     .dbEnv$translatedTables <-
@@ -137,12 +160,19 @@
          WHERE TABLE_TYPE = 'BASE TABLE'
          AND TABLE_CATALOG='NhanesLandingZone'
          AND TABLE_SCHEMA = 'Translated'")$TABLE_NAME
-    .dbEnv$validTables <- 
-      .nhanesQuery(
-        "SELECT DISTINCT TableName FROM Metadata.QuestionnaireVariables;")$TableName
+    ## .dbEnv$validTables <- 
+    ##   .nhanesQuery(
+    ##     "SELECT DISTINCT TableName FROM Metadata.QuestionnaireVariables;")$TableName
   }
   if (inherits(.dbEnv$cn, "try-error"))
     warning("Unable to connect to DB, falling back to online downloads")
+  else {
+    .dbEnv$validTables <- 
+      .nhanesQuery(
+        sprintf("SELECT DISTINCT TableName FROM %s;",
+                MetadataTable("QuestionnaireVariables"))
+      )$TableName
+  }
   return(.dbEnv$ok)
 }
 
