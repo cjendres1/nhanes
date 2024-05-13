@@ -231,7 +231,7 @@ nhanesManifest_limitedaccess <- function(verbose)
   skip <- (tab2 %in% c("#", "/Nchs/Nhanes/Omp/Default.aspx"))
   tab2 <- tab2[!skip]
   ##whenever they update we need to error out and then fix it
-  if(length(tab2) != 223) stop("CDC updated data manifest")
+  if(length(tab2) != 224) stop("CDC updated data manifest")
   htmNames = tab2
   df = tab1 |> html_table() |> as.data.frame()
   df = subset(df, !skip)
