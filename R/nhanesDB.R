@@ -281,9 +281,11 @@
     }
   }
 
-  if(ignore.case){
+  ## if (ignore.case){
+  ##   sql = gsub("COLLATE SQL_Latin1_General_CP1_CS_AS", "", sql)
+  ## }
+  if (!ignore.case){
     warning("'ignore.case = FALSE' is not supported in the DB version of nhanesSearch()")
-    ## sql = gsub("COLLATE SQL_Latin1_General_CP1_CS_AS", "", sql)
   }
 
   if(!is.null(data_group)){
