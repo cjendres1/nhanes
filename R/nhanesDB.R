@@ -18,24 +18,21 @@
   ##construct SQL queries
 
   tables <-
-      paste0("SELECT TableName AS 'Data.File.Name',
-                Description as 'Data.File.Description',
-                CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS Component,
-                BeginYear AS 'Begin.Year', EndYear
-                FROM
-                NhanesMetadata.QuestionnaireDescriptions where DataGroup='",
-                  data_group, "' and BeginYear=", if (EVEN) year-1 else year)
-
-  if(details==FALSE){
-    tables = paste0("SELECT TableName AS 'Data.File.Name',
-                Description as 'Data.File.Description'
-                FROM
-                NhanesMetadata.QuestionnaireDescriptions where DataGroup='",
-                    data_group, "' and BeginYear=",ifelse(EVEN, year-1, year))
-  }
-
+    if (isTRUE(details))
+      paste0('SELECT TableName AS "Data.File.Name", ',
+             '       Description as "Data.File.Description", ',
+             '       CONCAT(SUBSTRING(DataGroup,1,1), LOWER(SUBSTRING(DataGroup,2,20))) AS "Component", ',
+             '       BeginYear AS "Begin.Year", ',
+             '       EndYear AS "EndYear" ',
+             sprintf('  FROM %s ', MetadataTable("QuestionnaireDescriptions")),
+             sprintf('  WHERE DataGroup=\'%s\' AND BeginYear = %d', data_group, if (EVEN) year - 1 else year))
+      else
+        paste0('SELECT TableName AS "Data.File.Name", ',
+               '       Description as "Data.File.Description" ',
+               sprintf('  FROM %s ', MetadataTable("QuestionnaireDescriptions")),
+               sprintf('  WHERE DataGroup=\'%s\' AND BeginYear = %d', data_group, if (EVEN) year - 1 else year))
   df =.nhanesQuery(tables)
-  if(namesonly){
+  if (namesonly) {
     return(unique(df$Data.File.Name))
   } else {
     return(df)
@@ -65,25 +62,25 @@
 
   .checkTableNames(nh_table)
 
-  sql = paste0("SELECT DISTINCT V.Variable AS 'Variable.Name',
-                       SUBSTRING(V.Description,1,",nchar,") AS 'Variable.Description',
-                       V.TableName AS 'Data.File.Name',
-                       SUBSTRING(Q.[Description],1,",nchar,") AS 'Data.File.Description',
-                       BeginYear AS 'Begin.Year', EndYear,
-                       CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS Component
-                  FROM NhanesMetadata.QuestionnaireDescriptions Q
-                  JOIN NhanesMetadata.QuestionnaireVariables V ON V.TableName = Q.TableName
-                  WHERE V.TableName = '",nh_table,"'")
-  if(!is.null(data_group)){
-    sql = paste0(sql," AND DataGroup LIKE '",data_group,"%'")
+  sql = paste0('SELECT DISTINCT V.Variable AS "Variable.Name", ',
+               '       SUBSTRING(V.Description,1,', nchar, ') AS "Variable.Description", ',
+               '       V.TableName AS "Data.File.Name", ',
+               '       SUBSTRING(Q.Description,1,', nchar, ') AS "Data.File.Description", ',
+               '       BeginYear AS "Begin.Year", ',
+               '       EndYear AS "EndYear", ',
+               '       CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS "Component" ',
+               sprintf('   FROM %s Q ', MetadataTable("QuestionnaireDescriptions")),
+               sprintf('   JOIN %s V ON V.TableName = Q.TableName ', MetadataTable("QuestionnaireVariables")),
+               sprintf('   WHERE V.TableName = \'%s\'', nh_table))
+  if (!is.null(data_group)) {
+    sql = paste0(sql, " AND DataGroup LIKE '", data_group, "%'")
   }
-
   df <- .nhanesQuery(sql)
-  if(namesonly){
+  if (namesonly) {
     return(unique(df$Variable.Name))
-  }else if(!details){
+  } else if (!details) {
     return(df[,c('Variable.Name','Variable.Description')])
-  }else{
+  } else {
     return(df)
   }
 }
@@ -133,10 +130,8 @@
   ## FIXME: simplify query when namesonly = TRUE?
   sql = paste0('SELECT DISTINCT V.Variable AS "Variable.Name", ', 
                '       SUBSTRING(V.Description,1,', nchar, ') AS "Variable.Description", ',
-               ## '       V.Description AS "Variable.Description", ',
                '       V.TableName AS "Data.File.Name", ',
-               '       SUBSTRING(Q.[Description],1,', nchar, ') AS "Data.File.Description", ',
-               ## '       Q.[Description] AS "Data.File.Description", ',
+               '       SUBSTRING(Q.Description,1,', nchar, ') AS "Data.File.Description", ',
                '       BeginYear AS "Begin.Year", EndYear AS "EndYear", ',
                '       CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS "Component" ',
                sprintf('  FROM %s Q ', MetadataTable("QuestionnaireDescriptions")),
@@ -195,7 +190,6 @@
     warning(paste("Cannot find any table name like:", pattern, "!"))
   }
 
-  str(df)
   if(details)
     return(df)
   else
@@ -247,49 +241,50 @@
 
 
 .nhanesSearchDB <- function( search_terms = NULL,
-                         exclude_terms = NULL,
-                         data_group = NULL,
-                         ignore.case = FALSE,
-                         ystart = NULL,
-                         ystop = NULL,
-                         includerdc = FALSE,
-                         nchar = 128,
-                         namesonly = FALSE)
+                            exclude_terms = NULL,
+                            data_group = NULL,
+                            ignore.case = FALSE,
+                            ystart = NULL,
+                            ystop = NULL,
+                            includerdc = FALSE,
+                            nchar = 128,
+                            namesonly = FALSE)
 {
 
   sql = paste0('SELECT V.Variable AS "Variable.Name", ',
                '       SUBSTRING(V.Description,1,', nchar, ') AS "Variable.Description", ',
                '       V.TableName AS "Data.File.Name", ',
-               '       SUBSTRING(Q.[Description],1,', nchar, ') AS "Data.File.Description", ',
+               '       SUBSTRING(Q.Description,1,', nchar, ') AS "Data.File.Description", ',
                '       BeginYear AS "Begin.Year", EndYear AS "EndYear", ',
                '       CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS "Component" ',
                sprintf('   FROM %s Q ', MetadataTable("QuestionnaireDescriptions")),
                sprintf('   JOIN %s V ON V.TableName = Q.TableName ', MetadataTable("QuestionnaireVariables")),
-               sprintf('   WHERE (V.Description COLLATE SQL_Latin1_General_CP1_CS_AS LIKE \'%%%s%%\'',
-                       search_terms[1]))
+               ## sprintf('   WHERE (V.Description COLLATE SQL_Latin1_General_CP1_CS_AS LIKE \'%%%s%%\'',
+               sprintf('   WHERE (LOWER(V.Description) LIKE \'%%%s%%\'',
+                       tolower(search_terms[1])))
 
   # COLLATE SQL_Latin1_General_CP1_CS_AS  : is to make case sensitive pattern match
 
   # match multiple patterns
-  if (length(search_terms)>=2){
-    for (term in search_terms[2:length(search_terms)]){
-      sql = paste0(sql, " OR V.Description COLLATE SQL_Latin1_General_CP1_CS_AS LIKE '%", term, "%'")
+  if (length(search_terms) >= 2) {
+    for (term in search_terms[2:length(search_terms)]) {
+      ## sql = paste0(sql, " OR V.Description COLLATE SQL_Latin1_General_CP1_CS_AS LIKE '%", term, "%'")
+      sql = paste0(sql, " OR LOWER(V.Description) LIKE '%", tolower(term), "%'")
     }
   }
   sql = paste0(sql,")")
 
-
-
   if(!is.null(exclude_terms)){
     for (term in exclude_terms){
-      sql = paste0(sql," AND V.Description COLLATE SQL_Latin1_General_CP1_CS_AS NOT LIKE '%",term,"%'")
+      ## sql = paste0(sql," AND V.Description COLLATE SQL_Latin1_General_CP1_CS_AS NOT LIKE '%",term,"%'")
+      sql = paste0(sql," AND LOWER(V.Description) NOT LIKE '%", tolower(term), "%'")
     }
   }
 
   if(ignore.case){
-    sql = gsub("COLLATE SQL_Latin1_General_CP1_CS_AS", "", sql)
+    warning("'ignore.case = FALSE' is not supported in the DB version of nhanesSearch()")
+    ## sql = gsub("COLLATE SQL_Latin1_General_CP1_CS_AS", "", sql)
   }
-
 
   if(!is.null(data_group)){
     if(length(data_group)>1){
