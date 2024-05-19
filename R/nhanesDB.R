@@ -1,5 +1,6 @@
 # nhanesDB - retrieve nhanes data from the local container
 # Laha Ale and Robert Gentleman 06/08/2023
+# With updates by Deepayan Sarkar (May 2024)
 
 .nhanesTablesDB <-
     function(data_group, year,
@@ -22,14 +23,14 @@
                 CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS Component,
                 BeginYear AS 'Begin.Year', EndYear
                 FROM
-                Metadata.QuestionnaireDescriptions where DataGroup='",
+                NhanesMetadata.QuestionnaireDescriptions where DataGroup='",
                   data_group, "' and BeginYear=", if (EVEN) year-1 else year)
 
   if(details==FALSE){
     tables = paste0("SELECT TableName AS 'Data.File.Name',
                 Description as 'Data.File.Description'
                 FROM
-                Metadata.QuestionnaireDescriptions where DataGroup='",
+                NhanesMetadata.QuestionnaireDescriptions where DataGroup='",
                     data_group, "' and BeginYear=",ifelse(EVEN, year-1, year))
   }
 
@@ -70,8 +71,8 @@
                        SUBSTRING(Q.[Description],1,",nchar,") AS 'Data.File.Description',
                        BeginYear AS 'Begin.Year', EndYear,
                        CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS Component
-                  FROM Metadata.QuestionnaireDescriptions Q
-                  JOIN Metadata.QuestionnaireVariables V ON V.TableName = Q.TableName
+                  FROM NhanesMetadata.QuestionnaireDescriptions Q
+                  JOIN NhanesMetadata.QuestionnaireVariables V ON V.TableName = Q.TableName
                   WHERE V.TableName = '",nh_table,"'")
   if(!is.null(data_group)){
     sql = paste0(sql," AND DataGroup LIKE '",data_group,"%'")
@@ -88,16 +89,16 @@
 }
 
 
-.nhanesDB <- function(nh_table, includelabels = FALSE, translated=TRUE)
+.nhanesDB <- function(nh_table, includelabels = FALSE, translated = TRUE)
 {
   .checkTableNames(nh_table)
-  label_sql = paste0("SELECT Variable,Description 
-                     FROM [Metadata].[QuestionnaireVariables] 
-                     WHERE TableName = '",nh_table,"'")
-  nh_table = .convertTranslatedTable(nh_table,translated)
-  sql = paste0('SELECT * FROM "', nh_table, '"')
+  label_sql = paste0('SELECT Variable, Description ',
+                     sprintf('  FROM %s ', MetadataTable("QuestionnaireVariables")),
+                     sprintf('  WHERE TableName = \'%s\'', nh_table))
+  nh_table = .convertTranslatedTable(nh_table, translated)
+  sql = sprintf('SELECT * FROM %s', nh_table)
   nh_df = .nhanesQuery(sql)
-  if(includelabels){
+  if(includelabels) {
     var_label = .nhanesQuery(label_sql)
     column_labels = var_label$Description
     column_names = var_label$Variable
@@ -112,75 +113,71 @@
       message(paste0("Column names and labels are not consistent for table ", nh_table, ". No labels added"))
     }
   }
-  
   nh_df
-  
 }
 
 
 .nhanesSearchVarNameDB <- function(varnames = NULL,
-                                ystart = NULL,
-                                ystop = NULL,
-                                includerdc = FALSE,
-                                nchar = 128,
-                                namesonly = TRUE)
+                                   ystart = NULL,
+                                   ystop = NULL,
+                                   includerdc = FALSE,
+                                   nchar = 128,
+                                   namesonly = TRUE)
 {
-
-  sql = paste0("SELECT DISTINCT V.Variable AS 'Variable.Name',
-                       SUBSTRING(V.Description,1,",nchar,") AS 'Variable.Description',
-                       V.TableName AS 'Data.File.Name',
-                       SUBSTRING(Q.[Description],1,",nchar,") AS 'Data.File.Description',
-                       BeginYear AS 'Begin.Year', EndYear,
-                       CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS Component
-                  FROM Metadata.QuestionnaireDescriptions Q
-                  JOIN Metadata.QuestionnaireVariables V ON V.TableName = Q.TableName
-                  WHERE V.Variable IN (", toString(sprintf("'%s'", varnames)),")")
+  varnames <- toString(sprintf("'%s'", varnames))
+  ## FIXME: simplify query when namesonly = TRUE?
+  sql = paste0('SELECT DISTINCT V.Variable AS "Variable.Name", ', 
+               '       SUBSTRING(V.Description,1,', nchar, ') AS "Variable.Description", ',
+               ## '       V.Description AS "Variable.Description", ',
+               '       V.TableName AS "Data.File.Name", ',
+               '       SUBSTRING(Q.[Description],1,', nchar, ') AS "Data.File.Description", ',
+               ## '       Q.[Description] AS "Data.File.Description", ',
+               '       BeginYear AS "Begin.Year", EndYear AS "EndYear", ',
+               '       CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS "Component" ',
+               sprintf('  FROM %s Q ', MetadataTable("QuestionnaireDescriptions")),
+               sprintf('  JOIN %s V ON V.TableName = Q.TableName ', MetadataTable("QuestionnaireVariables")),
+               sprintf('  WHERE V.Variable IN (%s)', varnames))
 
   if(!is.null(ystart)){
-    sql <- paste(sql,"AND Q.BeginYear >=",ystart)
+    sql <- paste0(sql, ' AND Q.BeginYear >= ', ystart)
   }
   if(!is.null(ystop)){
-    sql <- paste(sql,"AND Q.EndYear <=",ystop)
+    sql <- paste0(sql, ' AND Q.EndYear <= ', ystop)
   }
 
 
   df =.nhanesQuery(sql)
   if(is.null(df)){
-    warning(paste("Variable ",toString(sprintf("'%s'", varnames)), "is not found in the database!"))
+    warning(paste0("Variable ", varnames, " is not found in the database!"))
   }
-
 
   if(namesonly){
     df = unique(df$Data.File.Name)
   }
-
   df
-
 }
 
 
 .nhanesSearchTableNamesDB <- function(pattern = NULL,
-                                    ystart = NULL,
-                                    ystop = NULL,
-                                    includerdc = FALSE,
-                                    includewithdrawn=FALSE,
-                                    nchar = 128,
-                                    details = FALSE)
+                                      ystart = NULL,
+                                      ystop = NULL,
+                                      includerdc = FALSE,
+                                      includewithdrawn=FALSE,
+                                      nchar = 128,
+                                      details = FALSE)
 {
-
-  sql <- paste0("SELECT DISTINCT TableName,
-                        CONCAT(Q.BeginYear, '-', Q.EndYear) AS Years
-                      FROM Metadata.QuestionnaireDescriptions Q
-                  WHERE TableName LIKE '%",pattern,"%'"
-  )
-  if(!is.null(ystart)){
-    sql = paste(sql,"AND Q.BeginYear >=",ystart)
+  sql <- paste0('SELECT DISTINCT TableName AS "TableName", ',
+                '       CONCAT(Q.BeginYear, \'-\', Q.EndYear) AS "Years" ',
+                sprintf('  FROM %s Q', MetadataTable("QuestionnaireDescriptions")),
+                sprintf('  WHERE TableName LIKE \'%%%s%%\'', pattern))
+  if(!is.null(ystart)) {
+    sql = paste0(sql, ' AND Q.BeginYear >= ', ystart)
   }
-  if(!is.null(ystop)){
-    sql <- paste(sql,"AND Q.EndYear <=",ystop)
+  if(!is.null(ystop)) {
+    sql <- paste0(sql, ' AND Q.EndYear <= ', ystop)
   }
 
-  if( includerdc ) warning("The DB has no restricted data")
+  if (includerdc) warning("The DB has no restricted data")
 
   df =.nhanesQuery(sql)
 
@@ -190,13 +187,16 @@
   # }
 
   if(is.null(df) | nrow(df)==0){
-    warning(paste("Cannot find any table name like:",pattern,"!"))
+    warning(paste("Cannot find any table name like:", pattern, "!"))
   }
 
+  str(df)
   if(details)
     return(df)
   else
     return(unique(df$TableName))
+  ## FIXME: do we want to use years as names?
+  ## return(with(df, structure(TableName, names = Years)))
 }
 
 
@@ -211,16 +211,30 @@
   }
 
   if(length(nh_table) > 1 ) stop("you can only select one table")
-  if(details) {
-    sql = 'SELECT Variable as "Variable", CodeOrValue AS "Code.or.Value", ValueDescription AS "Value.Description", Count AS "Count", Cumulative AS "Cumulative", SkipToItem AS "Skip.to.Item" FROM "Metadata.VariableCodebook" WHERE TableName=\''
-  } else {
-    sql = 'SELECT Variable as "Variable", CodeOrValue AS "Code.or.Value", ValueDescription AS "Value.Description" FROM "Metadata.VariableCodebook" WHERE TableName=\''
+  sql <-
+    if(details) {
+      paste0('SELECT Variable AS "Variable", ', 
+             '       CodeOrValue AS "Code.or.Value", ',
+             '       ValueDescription AS "Value.Description", ',
+             '       Count AS "Count", ',
+             '       Cumulative AS "Cumulative", ',
+             '       SkipToItem AS "Skip.to.Item" ',
+             sprintf('  FROM %s ', MetadataTable("VariableCodebook")),
+             sprintf('  WHERE TableName = \'%s\'', nh_table))
+    } else {
+      paste0('SELECT Variable AS "Variable", ', 
+             '       CodeOrValue AS "Code.or.Value", ',
+             '       ValueDescription AS "Value.Description" ',
+             sprintf('  FROM %s ', MetadataTable("VariableCodebook")),
+             sprintf('  WHERE TableName = \'%s\'', nh_table))
   }
-  sql = paste0(sql,nh_table,"'")
-  if(!is.null(colnames)) # FIXME: check if this needs to be adjusted
-    sql = paste0(sql, " AND Variable IN (", toString(sprintf("'%s'", colnames)),")")
+  if(!is.null(colnames))
+    sql = paste0(sql,
+                 ' AND Variable IN (',
+                 toString(sprintf("'%s'", colnames)),
+                 ')')
 
-  df =.nhanesQuery(sql)
+  df  = .nhanesQuery(sql)
   ans = split(df[-which(names(df)=="Variable")], df$Variable)
   ans = lapply(ans,function(x){row.names(x)=NULL;x}) # reset row names
   ans
@@ -238,23 +252,23 @@
                          namesonly = FALSE)
 {
 
-  sql = paste0("SELECT V.Variable AS 'Variable.Name',
-                       SUBSTRING(V.Description,1,",nchar,") AS 'Variable.Description',
-                       V.TableName AS 'Data.File.Name',
-                       SUBSTRING(Q.[Description],1,",nchar,") AS 'Data.File.Description',
-                       BeginYear AS 'Begin.Year', EndYear,
-                       CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS Component
-                  FROM Metadata.QuestionnaireDescriptions Q
-                  JOIN Metadata.QuestionnaireVariables V ON V.TableName = Q.TableName
-                  WHERE (V.Description COLLATE SQL_Latin1_General_CP1_CS_AS LIKE '%")
+  sql = paste0('SELECT V.Variable AS "Variable.Name", ',
+               '       SUBSTRING(V.Description,1,', nchar, ') AS "Variable.Description", ',
+               '       V.TableName AS "Data.File.Name", ',
+               '       SUBSTRING(Q.[Description],1,', nchar, ') AS "Data.File.Description", ',
+               '       BeginYear AS "Begin.Year", EndYear AS "EndYear", ',
+               '       CONCAT(SUBSTRING(DataGroup,1,1),LOWER(SUBSTRING(DataGroup,2,20))) AS "Component" ',
+               sprintf('   FROM %s Q ', MetadataTable("QuestionnaireDescriptions")),
+               sprintf('   JOIN %s V ON V.TableName = Q.TableName ', MetadataTable("QuestionnaireVariables")),
+               sprintf('   WHERE (V.Description COLLATE SQL_Latin1_General_CP1_CS_AS LIKE \'%%%s%%\'',
+                       search_terms[1]))
 
   # COLLATE SQL_Latin1_General_CP1_CS_AS  : is to make case sensitive pattern match
 
-  sql = paste0(sql,search_terms[1],"%'")
   # match multiple patterns
   if (length(search_terms)>=2){
     for (term in search_terms[2:length(search_terms)]){
-      sql = paste0(sql," OR V.Description COLLATE SQL_Latin1_General_CP1_CS_AS LIKE '%",term,"%'")
+      sql = paste0(sql, " OR V.Description COLLATE SQL_Latin1_General_CP1_CS_AS LIKE '%", term, "%'")
     }
   }
   sql = paste0(sql,")")
@@ -289,10 +303,10 @@
   sql = gsub("%\\^", "", sql) # address start with ..
 
   if(!is.null(ystart)){
-    sql <- paste(sql,"AND Q.BeginYear >=",ystart)
+    sql <- paste(sql, "AND Q.BeginYear >=", ystart)
   }
   if(!is.null(ystop)){
-    sql <- paste(sql,"AND Q.EndYear <=",ystop)
+    sql <- paste(sql, "AND Q.EndYear <=", ystop)
   }
   df =.nhanesQuery(sql)
   if(namesonly){
@@ -307,21 +321,21 @@
 {
   # FIXME: we need handle multiple targets once DB is updated!
   .checkTableNames(nh_table)
-
-  sql = paste0('SELECT Variable AS "Variable Name:",
-                       SasLabel AS "SAS Label:",
-                       Description AS "English Text:",
-                       Target AS "Target:"
-                       FROM "Metadata.QuestionnaireVariables" WHERE TableName = \'',
-               nh_table, '\'')
-    
+  sql = paste0('SELECT Variable AS "Variable Name:", ',
+               '       SasLabel AS "SAS Label:", ',
+               '       Description AS "English Text:", ',
+               '       Target AS "Target:" ',
+               sprintf('  FROM %s ', MetadataTable("QuestionnaireVariables")),
+               sprintf('  WHERE TableName = \'%s\'', nh_table))
   if(!is.null(colname))
-    sql = paste0(sql," AND Variable IN (", toString(sprintf("'%s'", colname)),")")
+    sql = paste0(sql,
+                 ' AND Variable IN (', toString(sprintf("'%s'", colname)),
+                 ' )')
 
   # res = as.list(t(.nhanesQuery(sql)))
   res = .nhanesQuery(sql)
 
-  if(length(res[[1]])==0){
+  if(length(res[[1]]) == 0){
     stop(paste0("The variable \"",colname,"\" is not found in the data file/table \"",nh_table,"\".
                 Please check the table and variable name!"))
   }
