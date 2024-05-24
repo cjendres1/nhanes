@@ -167,7 +167,8 @@
                                       details = FALSE)
 {
   sql <- paste0('SELECT DISTINCT TableName AS "TableName", ',
-                '       CONCAT(Q.BeginYear, \'-\', Q.EndYear) AS "Years" ',
+                '       CONCAT(Q.BeginYear, \'-\', Q.EndYear) AS "Years", ',
+                'DatePublished AS "Date.Published" ',
                 sprintf('  FROM %s Q', MetadataTable("QuestionnaireDescriptions")),
                 sprintf('  WHERE TableName LIKE \'%%%s%%\'', pattern))
   if(!is.null(ystart)) {
