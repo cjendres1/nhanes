@@ -73,7 +73,7 @@ TranslatedTable <- function(x, conn = cn()) .constructId(conn, "Translated", x)
 
 ##' @importFrom methods is
 
-.connect_db_mssql <- function()
+.connect_db_postgres = function()
 {
   if (is(cn(), "DBIConnection")) return(TRUE) # connection already set up
   .dbEnv$container_version <- Sys.getenv("EPICONDUCTOR_CONTAINER_VERSION")
@@ -83,9 +83,9 @@ TranslatedTable <- function(x, conn = cn()) .constructId(conn, "Translated", x)
   if (!nzchar(.dbEnv$container_version) || is.na(.dbEnv$collection_date)) {
     return(FALSE) # no DB available for use 
   }
-  if (!requireNamespace("DBI", quietly = TRUE) || !requireNamespace("odbc", quietly = TRUE)) {
+  if (!requireNamespace("DBI", quietly = TRUE) || !requireNamespace("RPostgres", quietly = TRUE)) {
     ## can't use DB because required packages not available
-    warning("Packages 'DBI' and 'odbc' unavailable but required to use MS SQL Server")
+    warning("Packages 'DBI' and 'RPostgres' unavailable but required to use Postgres DB")
     return(FALSE)
   }
   ## suppress warning from DBI::dbConnect()
@@ -93,46 +93,12 @@ TranslatedTable <- function(x, conn = cn()) .constructId(conn, "Translated", x)
   .dbEnv$cn <-
     try(
       DBI::dbConnect(
-        odbc::odbc(),
-        uid = Sys.getenv("EPICONDUCTOR_DB_UID", unset = "sa"),
-        pwd = Sys.getenv("SA_PASSWORD", unset = "yourStrong(!)Password"),
-        server = Sys.getenv("EPICONDUCTOR_DB_SERVER", unset = "localhost"),
-        port = as.integer(Sys.getenv("EPICONDUCTOR_DB_PORT", unset = "1433")),
-        database = Sys.getenv("EPICONDUCTOR_DB_DATABASE", unset = "NhanesLandingZone"),
-        driver = Sys.getenv("EPICONDUCTOR_DB_DRIVER", unset = "ODBC Driver 17 for SQL Server")
-      ),
-      silent = TRUE)
-  after <- getTaskCallbackNames()
-  removeTaskCallback(which(!after %in% before))
-  return(is(.dbEnv$cn, "DBIConnection"))
-}
-
-.connect_db_mariadb <- function()
-{
-  if (is(cn(), "DBIConnection")) return(TRUE) # connection already set up
-  .dbEnv$container_version <- Sys.getenv("EPICONDUCTOR_CONTAINER_VERSION")
-  .dbEnv$collection_date <- as.Date(Sys.getenv("EPICONDUCTOR_COLLECTION_DATE"))
-  ## message("EpiConductor Container Version: ", .container_version)
-  ## message("Data Collection Date: ", .collection_date)
-  if (!nzchar(.dbEnv$container_version) || is.na(.dbEnv$collection_date)) {
-    return(FALSE) # no DB available for use 
-  }
-  if (!requireNamespace("DBI", quietly = TRUE) || !requireNamespace("RMariaDB", quietly = TRUE)) {
-    ## can't use DB because required packages not available
-    warning("Packages 'DBI' and 'RMariaDB' unavailable but required to use MariaDB")
-    return(FALSE)
-  }
-  ## suppress warning from DBI::dbConnect()
-  before <- getTaskCallbackNames()
-  .dbEnv$cn <-
-    try(
-      DBI::dbConnect(
-        RMariaDB::MariaDB(),
-        username = Sys.getenv("EPICONDUCTOR_DB_UID", unset = "admin"),
-        password = Sys.getenv("SA_PASSWORD", unset = "C0lumnStore!"),
+        RPostgres::Postgres(),
+        user = Sys.getenv("EPICONDUCTOR_DB_UID", unset = "sa"),
+        password = Sys.getenv("SA_PASSWORD", unset = "NHAN35"),
         host = Sys.getenv("EPICONDUCTOR_DB_SERVER", unset = "localhost"),
-        port = as.integer(Sys.getenv("EPICONDUCTOR_DB_PORT", unset = "3306")),
-        mysql = FALSE
+        port = as.integer(Sys.getenv("EPICONDUCTOR_DB_PORT", unset = "5432")),
+        dbname = Sys.getenv("EPICONDUCTOR_DB_NAME", unset = "NhanesLandingZone")
       ),
       silent = TRUE)
   after <- getTaskCallbackNames()
@@ -145,31 +111,17 @@ TranslatedTable <- function(x, conn = cn()) .constructId(conn, "Translated", x)
 {
   if (isTRUE(.dbEnv$ok)) return(TRUE) # already set up
   ## otherwise try to set it up: Try MariaDB first
-  if (.dbEnv$ok <- .connect_db_mariadb()) {
-    .dbEnv$translatedTables <-
-      .nhanesQuery("SHOW TABLES FROM NhanesTranslated")[[1]]
-    ## .dbEnv$validTables <- 
-    ##   .nhanesQuery(
-    ##     "SELECT DISTINCT TableName FROM NhanesMetadata.QuestionnaireVariables;")$TableName
-  }
-  else if (.dbEnv$ok <- .connect_db_mssql()) {
-    .dbEnv$translatedTables <-
+  if (.dbEnv$ok <- .connect_db_postgres()) {
+    .dbEnv$validTables <- 
       .nhanesQuery(
-        "SELECT DISTINCT TABLE_NAME
-         FROM INFORMATION_SCHEMA.TABLES
-         WHERE TABLE_TYPE = 'BASE TABLE'
-         AND TABLE_CATALOG='NhanesLandingZone'
-         AND TABLE_SCHEMA = 'Translated'")$TABLE_NAME
-    ## .dbEnv$validTables <- 
-    ##   .nhanesQuery(
-    ##     "SELECT DISTINCT TableName FROM Metadata.QuestionnaireVariables;")$TableName
+        "SELECT DISTINCT \"TableName\" FROM \"Metadata.QuestionnaireDescriptions\"")$TableName
   }
   if (inherits(.dbEnv$cn, "try-error"))
     warning("Unable to connect to DB, falling back to online downloads")
   else {
     .dbEnv$validTables <- 
       .nhanesQuery(
-        sprintf("SELECT DISTINCT TableName FROM %s;",
+        sprintf("SELECT DISTINCT \"TableName\" FROM %s;",
                 MetadataTable("QuestionnaireVariables"))
       )$TableName
   }
