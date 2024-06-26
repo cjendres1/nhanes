@@ -188,7 +188,7 @@
   # Apply additional filters based on ystart and ystop
   if (!is.null(ystart)) {
     query = query |>
-      dplyr::filter(BeginYear >= ystart)
+      dplyr::filter(Begin.Year >= ystart)
   }
   if (!is.null(ystop)) {
     query = query |>

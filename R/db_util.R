@@ -12,9 +12,7 @@
 {
     backend <- class(conn) |> attr("package")
     switch(backend,
-           odbc = sprintf('"%s"."%s"', schema, table),
            RPostgres = sprintf('"%s.%s"', schema, table),
-           RMariaDB = sprintf('Nhanes%s.%s', schema, table),
            stop("Unsupported DB backend: ", backend))
 }
 
@@ -110,21 +108,14 @@ TranslatedTable <- function(x, conn = cn()) .constructId(conn, "Translated", x)
 .init_db <- function()
 {
   if (isTRUE(.dbEnv$ok)) return(TRUE) # already set up
-  ## otherwise try to set it up: Try MariaDB first
-  if (.dbEnv$ok <- .connect_db_postgres()) {
-    .dbEnv$validTables <- 
+  .dbEnv$ok <- .connect_db_postgres()
+  .dbEnv$validTables <- 
       .nhanesQuery(
         "SELECT DISTINCT \"TableName\" FROM \"Metadata.QuestionnaireDescriptions\"")$TableName
-  }
+  
   if (inherits(.dbEnv$cn, "try-error"))
     warning("Unable to connect to DB, falling back to online downloads")
-  else {
-    .dbEnv$validTables <- 
-      .nhanesQuery(
-        sprintf("SELECT DISTINCT \"TableName\" FROM %s;",
-                MetadataTable("QuestionnaireVariables"))
-      )$TableName
-  }
+  
   return(.dbEnv$ok)
 }
 
