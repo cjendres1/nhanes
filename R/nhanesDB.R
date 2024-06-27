@@ -315,7 +315,7 @@
   # FIXME: we need handle multiple targets once DB is updated!
   .checkTableNames(nh_table)
   sql = paste0('SELECT "Variable" AS "Variable Name:", ',
-               '       "SaSLabel" AS "SAS Label:", ',
+               '       "SasLabel" AS "SAS Label:", ',
                '       "Description" AS "English Text:", ',
                '       "Target" AS "Target:" ',
                sprintf('  FROM %s ', MetadataTable("QuestionnaireVariables")),
