@@ -9,12 +9,12 @@
 
 .constructId <- function(conn, schema, table)
 {
-    backend <- class(conn) |> attr("package")
-    switch(backend,
-           odbc = sprintf('"%s"."%s"', schema, table),
-           RPostgres = sprintf('"%s.%s"', schema, table),
-           RMariaDB = sprintf('Nhanes%s.%s', schema, table),
-           stop("Unsupported DB backend: ", backend))
+  backend <- class(conn) |> attr("package")
+  switch(backend,
+         odbc = sprintf('"%s"."%s"', schema, table),
+         RPostgres = sprintf('"%s.%s"', schema, table),
+         RMariaDB = sprintf('Nhanes%s.%s', schema, table),
+         stop("Unsupported DB backend: ", backend))
 }
 
 MetadataTable <- function(x, conn = cn()) .constructId(conn, "Metadata", x)
@@ -22,12 +22,48 @@ RawTable <- function(x, conn = cn()) .constructId(conn, "Raw", x)
 TranslatedTable <- function(x, conn = cn()) .constructId(conn, "Translated", x)
 
 
+## When connecting to a DB, we need to initialize a list of available
+## tables / translated tables. There is no nice backward compatible
+## way to do this, and we need backend-specific hacks
+
+.getValidTables <- function(conn = cn(), type = c("Raw", "Translated"))
+{
+  type <- match.arg(type)
+  backend <- class(conn) |> attr("package")
+  switch(backend,
+         odbc =
+           {
+             sql <- paste("SELECT DISTINCT TABLE_NAME", 
+                          "FROM INFORMATION_SCHEMA.TABLES",
+                          "WHERE TABLE_TYPE = 'BASE TABLE'",
+                          "AND TABLE_CATALOG = 'NhanesLandingZone'",
+                          sprintf("AND TABLE_SCHEMA = '%s'", type))
+             DBI::dbGetQuery(conn, sql)[[1]]
+           },
+         RPostgres = 
+           {
+             sql <- paste("SELECT DISTINCT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES", 
+                          "WHERE TABLE_TYPE = 'BASE TABLE' AND ", 
+                          "TABLE_CATALOG = 'NhanesLandingZone'")
+             ## schema doesn't work properly yet, so work around
+             alltabs <- DBI::dbGetQuery(conn, sql)[[1]]
+             alltabs <- alltabs[startsWith(alltabs, paste0(type, "."))]
+             gsub(paste0(type, "."), "", alltabs, fixed = TRUE)
+           },
+         RMariaDB =
+           {
+             sql <- sprintf("SHOW TABLES FROM Nhanes%s", type)
+             DBI::dbGetQuery(conn, sql)[[1]]
+           },
+         stop("Unsupported DB backend: ", backend))
+}
+
+
 ## Query data from the Docker database
 ## examples: nhanesQuery("SELECT TOP(50) * FROM QuestionnaireVariables;")
 
 ## Query data from the Docker database
 ## examples: nhanesQuery("SELECT TOP(50) * FROM Metadata.QuestionnaireVariables;")
-
 
 .nhanesQuery <- function(sql)
 {
@@ -137,15 +173,16 @@ TranslatedTable <- function(x, conn = cn()) .constructId(conn, "Translated", x)
   }
   else if (nzchar(container_version)) { ## update for new container releases
     if (container_version == "v0.4.1") .connect_db_mssql()
-    else if (container_version == "v0.5.0") .connect_db_mssql()
+    else if (container_version == "v0.5.0") .connect_db_mariadb()
     else .connect_db_postgres()
   }
   else FALSE
   if (isFALSE(.dbEnv$ok) &&
         (nzchar(container_version) || nzchar(container_backend)))
     warning("Unable to connect to DB, falling back to online downloads")
-  ### TODO: populate
-  ## .dbEnv$validTables # 'SELECT DISTINCT "TableName" FROM "Metadata.QuestionnaireVariables'
-  ## .dbEnv$translatedTables # tricky --- a bit ad hoc
+  else {
+    .dbEnv$validTables <- .getValidTables(type = "Raw")
+    .dbEnv$translatedTables <- .getValidTables(type = "Translated")
+  }
 }
 
