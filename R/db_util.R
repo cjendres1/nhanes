@@ -10,6 +10,7 @@
 .constructId <- function(conn, schema, table)
 {
   backend <- class(conn) |> attr("package")
+  cat(paste("---> backend = ", backend, " in constructId() <---\n"))
   switch(backend,
          odbc = sprintf('"%s"."%s"', schema, table),
          RPostgres = sprintf('"%s.%s"', schema, table),
@@ -30,6 +31,7 @@ TranslatedTable <- function(x, conn = cn()) .constructId(conn, "Translated", x)
 {
   type <- match.arg(type)
   backend <- class(conn) |> attr("package")
+  cat(paste("---> backend = ", backend, " in .getValidTables() <---\n"))
   switch(backend,
          odbc =
            {
