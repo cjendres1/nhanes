@@ -31,35 +31,34 @@ TranslatedTable <- function(x, conn = cn()) .constructId(conn, "Translated", x)
 {
   type <- match.arg(type)
   backend <- class(conn) |> attr("package")
-  cat(paste("---> backend = ", backend, " in .getValidTables() <---\n"))
-  switch(backend,
-         odbc =
-           {
-             sql <- paste("SELECT DISTINCT TABLE_NAME", 
-                          "FROM INFORMATION_SCHEMA.TABLES",
-                          "WHERE TABLE_TYPE = 'BASE TABLE'",
-                          "AND TABLE_CATALOG = 'NhanesLandingZone'",
-                          sprintf("AND TABLE_SCHEMA = '%s'", type))
-             DBI::dbGetQuery(conn, sql)[[1]]
-           },
-         RPostgres = 
-           {
-             sql <- paste("SELECT DISTINCT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES", 
-                          "WHERE TABLE_TYPE = 'BASE TABLE' AND ", 
-                          "TABLE_CATALOG = 'NhanesLandingZone'")
-             ## schema doesn't work properly yet, so work around
-             alltabs <- DBI::dbGetQuery(conn, sql)[[1]]
-             alltabs <- alltabs[startsWith(alltabs, paste0(type, "."))]
-             gsub(paste0(type, "."), "", alltabs, fixed = TRUE)
-           },
-         RMariaDB =
-           {
-             sql <- sprintf("SHOW TABLES FROM Nhanes%s", type)
-             DBI::dbGetQuery(conn, sql)[[1]]
-           },
-         stop("Unsupported DB backend: ", backend))
+  if (length(backend) == 1L)
+    switch(backend,
+           odbc =
+             {
+               sql <- paste("SELECT DISTINCT TABLE_NAME", 
+                            "FROM INFORMATION_SCHEMA.TABLES",
+                            "WHERE TABLE_TYPE = 'BASE TABLE'",
+                            "AND TABLE_CATALOG = 'NhanesLandingZone'",
+                            sprintf("AND TABLE_SCHEMA = '%s'", type))
+               DBI::dbGetQuery(conn, sql)[[1]]
+             },
+           RPostgres = 
+             {
+               sql <- paste("SELECT DISTINCT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES", 
+                            "WHERE TABLE_TYPE = 'BASE TABLE' AND ", 
+                            "TABLE_CATALOG = 'NhanesLandingZone'")
+               ## schema doesn't work properly yet, so work around
+               alltabs <- DBI::dbGetQuery(conn, sql)[[1]]
+               alltabs <- alltabs[startsWith(alltabs, paste0(type, "."))]
+               gsub(paste0(type, "."), "", alltabs, fixed = TRUE)
+             },
+           RMariaDB =
+             {
+               sql <- sprintf("SHOW TABLES FROM Nhanes%s", type)
+               DBI::dbGetQuery(conn, sql)[[1]]
+             },
+           stop("Unsupported DB backend: ", backend))
 }
-
 
 ## Query data from the Docker database
 ## examples: nhanesQuery("SELECT TOP(50) * FROM QuestionnaireVariables;")
