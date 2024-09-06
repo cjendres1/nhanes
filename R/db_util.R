@@ -183,8 +183,8 @@ TranslatedTable <- function(x, conn = cn()) .constructId(conn, "Translated", x)
         (nzchar(container_version) || nzchar(container_backend)))
     warning("Unable to connect to DB, falling back to online downloads")
   else {
-    .dbEnv$validTables <- .getValidTables(type = "Raw")
-    .dbEnv$translatedTables <- .getValidTables(type = "Translated")
+    .dbEnv$validTables <- .getValidTables(.dbEnv$cn, type = "Raw")
+    .dbEnv$translatedTables <- .getValidTables(.dbEnv$cn, type = "Translated")
   }
 }
 
