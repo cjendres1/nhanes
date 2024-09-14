@@ -28,15 +28,15 @@
     
     if (details) {
       query = query |>
-        dplyr::select("Data.File.Name" = TableName,
-                      "Data.File.Description" = Description,
+        dplyr::select(Data.File.Name = TableName,
+                      Data.File.Description = Description,
                       Component,
-                      "Begin.Year" = BeginYear,
+                      Begin.Year = BeginYear,
                       EndYear)
     } else {
       query = query |>
-        dplyr::select("Data.File.Name"= TableName,
-                      "Data.File.Description"= Description)
+        dplyr::select(Data.File.Name = TableName,
+                      Data.File.Description = Description)
     }
     
     # Fetch the results by executing the query
@@ -49,15 +49,17 @@
     }
   }
 
-.checkDataGroupDB <- function(data_group)
+.checkDataGroupDB <-
+  function(data_group)
 {
   if (!(data_group %in% names(nhanes_group)))
     stop("Invalid survey group!")
   
 }
 
-.nhanesTableVarsDB <- function(data_group, nh_table, details = FALSE,
-                               nchar=128, namesonly = FALSE)
+.nhanesTableVarsDB <-
+  function(data_group, nh_table, details = FALSE,
+           nchar = 128, namesonly = FALSE)
 {
   
   # FIXME: We need to add Use.Constraints when DB is updated
@@ -111,7 +113,8 @@
   }
 }
 
-.nhanesDB <- function(nh_table, includelabels = FALSE, translated = TRUE)
+.nhanesDB <-
+  function(nh_table, includelabels = FALSE, translated = TRUE)
 {
   .checkTableNames(nh_table)
   ## get appropriate DB table name (downgrading to raw if translated not available)
@@ -143,31 +146,34 @@
 }
 
 
-.nhanesSearchVarNameDB <- function(varnames = NULL,
-                                   ystart = NULL,
-                                   ystop = NULL,
-                                   includerdc = FALSE,
-                                   nchar = 128,
-                                   namesonly = TRUE)
+.nhanesSearchVarNameDB <-
+  function(varnames = NULL,
+           ystart = NULL,
+           ystop = NULL,
+           includerdc = FALSE,
+           nchar = 128,
+           namesonly = TRUE)
 {
   ## FIXME: simplify query when namesonly = TRUE?
   
   # Define the schema-qualified table references
-  metadata_questionnaire_descriptions = dplyr::tbl(cn(), I(MetadataTable("QuestionnaireDescriptions")))
-  metadata_questionnaire_variables = dplyr::tbl(cn(), I(MetadataTable("QuestionnaireVariables")))
+  metadata_questionnaire_descriptions <-
+    dplyr::tbl(cn(), I(MetadataTable("QuestionnaireDescriptions")))
+  metadata_questionnaire_variables <-
+    dplyr::tbl(cn(), I(MetadataTable("QuestionnaireVariables")))
   
   # Build the query using dplyr
-  query = metadata_questionnaire_variables |>
+  query <-
+    metadata_questionnaire_variables |>
     dplyr::filter(Variable %in% varnames) |>
     dplyr::mutate(Variable.Description = substr(Description, 1, nchar))|>
     dplyr::select(Variable.Name = Variable,
                   Variable.Description,
                   TableName) |>
     dplyr::inner_join(metadata_questionnaire_descriptions, by = "TableName") |>
-    dplyr::mutate(
-      Data.File.Description = substr(Description, 1, nchar),
-      Component = paste0(substr(DataGroup, 1, 1), tolower(substr(DataGroup, 2, 20)))
-    ) |>
+    dplyr::mutate(Data.File.Description = substr(Description, 1, nchar),
+                  Component = paste0(substr(DataGroup, 1, 1),
+                                     tolower(substr(DataGroup, 2, 20)))) |>
     dplyr::select(Variable.Name,
                   Variable.Description,
                   Data.File.Name = TableName,
@@ -178,16 +184,14 @@
   
   # Apply additional filters based on ystart and ystop
   if (!is.null(ystart)) {
-    query = query |>
-      dplyr::filter(Begin.Year >= ystart)
+    query <- dplyr::filter(query, Begin.Year >= ystart)
   }
   if (!is.null(ystop)) {
-    query = query |>
-      dplyr::filter(EndYear <= ystop)
+    query <- dplyr::filter(query, EndYear <= ystop)
   }
   
   # Fetch the results by executing the query
-  df = query |> dplyr::collect()
+  df <- query |> dplyr::collect()
   
   if(is.null(df)){
     warning(paste0("Variable ", varnames, " is not found in the database!"))
@@ -249,8 +253,6 @@
   
   # Build the query using dplyr
   query <-
-  
-  query <-
     if (details) {
       metadata_variable_codebook |>
         dplyr::filter(TableName == nh_table) |>
@@ -274,145 +276,133 @@
   }
   
   # Fetch the results by executing the query
-  df = query |> dplyr::collect()
-  
-  ans = split(df[-which(names(df) == "Variable")], df$Variable)
-  ans = lapply(ans, function(x) { row.names(x) = NULL; x}) # reset row names
+  df <- dplyr::collect(query)
+  varIndex <- which(names(df) == "Variable") # should always be 1, but just in case...
+  ans <- split(df[-varIndex], df[[varIndex]])
+  # reset row names --- not needed for tibbles
+  ## for (i in seq_along(ans)) { row.names(ans[[i]]) <- NULL }
   ans
 }
 
 
-.nhanesSearchDB <- function( search_terms = NULL,
-                            exclude_terms = NULL,
-                            data_group = NULL,
-                            ignore.case = FALSE,
-                            ystart = NULL,
-                            ystop = NULL,
-                            includerdc = FALSE,
-                            nchar = 128,
-                            namesonly = FALSE)
+.nhanesSearchDB <-
+  function(search_terms = NULL,
+           exclude_terms = NULL,
+           data_group = NULL,
+           ignore.case = FALSE,
+           ystart = NULL,
+           ystop = NULL,
+           includerdc = FALSE,
+           nchar = 128,
+           namesonly = FALSE)
 {
-  
-  
-  
   # Define the schema-qualified table references
-  metadata_questionnaire_descriptions = dplyr::tbl(cn(), I(MetadataTable("QuestionnaireDescriptions")))
-  metadata_questionnaire_variables = dplyr::tbl(cn(), I(MetadataTable("QuestionnaireVariables")))
+  metadata_questionnaire_descriptions <-
+    dplyr::tbl(cn(), I(MetadataTable("QuestionnaireDescriptions")))
+  metadata_questionnaire_variables <-
+    dplyr::tbl(cn(), I(MetadataTable("QuestionnaireVariables")))
   
   # Join the tables
-  query = metadata_questionnaire_variables |>
+  query <-
+    metadata_questionnaire_variables |>
     dplyr::inner_join(metadata_questionnaire_descriptions, by = "TableName") |>
-    dplyr::mutate(
-      Variable.Name = Variable,
-      Variable.Description = substr(Description.x, 1, nchar),
-      Data.File.Name = TableName,
-      Data.File.Description = substr(Description.y, 1, nchar),
-      Component = paste0(substr(DataGroup, 1, 1), tolower(substr(DataGroup, 2, 20))),
-      Begin.Year = BeginYear,
-      EndYear = EndYear
-    )
-  
+    dplyr::mutate(Variable.Name = Variable,
+                  Variable.Description = substr(Description.x, 1, nchar),
+                  Data.File.Name = TableName,
+                  Data.File.Description = substr(Description.y, 1, nchar),
+                  Component = paste0(substr(DataGroup, 1, 1),
+                                     tolower(substr(DataGroup, 2, 20))),
+                  Begin.Year = BeginYear,
+                  EndYear = EndYear)
   
   # Apply search terms
-  search_terms = paste(search_terms,collapse = "|")
-  query = query |> dplyr::filter(str_detect(tolower(Description.x),tolower(search_terms)))
+  search_terms <- paste(search_terms, collapse = "|")
+  query <-
+    dplyr::filter(query,
+                  str_detect(tolower(Description.x),
+                             tolower(search_terms)))
   
   # Create exclude filter expressions
   if (!is.null(exclude_terms)) {
-    exclude_terms = paste(exclude_terms,collapse = "|")
-    query = query |> dplyr::filter(!str_detect(tolower(Description.x),tolower(exclude_terms)))
+    exclude_terms <- paste(exclude_terms, collapse = "|")
+    query <- dplyr::filter(query,
+                           str_detect(tolower(Description.x),
+                                      tolower(exclude_terms),
+                                      negate = TRUE))
   }
-  
+
   # Apply data group filter
   if (!is.null(data_group)) {
     if (length(data_group) > 1) {
-      query = query |>
-        dplyr::filter(str_detect(DataGroup, data_group[1]))
+      query <- dplyr::filter(query, str_detect(DataGroup, data_group[1]))
       for (term in data_group[2:length(data_group)]) {
-        query = query |>
-          dplyr::filter(str_detect(DataGroup, term))
+        query <- dplyr::filter(query, str_detect(DataGroup, term))
       }
     } else {
-      query = query |>
-        dplyr::filter(str_detect(DataGroup, data_group))
+      query <- dplyr::filter(query, str_detect(DataGroup, data_group))
     }
   }
   
   # Apply year filters
-  if (!is.null(ystart)) {
-    query = query |>
-      dplyr::filter(BeginYear >= ystart)
-  }
-  if (!is.null(ystop)) {
-    query = query |>
-      dplyr::filter(EndYear <= ystop)
-  }
-  query = query |> dplyr::select(Variable.Name,
-                                 Variable.Description,
-                                 Data.File.Name,
-                                 Data.File.Description,
-                                 Begin.Year,
-                                 EndYear,
-                                 Component
-                                 )
+  if (!is.null(ystart)) { query <- dplyr::filter(query, BeginYear >= ystart) }
+  if (!is.null(ystop)) { query <- dplyr::filter(query, EndYear <= ystop) }
+  query <- dplyr::select(query,
+                         Variable.Name,
+                         Variable.Description,
+                         Data.File.Name,
+                         Data.File.Description,
+                         Begin.Year,
+                         EndYear,
+                         Component)
   
   # Fetch the results by executing the query
-  df = query |> dplyr::collect()
-  
-  if(namesonly){
-    df = unique(df$Data.File.Name)
-  }
-  
+  df <- dplyr::collect(query)
+  if (namesonly) { df <- unique(df$Data.File.Name) }
   df
 }
 
 
 .nhanesCodebookDB <- function(nh_table, colname)
 {
-  # FIXME: we need handle multiple targets once DB is updated!
+  # FIXME: we need to handle multiple targets once DB is updated!
   .checkTableNames(nh_table)
   
   # Define the schema-qualified table reference
-  metadata_questionnaire_variables <- dplyr::tbl(cn(), I(MetadataTable("QuestionnaireVariables")))
+  metadata_questionnaire_variables <-
+    dplyr::tbl(cn(), I(MetadataTable("QuestionnaireVariables")))
   
   # Build the query
-  query = metadata_questionnaire_variables |>
+  query <-
+    metadata_questionnaire_variables |>
     dplyr::filter(TableName == nh_table)
   
-  if (!is.null(colname)) {
-    query  = query |>
-      dplyr::filter(Variable %in% colname)
-  }
-  
-  query = query |> dplyr::select(
-    'Variable Name:' = Variable,
-    'SAS Label:' = SasLabel,
-    'English Text:' = Description,
-    'Target:' = Target
-  )
+  if (!is.null(colname)) { query <- dplyr::filter(query, Variable %in% colname) }
+
+  ## FIXME: Some tables have more; need a way to study and handle them
+  query <- dplyr::select(query, 
+                         'Variable Name:' = Variable,
+                         'SAS Label:' = SasLabel,
+                         'English Text:' = Description,
+                         'Target:' = Target)
   
   # Fetch the results by executing the query
-  res = query |> dplyr::collect()
+  res <- dplyr::collect(query)
   
-  
-  if(length(res[[1]]) == 0){
-    stop(paste0("The variable \"",colname,"\" is not found in the data file/table \"",nh_table,"\".
-                Please check the table and variable name!"))
+  if (length(res[[1]]) == 0) {
+    stop("The variable '", colname,
+         "' is not found in the data file / table '", nh_table, "'.")
   }
-  colname = res$`Variable Name:`
-  res.list = split(res, seq(nrow(res)))
-  res.list = lapply(res.list, as.list)
-  names(res.list) = colname
-  
-  str(list(nh_table = nh_table, colname = colname))
-  trans = nhanesTranslate(nh_table, colname, details = TRUE)
-  
-  for (code in names(res.list)){
-    if(code %in% names(trans)){
-      res.list[[code]] = append(res.list[[code]],trans[code])
+  colname <- res$`Variable Name:`
+  res.list <- split(res, seq(nrow(res)))
+  res.list <- lapply(res.list, as.list)
+  names(res.list) <- colname
+  ## str(res.list)
+  trans <- nhanesTranslate(nh_table, colname, details = TRUE)
+  for (code in colname) {
+    if (code %in% names(trans)) {
+      res.list[[code]] <- c(res.list[[code]], trans[code])
     }
   }
-  
   res.list 
 }
 
