@@ -326,9 +326,8 @@
   if (!is.null(exclude_terms)) {
     exclude_terms <- paste(exclude_terms, collapse = "|")
     query <- dplyr::filter(query,
-                           str_detect(tolower(Description.x),
-                                      tolower(exclude_terms),
-                                      negate = TRUE))
+                           !str_detect(tolower(Description.x),
+                                       tolower(exclude_terms)))
   }
 
   # Apply data group filter
