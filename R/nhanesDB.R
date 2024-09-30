@@ -302,49 +302,58 @@
   metadata_questionnaire_variables <-
     dplyr::tbl(cn(), I(MetadataTable("QuestionnaireVariables")))
   
-  # Join the tables
-  query <-
-    metadata_questionnaire_variables |>
+ 
+  
+  
+  # Start building the query
+  query <- metadata_questionnaire_variables |>
     dplyr::inner_join(metadata_questionnaire_descriptions, by = "TableName") |>
-    dplyr::mutate(Variable.Name = Variable,
-                  Variable.Description = substr(Description.x, 1, nchar),
-                  Data.File.Name = TableName,
-                  Data.File.Description = substr(Description.y, 1, nchar),
-                  Component = paste0(substr(DataGroup, 1, 1),
-                                     tolower(substr(DataGroup, 2, 20))),
-                  Begin.Year = BeginYear,
-                  EndYear = EndYear)
+    dplyr::mutate(
+      Variable.Name = Variable,
+      Variable.Description = substr(Description.x, 1, nchar),
+      Data.File.Name = TableName,
+      Data.File.Description = substr(Description.y, 1, nchar),
+      Begin.Year = BeginYear,
+      EndYear = EndYear,
+      Component = paste0(
+        substr(DataGroup, 1, 1),
+        tolower(substr(DataGroup, 2, 20))
+      )
+    )
   
-  # Apply search terms
-  search_terms <- paste(search_terms, collapse = "|")
-  query <-
-    dplyr::filter(query,
-                  str_detect(tolower(Description.x),
-                             tolower(search_terms)))
-  
-  # Create exclude filter expressions
-  if (!is.null(exclude_terms)) {
-    exclude_terms <- paste(exclude_terms, collapse = "|")
-    query <- dplyr::filter(query,
-                           !str_detect(tolower(Description.x),
-                                       tolower(exclude_terms)))
+  # Apply search terms filter
+  if (!is.null(search_terms)) {
+    search_pattern <- paste(search_terms, collapse = "|")
+    query <- query |> dplyr::filter(stringr::str_detect(Description.x, search_pattern))
+    
+  } else {
+    warning("'search_terms' is NULL; the function will return all variables.")
   }
-
-  # Apply data group filter
+  
+  # Apply exclude terms filter
+  if (!is.null(exclude_terms)) {
+    exclude_pattern <- paste(exclude_terms, collapse = "|")
+    query <- query |> dplyr::filter(!stringr::str_detect(Description.x, exclude_pattern))
+  }
+  
+  # Apply data_group filter
   if (!is.null(data_group)) {
-    if (length(data_group) > 1) {
-      query <- dplyr::filter(query, str_detect(DataGroup, data_group[1]))
-      for (term in data_group[2:length(data_group)]) {
-        query <- dplyr::filter(query, str_detect(DataGroup, term))
-      }
-    } else {
-      query <- dplyr::filter(query, str_detect(DataGroup, data_group))
-    }
+    data_group = nhanes_group[data_group]
+    data_group_pattern <- paste(data_group, collapse = "|")
+    query <- query |> dplyr::filter(stringr::str_detect(DataGroup, data_group_pattern))
+    
   }
   
   # Apply year filters
-  if (!is.null(ystart)) { query <- dplyr::filter(query, BeginYear >= ystart) }
-  if (!is.null(ystop)) { query <- dplyr::filter(query, EndYear <= ystop) }
+  if (!is.null(ystart)) {
+    query <-  query |> dplyr::filter(BeginYear >= ystart)
+  }
+  if (!is.null(ystop)) {
+    query <- query |> dplyr::filter (EndYear <= ystop)
+  }
+  
+  # Select and rename columns
+  
   query <- dplyr::select(query,
                          Variable.Name,
                          Variable.Description,
