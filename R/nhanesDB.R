@@ -332,14 +332,10 @@
 
   # Apply data group filter
   if (!is.null(data_group)) {
-    if (length(data_group) > 1) {
-      query <- dplyr::filter(query, str_detect(DataGroup, data_group[1]))
-      for (term in data_group[2:length(data_group)]) {
-        query <- dplyr::filter(query, str_detect(DataGroup, term))
-      }
-    } else {
-      query <- dplyr::filter(query, str_detect(DataGroup, data_group))
-    }
+    data_group <- nhanes_group[data_group]
+    data_group_pattern <- paste(data_group, collapse = "|")
+    query <- query |> dplyr::filter(stringr::str_detect(DataGroup, data_group_pattern))
+    
   }
   
   # Apply year filters
