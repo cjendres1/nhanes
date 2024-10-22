@@ -25,11 +25,17 @@ validTables <- function() .dbEnv$validTables
   makeActiveBinding(sym = "nhanesTableURL",
                     fun = ab_nhanesTableURL,
                     env = environment(ab_nhanesTableURL))
-  ## declare 'global' variables used in subset() to make codetools happy 
-  utils::globalVariables(c("DataURL", "Begin.Year", "Component", "Data.File",
-                           "Data.File.Name", "Date.Published", "Doc.File",
-                           "EndYear", "Use.Constraints",
-                           "Variable.Description", "Value.Description"),
+  ## declare 'global' variables used in subset() to make codetools happy
+  NSE.globals <-
+      c("Begin.Year", "BeginYear", "CodeOrValue", "Component",
+        "concat", "Count", "Cumulative", "Data.File",
+        "Data.File.Description", "Data.File.Name", "DataGroup",
+        "DataURL", "Date.Published", "DatePublished", "Description",
+        "Description.x", "Description.y", "Doc.File", "EndYear",
+        "SasLabel", "SkipToItem", "TableName", "Target",
+        "Use.Constraints", "Value.Description", "ValueDescription",
+        "Variable", "Variable.Description", "Variable.Name", "Years")
+  utils::globalVariables(NSE.globals,
                          package = "nhanesA", add = FALSE)
 }
 
@@ -39,4 +45,6 @@ validTables <- function() .dbEnv$validTables
     DBI::dbDisconnect(cn())
   }
 }
+
+
 
