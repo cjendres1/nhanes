@@ -1,6 +1,6 @@
 Package: nhanesA
-Version: 1.1.1
-Date: 2024-05-10
+Version: 1.1.6
+Date: 2024-11-07
 Title: NHANES Data Retrieval
 Authors@R:
     c(person(given = "Christopher",
@@ -28,6 +28,7 @@ Imports:
     foreign,
     rvest,
     xml2,
+    dplyr,
     plyr
 Description: Utility to retrieve data from the National Health and Nutrition 
 	Examination Survey (NHANES) website <https://www.cdc.gov/nchs/nhanes/index.htm>.
@@ -36,10 +37,9 @@ Encoding: UTF-8
 URL: https://cran.r-project.org/package=nhanesA
 Suggests:
     knitr,
-    odbc,
-    DBI,
+    DBI, odbc, RMariaDB, RPostgres,
     rmarkdown,
     survey,
     ggplot2
 VignetteBuilder: knitr
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2

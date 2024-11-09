@@ -8,6 +8,7 @@ nhanesManifest(
   which = c("public", "limitedaccess", "variables"),
   sizes = FALSE,
   dxa = FALSE,
+  component = NULL,
   verbose = getOption("verbose"),
   use_cache = TRUE,
   max_age = 24 * 60 * 60
@@ -22,8 +23,18 @@ available variables.}
 reported by the server) and include them in the result.}
 
 \item{dxa}{Logical, whether to include information on DXA tables.
-These tables contain imputed imputed Dual Energy X-ray Absorptiometry
-measurements, and are listed separately, not in the main listing.}
+These tables contain imputed imputed Dual Energy X-ray
+Absorptiometry measurements, and are listed separately, not in
+the main listing.}
+
+\item{component}{An optional character string specifying the
+component for which the public data manifest is to be
+downloaded. Valid values are \code{"demographics"},
+\code{"dietary"}, \code{"examination"}, \code{"laboratory"}, and
+\code{"questionnaire"}.  Partial matching is allowed, and case
+is ignored. Specifying a component will return a subset of the
+tables, but has the advantage that the result will include a
+description of each table.}
 
 \item{verbose}{Logical flag indicating whether information on
 progress should be reported.}
@@ -38,13 +49,16 @@ ignored, even if available.}
 \value{
 A data frame, with columns that depend on
   \code{which}. For a manifest of tables, columns are "Table",
-  "DocURL", "DataURL", "Years", "Date.Published". If \code{sizes =
-  TRUE}, an additional column "DataSize" giving the data file
-  sizes in bytes (as reported by the server) is included. For
-  limited access tables, the "DataURL" and "DataSize" columns are
-  omitted. For a manifest of variables, columns are "VarName",
-  "VarDesc", "Table", "TableDesc", "BeginYear", "EndYear",
-  "Component", and "UseConstraints".
+  "DocURL", "DataURL", "Years", "Date.Published". If
+  \code{component} is specified, an additional column
+  "Description" giving a description of the table will be
+  included. If \code{sizes = TRUE}, an additional column
+  "DataSize" giving the data file sizes in bytes (as reported by
+  the server) is included. For limited access tables, the
+  "DataURL" and "DataSize" columns are omitted. For a manifest of
+  variables, columns are "VarName", "VarDesc", "Table",
+  "TableDesc", "BeginYear", "EndYear", "Component", and
+  "UseConstraints".
 }
 \description{
 Downloads and parses NHANES manifests for public data

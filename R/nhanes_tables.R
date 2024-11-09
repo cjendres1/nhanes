@@ -56,8 +56,17 @@ estimate_timeout <- function(url, factor = 1, perMB = 10)
 ##' @param sizes Logical, whether to compute data file sizes (as
 ##'   reported by the server) and include them in the result.
 ##' @param dxa Logical, whether to include information on DXA tables.
-##'   These tables contain imputed imputed Dual Energy X-ray Absorptiometry
-##'   measurements, and are listed separately, not in the main listing.
+##'   These tables contain imputed imputed Dual Energy X-ray
+##'   Absorptiometry measurements, and are listed separately, not in
+##'   the main listing.
+##' @param component An optional character string specifying the
+##'   component for which the public data manifest is to be
+##'   downloaded. Valid values are \code{"demographics"},
+##'   \code{"dietary"}, \code{"examination"}, \code{"laboratory"}, and
+##'   \code{"questionnaire"}.  Partial matching is allowed, and case
+##'   is ignored. Specifying a component will return a subset of the
+##'   tables, but has the advantage that the result will include a
+##'   description of each table.
 ##' @param verbose Logical flag indicating whether information on
 ##'   progress should be reported.
 ##' @param use_cache Logical flag indicating whether a cached version
@@ -67,13 +76,16 @@ estimate_timeout <- function(url, factor = 1, perMB = 10)
 ##'   ignored, even if available.
 ##' @return A data frame, with columns that depend on
 ##'   \code{which}. For a manifest of tables, columns are "Table",
-##'   "DocURL", "DataURL", "Years", "Date.Published". If \code{sizes =
-##'   TRUE}, an additional column "DataSize" giving the data file
-##'   sizes in bytes (as reported by the server) is included. For
-##'   limited access tables, the "DataURL" and "DataSize" columns are
-##'   omitted. For a manifest of variables, columns are "VarName",
-##'   "VarDesc", "Table", "TableDesc", "BeginYear", "EndYear",
-##'   "Component", and "UseConstraints".
+##'   "DocURL", "DataURL", "Years", "Date.Published". If
+##'   \code{component} is specified, an additional column
+##'   "Description" giving a description of the table will be
+##'   included. If \code{sizes = TRUE}, an additional column
+##'   "DataSize" giving the data file sizes in bytes (as reported by
+##'   the server) is included. For limited access tables, the
+##'   "DataURL" and "DataSize" columns are omitted. For a manifest of
+##'   variables, columns are "VarName", "VarDesc", "Table",
+##'   "TableDesc", "BeginYear", "EndYear", "Component", and
+##'   "UseConstraints".
 ##' @note Duplicate rows are removed from the result. Most of these
 ##'   duplicates arise from duplications in the source tables for
 ##'   multi-cycle tables (which are repeated once for each cycle). One
@@ -87,13 +99,23 @@ estimate_timeout <- function(url, factor = 1, perMB = 10)
 ##' 
 ##' @export
 nhanesManifest <- function(which = c("public", "limitedaccess", "variables"),
-                           sizes = FALSE, dxa = FALSE,
+                           sizes = FALSE, dxa = FALSE, component = NULL,
                            verbose = getOption("verbose"),
                            use_cache = TRUE, max_age = 24 * 60 * 60)
 {
+  if (!is.null(component)) {
+    comps <- c("demographics", "dietary", "examination", "laboratory", "questionnaire")
+    i <- pmatch(tolower(component), comps, nomatch = 0L)
+    component <- if (i) comps[[i]] else NULL
+    if (!is.null(component) && isTRUE(dxa)) {
+      warning("'dxa = TRUE' is ignored when 'component' is specified")
+      dxa <- FALSE
+    }
+  }
   which <- match.arg(which)
   cache_key <- if (which == "public")
-                   paste(c("public", "sizes", "dxa")[c(TRUE, sizes, dxa)], collapse = "+")
+                 paste(c("public", "sizes", "dxa", component)[c(TRUE, sizes, dxa, TRUE)],
+                       collapse = "+")
                else which
   if (isTRUE(use_cache)) {
     cache_val <- .nhanesCacheEnv[[ cache_key ]]
@@ -107,7 +129,8 @@ nhanesManifest <- function(which = c("public", "limitedaccess", "variables"),
     switch(which,
            public = if (dxa) rbind(nhanesManifest_public(sizes = sizes, verbose = verbose),
                                    nhanesManifest_DXA_hardcoded(sizes))
-                    else nhanesManifest_public(sizes = sizes, verbose = verbose),
+                    else nhanesManifest_public(sizes = sizes, verbose = verbose,
+                                               component = component),
            limitedaccess = nhanesManifest_limitedaccess(verbose = verbose),
            variables = nhanesManifest_variables(verbose = verbose)) |>
       unique()
@@ -119,8 +142,9 @@ nhanesManifest <- function(which = c("public", "limitedaccess", "variables"),
 .nhanesCacheEnv <- new.env(parent = emptyenv())
 
 
-nhanesManifest_public <- function(sizes, verbose)
+nhanesManifest_public <- function(sizes, verbose, component = NULL)
 {
+  if (!is.null(component)) dataURL <- paste0(dataURL, "?Component=", component)
   if (verbose) message("Downloading ", dataURL)
   hurl <- .checkHtml(dataURL)
   if(is.null(hurl)) {
@@ -146,7 +170,12 @@ nhanesManifest_public <- function(sizes, verbose)
   df$DataURL <- hrefs[c(FALSE, TRUE)]
   ## subset(df, tools::file_ext(DataURL) != "XPT")
   df <- subset(df, startsWith(DataURL, "/") & endsWith(toupper(DataURL), ".XPT"))
-  df <- df[c("Table", "DocURL", "DataURL", "Years", "Date.Published")]
+  if (!is.null(df$Data.File.Name)) {
+    df$Description <- df$Data.File.Name
+    df <- df[c("Table", "Description", "DocURL", "DataURL", "Years", "Date.Published")]
+  }
+  else
+    df <- df[c("Table", "DocURL", "DataURL", "Years", "Date.Published")]
   if (sizes) {
     if (verbose) message("Checking data file sizes...")
     s <- sapply(df$DataURL, .get_content_length, verbose = verbose)
@@ -231,13 +260,14 @@ nhanesManifest_limitedaccess <- function(verbose)
   skip <- (tab2 %in% c("#", "/Nchs/Nhanes/Omp/Default.aspx"))
   tab2 <- tab2[!skip]
   ##whenever they update we need to error out and then fix it
-  if(length(tab2) != 224) stop("CDC updated data manifest")
+  ## if(length(tab2) != 224) stop("CDC updated data manifest")
   htmNames = tab2
   df = tab1 |> html_table() |> as.data.frame()
   df = subset(df, !skip)
   df$Table = sub(" Doc", "", df$Doc.File)
   df$DocURL = htmNames
-  df = df[,c("Table", "DocURL", "Years", "Date.Published")]
+  df$Description = df$Data.File.Name
+  df = df[,c("Table", "Description", "DocURL", "Years", "Date.Published")]
   return(df)
 }
 
