@@ -20,7 +20,7 @@
 #'   can be very long. \cr Truncate the length by setting nchar
 #'   (default = 128).
 #' @param mincategories The minimum number of categories needed for
-#'   code translations to be applied to the data (default=2).
+#'   code translations to be applied to the data (default=1).
 #' @param details If TRUE then all available table translation
 #'   information is displayed (default=FALSE).
 #' @param dxa If TRUE then the 2005-2006 DXA translation table will be
@@ -49,7 +49,7 @@
 #' @export
 #' 
 nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128, 
-                            mincategories = 2, details=FALSE, dxa=FALSE,
+                            mincategories = 1, details=FALSE, dxa=FALSE,
                             cleanse_numeric = FALSE)
 {
   if(isFALSE(dxa) && !grepl("^(Y_)\\w+", nh_table) && .useDB()) {

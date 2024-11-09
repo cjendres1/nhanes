@@ -199,7 +199,7 @@ df[df==4] <- 'Large (15X32)'
 df
 ```
 
-Some discretion should be applied when translating coded columns as code translations can be quite long. To improve readability the translation string is restricted to a default length of 128 but can be set as high as 1024. Also, columns that have at least two categories (e.g. Male, Female) will be translated, but mincategories can be set to 1 to perform the translation even if only a single category is present.
+Some discretion should be applied when translating coded columns as code translations can be quite long. To improve readability the translation string is restricted to a default length of 128 but can be set as high as 1024.
 
 ### Download a Complete Survey
 The primary goal of nhanesA is to enable fully customizable processing of select NHANES tables. However, it is quite easy to download entire surveys using nhanesA functions.
