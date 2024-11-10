@@ -18,7 +18,7 @@ is designed to be useful for research and instructional purposes.
 
 The functions in the nhanesA package allow for fully customizable
 selection and import of data directly from the [NHANES
-website](https://www.cdc.gov/nchs/nhanes/) thus it is essential to have
+website](https://www.cdc.gov/nchs/nhanes/). Thus it is essential to have
 an active network connection.
 
 ## Install from CRAN
