@@ -34,7 +34,7 @@ validTables <- function() .dbEnv$validTables
         "Description.x", "Description.y", "Doc.File", "EndYear",
         "SasLabel", "SkipToItem", "TableName", "Target",
         "Use.Constraints", "Value.Description", "ValueDescription",
-        "Variable", "Variable.Description", "Variable.Name", "Years")
+        "Variable", "Variable.Description", "Variable.Name", "Years", "UseConstraints")
   utils::globalVariables(NSE.globals,
                          package = "nhanesA", add = FALSE)
 }
