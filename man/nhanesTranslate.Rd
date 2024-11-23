@@ -9,7 +9,7 @@ nhanesTranslate(
   colnames = NULL,
   data = NULL,
   nchar = 128,
-  mincategories = 2,
+  mincategories = 1,
   details = FALSE,
   dxa = FALSE,
   cleanse_numeric = FALSE
@@ -30,7 +30,7 @@ can be very long. \cr Truncate the length by setting nchar
 (default = 128).}
 
 \item{mincategories}{The minimum number of categories needed for
-code translations to be applied to the data (default=2).}
+code translations to be applied to the data (default=1).}
 
 \item{details}{If TRUE then all available table translation
 information is displayed (default=FALSE).}

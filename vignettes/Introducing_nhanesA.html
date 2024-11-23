@@ -12,7 +12,7 @@
 
 <meta name="author" content="Christopher J. Endres" />
 
-<meta name="date" content="2024-01-09" />
+<meta name="date" content="2024-11-23" />
 
 <title>Introducing nhanesA</title>
 
@@ -51,7 +51,7 @@ overflow: visible;
 </style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -62,7 +62,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Introducing nhanesA</h1>
 <h4 class="author">Christopher J. Endres</h4>
-<h4 class="date">2024-01-09</h4>
+<h4 class="date">2024-11-23</h4>
 
 
 
@@ -516,10 +516,7 @@ variable list to nhanesTranslate</p>
 <p>Some discretion should be applied when translating coded columns as
 code translations can be quite long. To improve readability the
 translation string is restricted to a default length of 128 but can be
-set as high as 1024. Also, columns that have at least two categories
-(e.g. Male, Female) will be translated, but mincategories can be set to
-1 to perform the translation even if only a single category is
-present.</p>
+set as high as 1024.</p>
 </div>
 <div id="download-a-complete-survey" class="section level3">
 <h3>Download a Complete Survey</h3>
