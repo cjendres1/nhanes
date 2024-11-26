@@ -1,6 +1,6 @@
 ## ----nhanestables, eval=FALSE-------------------------------------------------
-#  library(nhanesA)
-#  nhanesTables('EXAM', 2005)
+# library(nhanesA)
+# nhanesTables('EXAM', 2005)
 
 ## ----nhanestables1, echo=FALSE------------------------------------------------
 df <- data.frame(matrix(1,nrow=13,ncol=2))
@@ -21,7 +21,7 @@ df[13,] <- list('DXXSPN_D',          'Dual Energy X-ray Absorptiometry - Spine')
 df
 
 ## ----nhanestablevars, eval=FALSE----------------------------------------------
-#  nhanesTableVars('EXAM', 'BMX_D')
+# nhanesTableVars('EXAM', 'BMX_D')
 
 ## ----nhanestablevars1, echo=FALSE---------------------------------------------
 df <- data.frame(matrix(1,nrow=27,ncol=2))
@@ -56,14 +56,14 @@ df[27,] <- list('SEQN',         'Respondent sequence number.')
 df
 
 ## ----nhanes, eval=FALSE-------------------------------------------------------
-#  bmx_d  <- nhanes('BMX_D')
-#  demo_d <- nhanes('DEMO_D')
+# bmx_d  <- nhanes('BMX_D')
+# demo_d <- nhanes('DEMO_D')
 
 ## ----bmd1, eval=FALSE---------------------------------------------------------
-#  bmx_demo <- merge(demo_d, bmx_d)
-#  options(digits=4)
-#  select_cols <- c('RIAGENDR', 'BMXHT', 'BMXWT', 'BMXLEG', 'BMXCALF', 'BMXTHICR')
-#  print(bmx_demo[5:8,select_cols], row.names=FALSE)
+# bmx_demo <- merge(demo_d, bmx_d)
+# options(digits=4)
+# select_cols <- c('RIAGENDR', 'BMXHT', 'BMXWT', 'BMXLEG', 'BMXCALF', 'BMXTHICR')
+# print(bmx_demo[5:8,select_cols], row.names=FALSE)
 
 ## ----bmx4, echo=FALSE---------------------------------------------------------
 df <- data.frame(matrix(1,nrow=4,ncol=6))
@@ -76,7 +76,7 @@ df[4,] <- list('Male', 182.4, 101.9,   41.5,    42.6,     50.5)
 print(df,row.names=FALSE)
 
 ## ----nhanescodebook, eval=FALSE-----------------------------------------------
-#  nhanesCodebook('DEMO_D', 'RIAGENDR')
+# nhanesCodebook('DEMO_D', 'RIAGENDR')
 
 ## ----translate1, echo=FALSE---------------------------------------------------
 df <- data.frame(matrix(1,nrow=3,ncol=5))
@@ -92,8 +92,8 @@ names(codelist) <- c('Variable Name', 'SAS Label', 'English Text', 'Target', 'RI
 codelist
 
 ## ----nhanestranslate1, eval=FALSE---------------------------------------------
-#  bpx_d <- nhanes('BPX_D', translate=FALSE)
-#  head(bpx_d[,6:11])
+# bpx_d <- nhanes('BPX_D', translate=FALSE)
+# head(bpx_d[,6:11])
 
 ## ----simpletranslate1, echo=FALSE---------------------------------------------
 df <- data.frame(matrix(1,nrow=6,ncol=6))
@@ -107,16 +107,16 @@ df[1,] <- NA
 df
 
 ## ----nhanestranslate2, eval=FALSE---------------------------------------------
-#  bpx_d_vars  <- nhanesTableVars('EXAM', 'BPX_D', namesonly=TRUE)
-#  #Alternatively may use bpx_d_vars = names(bpx_d)
-#  bpx_d <- nhanesTranslate('BPX_D', bpx_d_vars, data=bpx_d)
+# bpx_d_vars  <- nhanesTableVars('EXAM', 'BPX_D', namesonly=TRUE)
+# #Alternatively may use bpx_d_vars = names(bpx_d)
+# bpx_d <- nhanesTranslate('BPX_D', bpx_d_vars, data=bpx_d)
 
 ## ----simpletranslate2, echo=FALSE---------------------------------------------
 translated <- c('BPAARM', 'BPACSZ', 'BPAEN2', 'BPAEN3', 'BPAEN4', 'BPQ150A', 'BPQ150B', 'BPQ150C', 'BPQ150D', 'BPXPTY', 'BPXPULS', 'PEASCCT1', 'PEASCST1')
 message(paste(c("Translated columns:", translated), collapse = ' '))
 
 ## ----nhanestranslate3, eval=FALSE---------------------------------------------
-#  head(bpx_d[,6:11])
+# head(bpx_d[,6:11])
 
 ## ----simpletranslate3, echo=FALSE---------------------------------------------
 df$BPAARM[df$BPAARM==1] <- 'Right'
@@ -127,72 +127,72 @@ df[df==4] <- 'Large (15X32)'
 df
 
 ## ----nhaneslapplytables, eval=FALSE-------------------------------------------
-#  q2007names  <- nhanesTables('Q', 2007, namesonly=TRUE)
-#  q2007tables <- lapply(q2007names, nhanes)
-#  names(q2007tables) <- q2007names
+# q2007names  <- nhanesTables('Q', 2007, namesonly=TRUE)
+# q2007tables <- lapply(q2007names, nhanes)
+# names(q2007tables) <- q2007names
 
 ## ----prepan, eval=FALSE-------------------------------------------------------
-#  #List all pre-pandemic tables
-#  nhanesSearchTableNames('^P_')
-#  #List table variables
-#  nhanesTableVars('EXAM', 'P_AUX', namesonly=TRUE)
-#  #List pre-pandemic EXAM tables
-#  nhanesTables('EXAM', 'P')
-#  #Table import, variable translation, and codebook display operate as usual
-#  p_dxxfem <- nhanes('P_DXXFEM')
-#  nhanesTranslate('P_BMX', 'BMDSTATS')
-#  nhanesCodebook('P_INS', 'LBDINSI')
+# #List all pre-pandemic tables
+# nhanesSearchTableNames('^P_')
+# #List table variables
+# nhanesTableVars('EXAM', 'P_AUX', namesonly=TRUE)
+# #List pre-pandemic EXAM tables
+# nhanesTables('EXAM', 'P')
+# #Table import, variable translation, and codebook display operate as usual
+# p_dxxfem <- nhanes('P_DXXFEM')
+# nhanesTranslate('P_BMX', 'BMDSTATS')
+# nhanesCodebook('P_INS', 'LBDINSI')
 
 ## ----nhanesdxa, eval=FALSE----------------------------------------------------
-#  #Import into R
-#  dxx_b <- nhanesDXA(2001)
-#  #Save to file
-#  nhanesDXA(2001, destfile="dxx_b.xpt")
-#  #Import supplemental data
-#  dxx_c_s <- nhanesDXA(2003, suppl=TRUE)
-#  #Apply code translations
-#  dxalist <- c('DXAEXSTS', 'DXIHE')
-#  dxx_b <- nhanesTranslate("dxxb",colnames=dxalist, data=dxx_b, dxa=TRUE)
+# #Import into R
+# dxx_b <- nhanesDXA(2001)
+# #Save to file
+# nhanesDXA(2001, destfile="dxx_b.xpt")
+# #Import supplemental data
+# dxx_c_s <- nhanesDXA(2003, suppl=TRUE)
+# #Apply code translations
+# dxalist <- c('DXAEXSTS', 'DXIHE')
+# dxx_b <- nhanesTranslate("dxxb",colnames=dxalist, data=dxx_b, dxa=TRUE)
 
 ## ----nnyfs, eval=FALSE--------------------------------------------------------
-#  #List NNYFS EXAM tables
-#  nhanesTables('EXAM', 'Y')
-#  #Table import and variable translation operate as usual
-#  y_cvx <- nhanes('Y_CVX')
-#  nhanesTranslate('Y_CVX','CVXPARC')
+# #List NNYFS EXAM tables
+# nhanesTables('EXAM', 'Y')
+# #Table import and variable translation operate as usual
+# y_cvx <- nhanes('Y_CVX')
+# nhanesTranslate('Y_CVX','CVXPARC')
 
 ## ----nhanessearch, eval=FALSE-------------------------------------------------
-#  # nhanesSearch use examples
-#  #
-#  # Search on the word bladder, restrict to the 2001-2008 surveys,
-#  # print out 50 characters of the variable description
-#  nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)
-#  #
-#  # Search on "urin" (will match urine, urinary, etc), from 1999-2010, return table names only
-#  nhanesSearch("urin", ignore.case=TRUE, ystop=2010, namesonly=TRUE)
-#  #
-#  # Search on "urin", exclude "During", search surveys from 1999-2010, return table names only
-#  nhanesSearch("urin", exclude_terms="during", ignore.case=TRUE, ystop=2010, namesonly=TRUE)
-#  #
-#  # Restrict search to 'EXAM' and 'LAB' data groups. Explicitly list matching and exclude terms, leave ignore.case set to default value of FALSE. Search surveys from 2009 to present.
-#  nhanesSearch(c("urin", "Urin"), exclude_terms=c("During", "eaten during", "do during"), data_group=c('EXAM', 'LAB'), ystart=2009)
-#  #
-#  # Search on "tooth" or "teeth", all years
-#  nhanesSearch(c("tooth", "teeth"), ignore.case=TRUE)
-#  #
-#  # Search for variables where the variable description begins with "Tooth"
-#  nhanesSearch("^Tooth")
+# # nhanesSearch use examples
+# #
+# # Search on the word bladder, restrict to the 2001-2008 surveys,
+# # print out 50 characters of the variable description
+# nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)
+# #
+# # Search on "urin" (will match urine, urinary, etc), from 1999-2010, return table names only
+# nhanesSearch("urin", ignore.case=TRUE, ystop=2010, namesonly=TRUE)
+# #
+# # Search on "urin", exclude "During", search surveys from 1999-2010, return table names only
+# nhanesSearch("urin", exclude_terms="during", ignore.case=TRUE, ystop=2010, namesonly=TRUE)
+# #
+# # Restrict search to 'EXAM' and 'LAB' data groups. Explicitly list matching and exclude terms, leave ignore.case set to default value of FALSE. Search surveys from 2009 to present.
+# nhanesSearch(c("urin", "Urin"), exclude_terms=c("During", "eaten during", "do during"), data_group=c('EXAM', 'LAB'), ystart=2009)
+# #
+# # Search on "tooth" or "teeth", all years
+# nhanesSearch(c("tooth", "teeth"), ignore.case=TRUE)
+# #
+# # Search for variables where the variable description begins with "Tooth"
+# nhanesSearch("^Tooth")
 
 ## ----nhanessearchvarname1, eval=FALSE-----------------------------------------
-#  #nhanesSearchVarName use examples
-#  nhanesSearchVarName('BPXPULS')
+# #nhanesSearchVarName use examples
+# nhanesSearchVarName('BPXPULS')
 
 ## ----nhanessearchvarname2, echo=FALSE-----------------------------------------
 bpxtables <- c("BPX_D", "BPX_E", "BPX",   "BPX_C", "BPX_B", "BPX_F", "BPX_G", "BPX_H", "BPX_I", "BPX_J")
 bpxtables
 
 ## ----nhanessearchvarname3, eval=FALSE-----------------------------------------
-#  nhanesSearchVarName('CSQ260i', includerdc=TRUE, nchar=38, namesonly=FALSE)
+# nhanesSearchVarName('CSQ260i', includerdc=TRUE, nchar=38, namesonly=FALSE)
 
 ## ----nhanessearchvarname4, echo=FALSE-----------------------------------------
 df <- data.frame(Variable.Name=character(2),
@@ -210,15 +210,15 @@ df[2,] <- list('CSQ260i', 'Do you now have any of the following p','CSX_H','Tast
 df
 
 ## ----nhanessearchtablenames1, eval=FALSE--------------------------------------
-#  # nhanesSearchTableNames use examples
-#  nhanesSearchTableNames('BMX')
+# # nhanesSearchTableNames use examples
+# nhanesSearchTableNames('BMX')
 
 ## ----nhanessearchtablename2, echo=FALSE---------------------------------------
 bpxtables <- c("BMX_D", "BMX",   "BMX_E", "BMX_C", "BMX_B", "BMX_F", "BMX_H", "BMX_G", "BMX_I", "BMX_J", "P_BMX")
 bpxtables
 
 ## ----nhanessearchtablenames3, eval=FALSE--------------------------------------
-#  nhanesSearchTableNames('HPVS', includerdc=TRUE, nchar=42, details=TRUE)
+# nhanesSearchTableNames('HPVS', includerdc=TRUE, nchar=42, details=TRUE)
 
 ## ----nhanessearchtablenames4, echo=FALSE--------------------------------------
 df <- data.frame(
