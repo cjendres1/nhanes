@@ -16,11 +16,10 @@
     .begin_year <- if (.is.even(year)) year - 1 else year
     
     # Define the table reference
-    metadata_questionnaire_descriptions <-
-      dplyr::tbl(cn(), I(MetadataTable("QuestionnaireDescriptions")))
-    
+    query <- dplyr::tbl(cn(), I(MetadataTable("QuestionnaireDescriptions")))
     # Build the query using dplyr
-    query = metadata_questionnaire_descriptions |>
+    if (!isTRUE(includerdc)) query <- dplyr::filter(query, UseConstraints == "None")
+    query <- query |>
       dplyr::filter(DataGroup == data_group,
                     BeginYear == .begin_year) |>
       dplyr::mutate(Component = concat(substr(DataGroup, 1, 1),
@@ -157,14 +156,10 @@
   ## FIXME: simplify query when namesonly = TRUE?
   
   # Define the schema-qualified table references
-  metadata_questionnaire_descriptions <-
-    dplyr::tbl(cn(), I(MetadataTable("QuestionnaireDescriptions")))
-  metadata_questionnaire_variables <-
-    dplyr::tbl(cn(), I(MetadataTable("QuestionnaireVariables")))
+  metadata_questionnaire_descriptions <- dplyr::tbl(cn(), I(MetadataTable("QuestionnaireDescriptions")))
+  query <- dplyr::tbl(cn(), I(MetadataTable("QuestionnaireVariables")))
   
-  # Build the query using dplyr
-  query <-
-    metadata_questionnaire_variables |>
+  query <- query |>
     dplyr::filter(Variable %in% varnames) |>
     dplyr::mutate(Variable.Description = substr(Description, 1, nchar))|>
     dplyr::select(Variable.Name = Variable,
@@ -173,7 +168,14 @@
     dplyr::inner_join(metadata_questionnaire_descriptions, by = "TableName") |>
     dplyr::mutate(Data.File.Description = substr(Description, 1, nchar),
                   Component = paste0(substr(DataGroup, 1, 1),
-                                     tolower(substr(DataGroup, 2, 20)))) |>
+                                     tolower(substr(DataGroup, 2, 20))))
+
+  # Apply additional filters based on includerdc, ystart and ystop
+  if (!isTRUE(includerdc)) query <- dplyr::filter(query, UseConstraints == "None")
+  if (!is.null(ystart)) query <- dplyr::filter(query, BeginYear >= ystart)
+  if (!is.null(ystop)) query <- dplyr::filter(query, EndYear <= ystop)
+
+  query <- query |>
     dplyr::select(Variable.Name,
                   Variable.Description,
                   Data.File.Name = TableName,
@@ -182,23 +184,13 @@
                   EndYear,
                   Component)
   
-  # Apply additional filters based on ystart and ystop
-  if (!is.null(ystart)) {
-    query <- dplyr::filter(query, Begin.Year >= ystart)
-  }
-  if (!is.null(ystop)) {
-    query <- dplyr::filter(query, EndYear <= ystop)
-  }
-  
   # Fetch the results by executing the query
-  df <- query |> dplyr::collect()
-  
+  df <- dplyr::collect(query)
   if(is.null(df)){
     warning(paste0("Variable ", varnames, " is not found in the database!"))
   }
-  
   if(namesonly){
-    df = unique(df$Data.File.Name)
+    df <- unique(df$Data.File.Name)
   }
   df
 }
@@ -213,22 +205,21 @@
            nchar = 128,
            details = FALSE)
 {
-  metadata_questionnaire_descriptions <-
-    dplyr::tbl(cn(), I(MetadataTable("QuestionnaireDescriptions")))
+  query <- dplyr::tbl(cn(), I(MetadataTable("QuestionnaireDescriptions")))
+  # filters based on includerdc, ystart and ystop
+  if (!isTRUE(includerdc)) query <- dplyr::filter(query, UseConstraints == "None")
+  if (!is.null(ystart)) query <- dplyr::filter(query, BeginYear >= ystart)
+  if (!is.null(ystop)) query <- dplyr::filter(query, EndYear <= ystop)
   
   # to use grepl we have load the whole table first, the table is not very big.
   df <-
-    dplyr::collect(metadata_questionnaire_descriptions) |> 
+    dplyr::collect(query) |> 
     dplyr::filter(grepl(pattern, TableName)) |>
     # dplyr::filter(dplyr::sql(paste0("TableName LIKE '%", pattern, "%'"))) |> 
     dplyr::mutate(Years = paste0(BeginYear, '-', EndYear)) |>
     dplyr::select(TableName,
                   Years,
                   Date.Published = DatePublished)
-  
-  # Apply additional filters based on ystart and ystop
-  if (!is.null(ystart)) df <- dplyr::filter(df, BeginYear >= ystart)
-  if (!is.null(ystop)) df <- dplyr::filter(df, EndYear <= ystop)
   if (is.null(df) || nrow(df)== 0) {
     warning("Cannot find any table name like: ", pattern)
   }
@@ -240,7 +231,7 @@
 
 
 .nhanesTranslateDB <- function(nh_table, colnames = NULL, data = FALSE, nchar = 32,
-                               mincategories = 2, details = FALSE, dxa = FALSE)
+                               mincategories = 1, details = FALSE, dxa = FALSE)
 {
   .checkTableNames(nh_table)
   if (!is.null(data)){
@@ -297,14 +288,12 @@
            namesonly = FALSE)
 {
   # Define the schema-qualified table references
-  metadata_questionnaire_descriptions <-
-    dplyr::tbl(cn(), I(MetadataTable("QuestionnaireDescriptions")))
-  metadata_questionnaire_variables <-
-    dplyr::tbl(cn(), I(MetadataTable("QuestionnaireVariables")))
+  metadata_questionnaire_descriptions <- dplyr::tbl(cn(), I(MetadataTable("QuestionnaireDescriptions")))
+  query <- dplyr::tbl(cn(), I(MetadataTable("QuestionnaireVariables")))
   
   # Join the tables
   query <-
-    metadata_questionnaire_variables |>
+    query |>
     dplyr::inner_join(metadata_questionnaire_descriptions, by = "TableName") |>
     dplyr::mutate(Variable.Name = Variable,
                   Variable.Description = substr(Description.x, 1, nchar),
@@ -314,6 +303,9 @@
                                      tolower(substr(DataGroup, 2, 20))),
                   Begin.Year = BeginYear,
                   EndYear = EndYear)
+  if (!isTRUE(includerdc))
+    query <- metadata_questionnaire_descriptions |>
+      dplyr::filter(UseConstraints == "None")
   
   # Apply search terms
   search_terms <- paste(search_terms, collapse = "|")
@@ -335,7 +327,6 @@
     data_group <- nhanes_group[data_group]
     data_group_pattern <- paste(data_group, collapse = "|")
     query <- query |> dplyr::filter(stringr::str_detect(DataGroup, data_group_pattern))
-    
   }
   
   # Apply year filters
