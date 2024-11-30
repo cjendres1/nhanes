@@ -84,7 +84,7 @@ time it is run.  More details such as the latest version and other
 useful options can be found
 [here](https://github.com/deepayan/nhanes-postgres/blob/main/README.md). Once
 the command runs successfully, one can log into RStudio Server running
-inside the docker container _via_ <http://localhost:8787> using the
+inside the docker container _via_ `http://localhost:8787` using the
 username and password set in the command above. The nhanesA package is
 already installed, and configured to use the database.
 
