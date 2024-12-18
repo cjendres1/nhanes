@@ -11,10 +11,13 @@
 ## nhanesTableURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/'
 ## nhanesManifestPrefix <- 'https://wwwn.cdc.gov'
 
+### sample of new path after changes in November 2024
+## https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2013/DataFiles/DEMO_H.htm
+
 ab_nhanesTableURL <- function(x) {
     if (!missing(x)) stop("Invalid assignment")
     paste0(Sys.getenv("NHANES_TABLE_BASE", unset = "https://wwwn.cdc.gov"),
-           "/Nchs/Nhanes/")
+           "/Nchs/Data/Nhanes/Public/")
 }
 
 ab_nhanesManifestPrefix <- function(x) {
@@ -23,7 +26,8 @@ ab_nhanesManifestPrefix <- function(x) {
 }
 
 
-nhanesURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/'
+nhanesURL <- 'https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/'
+nhanesSearchURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/'
 dataURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx'
 ladDataURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx?Component=LimitedAccess'
 dxaURL  <- "https://wwwn.cdc.gov/nchs/data/nhanes/dxa/"
@@ -72,12 +76,13 @@ nh_years <-
 
 # Continuous NHANES table names have a letter suffix that indicates the collection interval
 data_idx <-
-  c(A = "1999-2000", a = "1999-2000", B = "2001-2002", b = "2001-2002", 
-    C = "2003-2004", c = "2003-2004", D = "2005-2006", E = "2007-2008", 
-    F = "2009-2010", G = "2011-2012", H = "2013-2014", I = "2015-2016", 
-    J = "2017-2018", K = "2019-2020", L = "2021-2022", M = "2023-2024")
+  c(A = "1999", a = "1999", B = "2001", b = "2001", 
+    C = "2003", c = "2003", D = "2005", E = "2007", 
+    F = "2009", G = "2011", H = "2013", I = "2015", 
+    J = "2017", K = "2019", L = "2021", M = "2023")
 
-anomalytables2005 <- c('CHLMD_DR', 'SSUECD_R', 'HSV_DR')
+anomalytables2003 <- c('SSUECD_R')
+anomalytables2005 <- c('CHLMD_DR', 'HSV_DR')
 nchar_max <- 1024
 nchar_default <- 128
 

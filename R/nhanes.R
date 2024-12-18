@@ -61,7 +61,7 @@ nhanes <- function(nh_table, includelabels = FALSE,
     if(startsWith(nh_table, "Y_")) {
       url <- paste0('https://wwwn.cdc.gov/Nchs/', nh_year, '/', nh_table, '.XPT')
     } else {
-      url <- paste0(nhanesTableURL, nh_year, '/', nh_table, '.XPT')
+      url <- paste0(nhanesTableURL, nh_year, '/DataFiles/', nh_table, '.XPT')
     }
     ## ask server for file size and adjust options("timeout") accordingly
     min_timeout <- estimate_timeout(url, factor = adjust_timeout)
@@ -290,7 +290,7 @@ nhanesAttr <- function(nh_table) {
     if(startsWith(nh_table, "Y_")) {
       url <- paste0('https://wwwn.cdc.gov/Nchs/', nh_year, '/', nh_table, '.XPT')
     } else {
-      url <- paste0(nhanesTableURL, nh_year, '/', nh_table, '.XPT')
+      url <- paste0(nhanesTableURL, nh_year, '/DataFiles/', nh_table, '.XPT')
     }
     
     tf <- tempfile()
@@ -391,13 +391,13 @@ browseNHANES <- function(year = NULL, data_group = NULL, nh_table = NULL,
     } else {
       nh_year <- .get_year_from_nh_table(nh_table)
       url <- paste0(if (local) nhanesTableURL else nhanesURL,
-                   nh_year, '/', nh_table, '.htm')
+                   nh_year, '/DataFiles/', nh_table, '.htm')
       handleURL(url)
     }
   } else if(!is.null(year)) {
     if(!is.null(data_group)) {
       nh_year <- .get_nh_survey_years(year)
-      url <- paste0(nhanesURL, 'Search/DataPage.aspx?Component=', 
+      url <- paste0(nhanesSearchURL, 'Search/DataPage.aspx?Component=', 
                     nhanes_group[data_group],
                     '&CycleBeginYear=', unlist(str_split(nh_year, '-'))[[1]])
       handleURL(url)
@@ -405,7 +405,7 @@ browseNHANES <- function(year = NULL, data_group = NULL, nh_table = NULL,
       nh_year <- .get_nh_survey_years(year)
 #      nh_year <- str_c(str_sub(unlist(str_extract_all(nh_year,"[[:digit:]]{4}")),3,4),collapse='_')
       nh_year <- unlist(str_extract_all(nh_year, "[[:digit:]]{4}"))[1]
-      url <- paste0(nhanesURL, 'continuousnhanes/default.aspx?BeginYear=', nh_year)
+      url <- paste0(nhanesSearchURL, 'continuousnhanes/default.aspx?BeginYear=', nh_year)
       handleURL(url)
     }
   } else {
