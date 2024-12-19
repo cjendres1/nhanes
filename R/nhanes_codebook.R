@@ -48,7 +48,7 @@ nhanesCodebook <- function(nh_table, colname=NULL, dxa=FALSE) {
     if(nh_year == "Nnyfs"){
       url <- paste0("https://wwwn.cdc.gov/Nchs/", nh_year, '/', nh_table, '.htm')
     } else {
-      url <- paste0(nhanesTableURL, nh_year, '/', nh_table, '.htm')
+      url <- paste0(nhanesTableURL, nh_year, '/DataFiles/', nh_table, '.htm')
     }
   }
   hurl <- .checkHtml(url)

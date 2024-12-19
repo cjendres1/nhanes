@@ -303,8 +303,9 @@
                                      tolower(substr(DataGroup, 2, 20))),
                   Begin.Year = BeginYear,
                   EndYear = EndYear)
-  if (!isTRUE(includerdc))
-    query <- metadata_questionnaire_descriptions |>
+  if (!isTRUE(includerdc)) 
+    query <- 
+      query |>
       dplyr::filter(UseConstraints == "None")
   
   # Apply search terms

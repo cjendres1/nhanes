@@ -11,11 +11,12 @@
 # If there is no suffix, then we are likely dealing with data from 1999-2000.
 
 .get_year_from_nh_table <- function(nh_table) {
-  if(nh_table %in% anomalytables2005) { return('2005-2006') }
-  if(startsWith(nh_table, "P_")) { return('2017-2018') } # Pre-pandemic
+  if(nh_table %in% anomalytables2005) { return('2005') }
+  else if(nh_table %in% anomalytables2003) { return('2003') }
+  if(startsWith(nh_table, "P_")) { return('2017') } # Pre-pandemic
   if(startsWith(nh_table, "Y_")) { return('Nnyfs') } # Youth survey
   ## exceptions: PFC_POOL and SSNH4THY are cycle 2 but don't have _B suffix
-  if(nh_table %in% c("PFC_POOL", "SSNH4THY")) { return('2001-2002') }
+  if(nh_table %in% c("PFC_POOL", "SSNH4THY")) { return('2001') }
   nhloc <- data.frame(stringr::str_locate_all(nh_table, '_'))
   nn <- nrow(nhloc)
   if(nn!=0){ #Underscores were found
@@ -29,9 +30,9 @@
       }
       return(data_idx[idx])
     } else { ## Underscore not 2nd to last. Assume table is from the first set.
-      return("1999-2000")}
+      return("1999")}
   } else { #If there are no underscores then table must be from first survey
-    return("1999-2000")
+    return("1999")
   }
   ## FIXME check: may be simpler to just check endsWith("_A"), endsWith("_B"), etc
 }

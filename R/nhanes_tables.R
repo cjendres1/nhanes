@@ -156,14 +156,20 @@ nhanesManifest_public <- function(sizes, verbose, component = NULL)
   tab1 <- hurl |> html_elements(xpath=xpath)
   ##pull out all the hrefs
   hrefs <- tab1 |> html_nodes("a") |> html_attr("href") |> parseRedirect()
-  ## There's a spurious # which needs to be removed
+  ## There are several spurious # which needs to be removed (withdrawn tables)
   hrefs <- hrefs[hrefs != "#"]
   df <- tab1 |> html_table() |> as.data.frame()
   df$Table <- sub(" Doc", "", df$Doc.File)
-  ## PAHS_H was withdrawn - only one entry in the table
+  ## PAHS_H and SSEVD_* were withdrawn
   ## The corresponding row has no useful HREFs, so there is a length mismatch
   ## subset(df, Date.Published == "Withdrawn")
   df <- subset(df, Date.Published != "Withdrawn")
+  ## As of Dec 2024, there is a spurious row (DNMEPI) with Doc but no
+  ## Data link. Compensating as a special case
+  for (drop_name in c("DNMEPI")) {
+      df <- subset(df, !(startsWith(Doc.File, drop_name) | startsWith(Data.File, drop_name)))
+      hrefs <- hrefs[ !startsWith(basename(hrefs), drop_name)  ]
+  }
   ## make sure lengths now match
   if (nrow(df) * 2 != length(hrefs)) stop("Wrong number of URLs in table manifest")
   df$DocURL <- hrefs[c(TRUE, FALSE)]
