@@ -397,7 +397,7 @@ browseNHANES <- function(year = NULL, data_group = NULL, nh_table = NULL,
   } else if(!is.null(year)) {
     if(!is.null(data_group)) {
       nh_year <- .get_nh_survey_years(year)
-      url <- paste0(nhanesSearchURL, 'Search/DataPage.aspx?Component=', 
+      url <- paste0(nhanesURL, 'Search/DataPage.aspx?Component=', 
                     nhanes_group[data_group],
                     '&CycleBeginYear=', unlist(str_split(nh_year, '-'))[[1]])
       handleURL(url)
@@ -405,7 +405,7 @@ browseNHANES <- function(year = NULL, data_group = NULL, nh_table = NULL,
       nh_year <- .get_nh_survey_years(year)
 #      nh_year <- str_c(str_sub(unlist(str_extract_all(nh_year,"[[:digit:]]{4}")),3,4),collapse='_')
       nh_year <- unlist(str_extract_all(nh_year, "[[:digit:]]{4}"))[1]
-      url <- paste0(nhanesSearchURL, 'continuousnhanes/default.aspx?BeginYear=', nh_year)
+      url <- paste0(nhanesURL, 'continuousnhanes/default.aspx?BeginYear=', nh_year)
       handleURL(url)
     }
   } else {

@@ -26,20 +26,19 @@ ab_nhanesManifestPrefix <- function(x) {
 }
 
 
-nhanesURL <- 'https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/'
-nhanesSearchURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/'
+nhanesURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/'
 dataURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx'
 ladDataURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx?Component=LimitedAccess'
 dxaURL  <- "https://wwwn.cdc.gov/nchs/data/nhanes/dxa/"
 dxaTablesURL  <- "https://wwwn.cdc.gov/Nchs/Nhanes/Dxa/Dxa.aspx"
 
-demoURL <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Demographics"
-dietURL <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Dietary"
-examURL <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Examination"
-labURL  <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Laboratory"
-qURL    <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Questionnaire"
-ladURL  <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=LimitedAccess"
-varURLs <- c(demoURL, dietURL, examURL, labURL, qURL) #, ladURL)
+demoURL <- "https://wwwn.cdc.gov/nchs/nhanes/search/datapage.aspx?Component=Demographics"
+dietURL <- "https://wwwn.cdc.gov/nchs/nhanes/search/datapage.aspx?Component=Dietary"
+examURL <- "https://wwwn.cdc.gov/nchs/nhanes/search/datapage.aspx?Component=Examination"
+labURL  <- "https://wwwn.cdc.gov/nchs/nhanes/search/datapage.aspx?Component=Laboratory"
+qURL    <- "https://wwwn.cdc.gov/nchs/nhanes/search/datapage.aspx?Component=Questionnaire"
+ladURL  <- "https://wwwn.cdc.gov/nchs/nhanes/search/datapage.aspx?Component=LimitedAccess"
+varURLs <- c(demoURL, dietURL, examURL, labURL, qURL) 
 
 
 # Create a list of nhanes groups
