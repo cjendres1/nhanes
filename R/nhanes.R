@@ -61,7 +61,7 @@ nhanes <- function(nh_table, includelabels = FALSE,
     if(startsWith(nh_table, "Y_")) {
       url <- paste0('https://wwwn.cdc.gov/Nchs/', nh_year, '/', nh_table, '.XPT')
     } else {
-      url <- paste0(nhanesTableURL, nh_year, '/', nh_table, '.XPT')
+      url <- paste0(nhanesTableURL, nh_year, '/DataFiles/', nh_table, '.XPT')
     }
     ## ask server for file size and adjust options("timeout") accordingly
     min_timeout <- estimate_timeout(url, factor = adjust_timeout)
@@ -290,7 +290,7 @@ nhanesAttr <- function(nh_table) {
     if(startsWith(nh_table, "Y_")) {
       url <- paste0('https://wwwn.cdc.gov/Nchs/', nh_year, '/', nh_table, '.XPT')
     } else {
-      url <- paste0(nhanesTableURL, nh_year, '/', nh_table, '.XPT')
+      url <- paste0(nhanesTableURL, nh_year, '/DataFiles/', nh_table, '.XPT')
     }
     
     tf <- tempfile()
@@ -391,7 +391,7 @@ browseNHANES <- function(year = NULL, data_group = NULL, nh_table = NULL,
     } else {
       nh_year <- .get_year_from_nh_table(nh_table)
       url <- paste0(if (local) nhanesTableURL else nhanesURL,
-                   nh_year, '/', nh_table, '.htm')
+                   nh_year, '/DataFiles/', nh_table, '.htm')
       handleURL(url)
     }
   } else if(!is.null(year)) {

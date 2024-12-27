@@ -128,7 +128,7 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128,
       if(nh_year == "Nnyfs"){
         paste0("https://wwwn.cdc.gov/Nchs/", nh_year, '/', nh_table, '.htm')
       } else {
-        paste0(nhanesTableURL, nh_year, '/', nh_table, '.htm')
+        paste0(nhanesTableURL, nh_year, '/DataFiles/', nh_table, '.htm')
       }
   }
   hurl <- .checkHtml(code_translation_url)
