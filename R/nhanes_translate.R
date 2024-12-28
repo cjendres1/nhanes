@@ -204,15 +204,20 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128,
 
 
 
-## alternative translate interface: given input (raw) data and input
+## The raw2translated() function below provides an alternative
+## translation interface given input (raw) data and input
 ## codebook. The intent is for this to work with data either from the
-## NHANES website or from the DB
+## NHANES website or from the DB. raw2translated() is currently
+## unexported, but used in nhanesFromURL(). It may be exported in some
+## form in future.
+
+## The intermediate functions are various helper utilities.
 
 
 ## numeric variables sometimes have 'codes' which have special
 ## meaning. Often these indicate left or right censoring (e.g., age >=
 ## 80 is coded as 80), or some special kind of missingness (e.g.,
-## refused / don't know). Sometimes these need to be handled on a case
+## "refused" / "don't know"). Sometimes these need to be handled on a case
 ## by case basis.
 
 ## Converting these to numerical values inevitably lose information,
@@ -384,11 +389,9 @@ specialNumericCodes <-
       )
 
 
-
-
-
-## convert 'raw' codes to either numeric or string (categorical)
-## values using codebook. For now, we will only
+## The next two functions convert 'raw' codes to either numeric or
+## string (categorical) values using a codebook. For now, we will only
+##
 ## - convert the 'NA' values to NA
 ## - complain if we see 'categorical' values
 
