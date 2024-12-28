@@ -185,7 +185,7 @@ nhanesSearch <- function(search_terms = NULL, exclude_terms = NULL,
 #' \donttest{bmx = nhanesSearchTableNames('BMX')}
 #' \donttest{length(bmx)}
 #' \donttest{hepbd = nhanesSearchTableNames('HEPBD')}
-#' \donttest{dim(hepbd)}
+#' \donttest{length(hepbd)}
 #' \donttest{hpvs = nhanesSearchTableNames('HPVS', includerdc=TRUE, details=TRUE)}
 #' \donttest{dim(hpvs)}
 #' @export
