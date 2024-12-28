@@ -23,7 +23,8 @@
 ##
 ## Consequently, the default value of `nhanesTableURL` has from
 ## 'https://wwwn.cdc.gov/Nchs/Nhanes/' to
-## 'https://wwwn.cdc.gov//Nchs/Data/Nhanes/Public/'
+## 'https://wwwn.cdc.gov//Nchs/Data/Nhanes/Public/'. The 'DataFiles'
+## part has been incorporated as needed in other functions such as nhanes().
 
 ab_nhanesTableURL <- function(x) {
     if (!missing(x)) stop("Invalid assignment")
