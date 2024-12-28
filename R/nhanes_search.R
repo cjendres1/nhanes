@@ -291,8 +291,10 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
 #' contain the given variable name. Only a single variable name may be entered, and only
 #' exact matches will be found.
 #' @examples 
-#' \donttest{nhanesSearchVarName('BMXLEG')}
-#' \donttest{nhanesSearchVarName('BMXHEAD', ystart=2003)}
+#' \donttest{bmxleg = nhanesSearchVarName('BMXLEG')}
+#' \donttest{length(bmxleg)}
+#' \donttest{bmxhead = nhanesSearchVarName('BMXHEAD', ystart=2003)}
+#' \donttest{length(bmxhead)}
 #' @export
 #'  
 nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=128, namesonly=TRUE) {
