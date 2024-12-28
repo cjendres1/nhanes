@@ -1,6 +1,7 @@
 ##notes
 
 .dbEnv <- new.env(parent = emptyenv())
+.nhanesCacheEnv <- new.env(parent = emptyenv())
 
 cn <- function() .dbEnv$cn
 translatedTables <- function() .dbEnv$translatedTables

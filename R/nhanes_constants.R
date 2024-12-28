@@ -7,12 +7,23 @@
 ## from a local copy). To keep the implementing functions see them as
 ## regular character variables, we implement them as active bindings
 ## (see .onLoad() in zzz.R).
+##
+## Default values:
+##   nhanesTableURL <- 'https://wwwn.cdc.gov//Nchs/Data/Nhanes/Public/'
+##   nhanesManifestPrefix <- 'https://wwwn.cdc.gov'
 
-## nhanesTableURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/'
-## nhanesManifestPrefix <- 'https://wwwn.cdc.gov'
-
-### sample of new path after changes in November 2024
-## https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2013/DataFiles/DEMO_H.htm
+## Note that the CDC changed the layout of data / doc files in November
+## 2024. For example, the DEMO_H doc URL, which was previously 
+##
+## <https://wwwn.cdc.gov/Nchs/Nhanes/2013-2014/DEMO_H.htm>
+##
+## has changed to
+##
+## <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2013/DataFiles/DEMO_H.htm>
+##
+## Consequently, the default value of `nhanesTableURL` has from
+## 'https://wwwn.cdc.gov/Nchs/Nhanes/' to
+## 'https://wwwn.cdc.gov//Nchs/Data/Nhanes/Public/'
 
 ab_nhanesTableURL <- function(x) {
     if (!missing(x)) stop("Invalid assignment")
@@ -24,7 +35,6 @@ ab_nhanesManifestPrefix <- function(x) {
     if (!missing(x)) stop("Invalid assignment")
     Sys.getenv("NHANES_TABLE_BASE", unset = "https://wwwn.cdc.gov")
 }
-
 
 nhanesURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/'
 dataURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx'
