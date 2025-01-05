@@ -2,7 +2,7 @@
 % Please edit documentation in R/nhanes.R
 \name{nhanesTableSummary}
 \alias{nhanesTableSummary}
-\title{Summarize NHANES table}
+\title{Summarize an NHANES table}
 \usage{
 nhanesTableSummary(nh_table, use = c("data", "codebook", "both"), ...)
 }
@@ -12,8 +12,8 @@ nhanesTableSummary(nh_table, use = c("data", "codebook", "both"), ...)
 \item{use}{character string, whether to create a summary from the
 data itself or the codebook, which respectively use either the
 NHANES SAS data files or the HTML documentation files. If
-\code{use = "both"} then both are computed as merged; the
-\code{src} and \code{...} arguments are ignored in this case.}
+\code{use = "both"} then both are computed and merged; additional
+arguments (\code{...}) are ignored in this case.}
 
 \item{...}{additional arguments, usually passed on to either
 \code{\link{nhanes}} or \code{\link{nhanesCodebook}} as
@@ -26,11 +26,18 @@ A data frame with one row per variable, with columns
   depending on the value of the \code{use} argument.
 }
 \description{
-Summarize a NHANES table
+Computes a per-variable summary of a NHANES table either using the
+actual data or its corresponding codebook
 }
 \details{
-Returns a per-variable summary of a NHANES table either using the
-actual data or its corresponding codebook
+This function computes useful summaries of each variable included
+in the specified NHANES table. The resulting data frame contains
+one row for each variable in the table, and includes summary
+measures that indicate the total number of observations, the
+number of missing observations, whether the variable is most
+likely numeric or categorical, whether the variable is related to
+skipping other variables, etc. The precise details depend on the
+\code{use} argument and are subject to change.
 }
 \examples{
 \donttest{nhanesTableSummary('DEMO_D', use = "data")}

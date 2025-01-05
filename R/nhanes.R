@@ -194,8 +194,6 @@ nhanesFromURL <- function(url, translated = TRUE, cleanse_numeric = TRUE,
 } 
 
 
-
-
 ## #------------------------------------------------------------------------------
 #' Import Dual Energy X-ray Absorptiometry (DXA) data.
 #' 
@@ -299,10 +297,10 @@ nhanesDXA <- function(year, suppl=FALSE, destfile=NULL, adjust_timeout = TRUE) {
 #'   URL instead of \url{https://wwwn.cdc.gov} (this allows the use of
 #'   a local or alternative mirror of the CDC data).
 #' @examples 
-#' \donttest{bpx_e = nhanesAttr('BPX_E')}
-#' \donttest{length(bpx_e)}
-#' \donttest{folate_f = nhanesAttr('FOLATE_F')}
-#' \donttest{length(folate_f)}
+#' \dontrun{bpx_e = nhanesAttr('BPX_E')}
+#' \dontrun{length(bpx_e)}
+#' \dontrun{folate_f = nhanesAttr('FOLATE_F')}
+#' \dontrun{length(folate_f)}
 #' @export
 #' 
 nhanesAttr <- function(nh_table) {

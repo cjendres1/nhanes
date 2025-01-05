@@ -1,6 +1,6 @@
 Package: nhanesA
-Version: 1.2.3
-Date: 2024-12-28
+Version: 1.2.4
+Date: 2025-01-05
 Title: NHANES Data Retrieval
 Authors@R:
     c(person(given = "Christopher",
@@ -31,7 +31,7 @@ Imports:
     dplyr,
     plyr
 Description: Utility to retrieve data from the National Health and Nutrition 
-	Examination Survey (NHANES) website <https://www.cdc.gov/nchs/nhanes/index.htm>.
+	Examination Survey (NHANES) website <https://www.cdc.gov/nchs/nhanes/>.
 License: GPL (>= 2)
 Encoding: UTF-8
 URL: https://cran.r-project.org/package=nhanesA
