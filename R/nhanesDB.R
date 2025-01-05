@@ -295,6 +295,7 @@
   query <-
     query |>
     dplyr::inner_join(metadata_questionnaire_descriptions, by = "TableName") |>
+    dplyr::collect() |> 
     dplyr::mutate(Variable.Name = Variable,
                   Variable.Description = substr(Description.x, 1, nchar),
                   Data.File.Name = TableName,

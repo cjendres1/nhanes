@@ -118,13 +118,29 @@ nhanes <- function(nh_table, includelabels = FALSE,
 }
 
 
-##' Download an NHANES table from URL
+##' Download NHANES table from URL
 ##'
-##' Downloads an NHANES table from a URL and returns it as a data frame
-##' @title Parse NHANES doc URL
+##' Downloads an NHANES table from a URL and returns it as a data
+##' frame.
+##'
+##' This function downloads a table from the NHANES website using its
+##' URL. It is similar to \code{\link{nhanes}}, except that it
+##' requires the URL to be explicitly specified, and does not try to
+##' infer it from the table name. It also performs some limited
+##' cleansing of the data by default.
+##'
+##' The URL may be completely specified, but the initial standard
+##' prefix \code{"https://wwwn.cdc.gov"} may be optionally
+##' dropped. More precisely, if the URL starts with \code{"/nchs/"},
+##' then the prefix is automatically added. It is possible to override
+##' the default prefix by setting the environment variable
+##' \code{NHANES_TABLE_BASE} (this allows the use of a local or
+##' alternative mirror of the CDC data).
+##' 
 ##' @importFrom tools file_path_sans_ext
-##' @param url URL of XPT file to be downloaded
-##' @param translated logical, whether variable codes should be translated
+##' @param url URL of XPT file to be downloaded.
+##' @param translated logical, whether variable codes should be
+##'   translated
 ##' @param cleanse_numeric Logical flag. If \code{TRUE}, some special
 ##'   codes in numeric variables, such as \sQuote{Refused} and
 ##'   \sQuote{Don't know} will be converted to \code{NA}.
@@ -135,7 +151,12 @@ nhanes <- function(nh_table, includelabels = FALSE,
 ##'   downloaded, as reported by the server. The value can also be a
 ##'   positive numeric value, in which case it is used as a further
 ##'   multiplicative factor for the default calculation.
-##' @return data frame
+##' @return A data frame containing the data in the XPT file avalable
+##'   at the URL.
+##' @examples 
+##' \donttest{vix_e = nhanesFromURL("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2007/DataFiles/VIX_E.xpt")}
+##' \donttest{bpx_e = nhanesFromURL("/Nchs/Data/Nhanes/Public/2007/DataFiles/BPX_E.xpt", translated = FALSE)}
+##' \donttest{dim(bpx_e)}
 ##' @export
 nhanesFromURL <- function(url, translated = TRUE, cleanse_numeric = TRUE,
                           nchar = 128, adjust_timeout = TRUE)
@@ -251,8 +272,9 @@ nhanesDXA <- function(year, suppl=FALSE, destfile=NULL, adjust_timeout = TRUE) {
 #------------------------------------------------------------------------------
 #' Returns the attributes of an NHANES data table.
 #' 
-#' Returns attributes such as number of rows, columns, and memory size,
-#' but does not return the table itself.
+#' Returns attributes such as number of rows, columns, and memory
+#' size, but does not return the table itself. This function is
+#' deprecated. Use \code{nhanesTableSummary} instead.
 #' 
 #' @importFrom foreign read.xport
 #' @importFrom utils object.size
@@ -270,11 +292,12 @@ nhanesDXA <- function(year, suppl=FALSE, destfile=NULL, adjust_timeout = TRUE) {
 #'   retrieve these characteristics, the specified table is
 #'   downloaded, characteristics are determined, then the table is
 #'   deleted. Downloads a table from the NHANES website as is, i.e. in
-#'   its entirety with no modification or cleansing. If the
-#'   environment variable \code{NHANES_TABLE_BASE} was set during
-#'   startup, the value of this variable is used as the base URL
-#'   instead of \url{https://wwwn.cdc.gov} (this allows the use of a
-#'   local or alternative mirror of the CDC data).
+#'   its entirety with no modification or cleansing.
+#'
+#'   If the environment variable \code{NHANES_TABLE_BASE} was set
+#'   during startup, the value of this variable is used as the base
+#'   URL instead of \url{https://wwwn.cdc.gov} (this allows the use of
+#'   a local or alternative mirror of the CDC data).
 #' @examples 
 #' \donttest{bpx_e = nhanesAttr('BPX_E')}
 #' \donttest{length(bpx_e)}
@@ -283,6 +306,7 @@ nhanesDXA <- function(year, suppl=FALSE, destfile=NULL, adjust_timeout = TRUE) {
 #' @export
 #' 
 nhanesAttr <- function(nh_table) {
+  .Deprecated("nhanesTableSummary")
   nht <- tryCatch({    
 
     nh_year <- .get_year_from_nh_table(nh_table)
@@ -421,6 +445,9 @@ browseNHANES <- function(year = NULL, data_group = NULL, nh_table = NULL,
 ## match (to the extent that the codebook has the relevant
 ## information).
 
+## The following internal (unexported) functions are used by
+## nhanesTableSummary(), which the user is expected to call.
+
 ## The first one is similar to nhanesAttr() but does not use the XPT file directly
 
 variableSummary_data <- function(x) {
@@ -508,17 +535,26 @@ nhanesSummary_codebook <- function(nh_table, src = nhanesCodebook(nh_table, ...)
   return(nhtatt)
 }
 
-##' Summarize a NHANES table
+##' Summarize an NHANES table
 ##'
-##' Returns a per-variable summary of a NHANES table either using the
+##' Computes a per-variable summary of a NHANES table either using the
 ##' actual data or its corresponding codebook
-##' @title Summarize NHANES table
+##'
+##' This function computes useful summaries of each variable included
+##' in the specified NHANES table. The resulting data frame contains
+##' one row for each variable in the table, and includes summary
+##' measures that indicate the total number of observations, the
+##' number of missing observations, whether the variable is most
+##' likely numeric or categorical, whether the variable is related to
+##' skipping other variables, etc. The precise details depend on the
+##' \code{use} argument and are subject to change.
+##' 
 ##' @param nh_table the name of a valid NHANES table
 ##' @param use character string, whether to create a summary from the
 ##'   data itself or the codebook, which respectively use either the
 ##'   NHANES SAS data files or the HTML documentation files. If
-##'   \code{use = "both"} then both are computed as merged; the
-##'   \code{src} and \code{...} arguments are ignored in this case.
+##'   \code{use = "both"} then both are computed and merged; additional
+##'   arguments (\code{...}) are ignored in this case.
 ##' @param ... additional arguments, usually passed on to either
 ##'   \code{\link{nhanes}} or \code{\link{nhanesCodebook}} as
 ##'   appropriate. Alternatively, the \code{src} argument can be used
