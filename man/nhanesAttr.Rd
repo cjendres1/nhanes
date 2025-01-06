@@ -20,8 +20,9 @@ size = total size of table in bytes \cr
 types = data types of each column
 }
 \description{
-Returns attributes such as number of rows, columns, and memory size,
-but does not return the table itself.
+Returns attributes such as number of rows, columns, and memory
+size, but does not return the table itself. This function is
+deprecated. Use \code{nhanesTableSummary} instead.
 }
 \details{
 nhanesAttr allows one to check the size and other
@@ -29,15 +30,16 @@ nhanesAttr allows one to check the size and other
   retrieve these characteristics, the specified table is
   downloaded, characteristics are determined, then the table is
   deleted. Downloads a table from the NHANES website as is, i.e. in
-  its entirety with no modification or cleansing. If the
-  environment variable \code{NHANES_TABLE_BASE} was set during
-  startup, the value of this variable is used as the base URL
-  instead of \url{https://wwwn.cdc.gov} (this allows the use of a
-  local or alternative mirror of the CDC data).
+  its entirety with no modification or cleansing.
+
+  If the environment variable \code{NHANES_TABLE_BASE} was set
+  during startup, the value of this variable is used as the base
+  URL instead of \url{https://wwwn.cdc.gov} (this allows the use of
+  a local or alternative mirror of the CDC data).
 }
 \examples{
-\donttest{bpx_e = nhanesAttr('BPX_E')}
-\donttest{length(bpx_e)}
-\donttest{folate_f = nhanesAttr('FOLATE_F')}
-\donttest{length(folate_f)}
+\dontrun{bpx_e = nhanesAttr('BPX_E')}
+\dontrun{length(bpx_e)}
+\dontrun{folate_f = nhanesAttr('FOLATE_F')}
+\dontrun{length(folate_f)}
 }

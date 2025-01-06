@@ -2,7 +2,7 @@
 % Please edit documentation in R/nhanes.R
 \name{nhanesFromURL}
 \alias{nhanesFromURL}
-\title{Parse NHANES doc URL}
+\title{Download NHANES table from URL}
 \usage{
 nhanesFromURL(
   url,
@@ -13,9 +13,10 @@ nhanesFromURL(
 )
 }
 \arguments{
-\item{url}{URL of XPT file to be downloaded}
+\item{url}{URL of XPT file to be downloaded.}
 
-\item{translated}{logical, whether variable codes should be translated}
+\item{translated}{logical, whether variable codes should be
+translated}
 
 \item{cleanse_numeric}{Logical flag. If \code{TRUE}, some special
 codes in numeric variables, such as \sQuote{Refused} and
@@ -31,11 +32,30 @@ positive numeric value, in which case it is used as a further
 multiplicative factor for the default calculation.}
 }
 \value{
-data frame
+A data frame containing the data in the XPT file avalable
+  at the URL.
 }
 \description{
-Download an NHANES table from URL
+Downloads an NHANES table from a URL and returns it as a data
+frame.
 }
 \details{
-Downloads an NHANES table from a URL and returns it as a data frame
+This function downloads a table from the NHANES website using its
+URL. It is similar to \code{\link{nhanes}}, except that it
+requires the URL to be explicitly specified, and does not try to
+infer it from the table name. It also performs some limited
+cleansing of the data by default.
+
+The URL may be completely specified, but the initial standard
+prefix \code{"https://wwwn.cdc.gov"} may be optionally
+dropped. More precisely, if the URL starts with \code{"/nchs/"},
+then the prefix is automatically added. It is possible to override
+the default prefix by setting the environment variable
+\code{NHANES_TABLE_BASE} (this allows the use of a local or
+alternative mirror of the CDC data).
+}
+\examples{
+\donttest{vix_e = nhanesFromURL("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2007/DataFiles/VIX_E.xpt")}
+\donttest{bpx_e = nhanesFromURL("/Nchs/Data/Nhanes/Public/2007/DataFiles/BPX_E.xpt", translated = FALSE)}
+\donttest{dim(bpx_e)}
 }

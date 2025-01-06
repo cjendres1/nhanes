@@ -47,7 +47,7 @@ that match a given name pattern. Only a single pattern may be entered.
 \donttest{bmx = nhanesSearchTableNames('BMX')}
 \donttest{length(bmx)}
 \donttest{hepbd = nhanesSearchTableNames('HEPBD')}
-\donttest{dim(hepbd)}
+\donttest{length(hepbd)}
 \donttest{hpvs = nhanesSearchTableNames('HPVS', includerdc=TRUE, details=TRUE)}
 \donttest{dim(hpvs)}
 }
