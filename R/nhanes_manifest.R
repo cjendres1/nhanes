@@ -224,12 +224,14 @@ nhanesManifest_public <- function(sizes, verbose, component = NULL)
   ## The corresponding row has no useful HREFs, so there is a length mismatch
   ## subset(df, Date.Published == "Withdrawn")
   df <- subset(df, Date.Published != "Withdrawn")
-  ## As of Dec 2024, there is a spurious row (DNMEPI) with Doc but no
-  ## Data link. Compensating as a special case
-  for (drop_name in c("DNMEPI")) {
+  ## Compensate for spurious rows with Doc link but no Data link
+  ## As of Dec 2024: DNMEPI
+  ## As of Sep 2025: DSBI_L, DSII_L, DSPI_L (no more DNMEPI)
+  for (drop_name in c("DNMEPI", "DSBI_L", "DSII_L", "DSPI_L")) {
       df <- subset(df, !(startsWith(Doc.File, drop_name) | startsWith(Data.File, drop_name)))
       hrefs <- hrefs[ !startsWith(basename(hrefs), drop_name)  ]
   }
+
   ## make sure lengths now match
   if (nrow(df) * 2 != length(hrefs)) stop("Wrong number of URLs in table manifest")
   df$DocURL <- hrefs[c(TRUE, FALSE)]
