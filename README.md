@@ -93,7 +93,7 @@ is already installed, and configured to use the database.
 
 ## Working with nhanesA
 
-- [Manual](https://cran.r-project.org/package=nhanesA/nhanesA.pdf)
+- [Manual](https://cran.r-project.org/package=nhanesA/refman/nhanesA.html)
 
 - [Vignette: Introducing
   nhanesA](https://cran.r-project.org/package=nhanesA/vignettes/Introducing_nhanesA.html)

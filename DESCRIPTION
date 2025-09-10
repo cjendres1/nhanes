@@ -1,11 +1,11 @@
 Package: nhanesA
-Version: 1.3
-Date: 2025-01-08
+Version: 1.4
+Date: 2025-09-09
 Title: NHANES Data Retrieval
 Authors@R:
     c(person(given = "Christopher",
              family = "Endres",
-             role = c("aut", "cre"),
+             role = "aut",
              email = "cjendres1@gmail.com"),
       person(given="Laha", 
              family="Ale",
@@ -18,8 +18,9 @@ Authors@R:
              email= "robert_gentleman@g.harvard.edu"),
       person(given="Deepayan", 
              family="Sarkar",
-             role = "aut", 
-             email="deepayan.sarkar@gmail.com"))
+             role = c("aut", "cre"),
+             email="deepayan.sarkar@r-project.org",
+	     comment = c(ORCID = "0000-0003-4107-1553")))
 BugReports: https://github.com/cjendres1/nhanes/issues
 Depends:
     R (>= 4.1.0), methods
@@ -42,4 +43,4 @@ Suggests:
     survey,
     ggplot2
 VignetteBuilder: knitr
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
