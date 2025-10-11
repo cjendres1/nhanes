@@ -53,8 +53,10 @@ Downloads a table from the NHANES website as is, i.e. in
   access data.
 }
 \examples{
-\donttest{bpx_e = nhanes('BPX_E')}
-\donttest{dim(bpx_e)}
-\donttest{folate_f = nhanes('FOLATE_F', includelabels = TRUE)}
-\donttest{dim(folate_f)}
+\donttest{
+bpx_e = nhanes('BPX_E')
+dim(bpx_e)
+folate_f = nhanes('FOLATE_F', includelabels = TRUE)
+dim(folate_f)
+}
 }

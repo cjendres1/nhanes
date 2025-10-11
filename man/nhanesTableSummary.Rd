@@ -40,6 +40,8 @@ skipping other variables, etc. The precise details depend on the
 \code{use} argument and are subject to change.
 }
 \examples{
-\donttest{nhanesTableSummary('DEMO_D', use = "data")}
-\donttest{nhanesTableSummary('DEMO_D', use = "codebook")}
+\donttest{
+nhanesTableSummary('DEMO_D', use = "data")
+nhanesTableSummary('DEMO_D', use = "codebook")
+}
 }

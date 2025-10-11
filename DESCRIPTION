@@ -1,12 +1,13 @@
 Package: nhanesA
-Version: 1.4
-Date: 2025-09-09
+Version: 1.4.1
+Date: 2025-10-11
 Title: NHANES Data Retrieval
 Authors@R:
     c(person(given = "Christopher",
              family = "Endres",
              role = "aut",
-             email = "cjendres1@gmail.com"),
+             email = "cjendres1@gmail.com",
+	     comment = "original author"),
       person(given="Laha", 
              family="Ale",
              role = "aut", 

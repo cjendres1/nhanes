@@ -30,12 +30,14 @@
 #' The search may be restricted to specific surveys using ystart and ystop.
 #' If no arguments are given, then nhanesSearch returns the complete variable list.
 #' @examples
-#'  \donttest{bladder = nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)}
-#'  \donttest{dim(bladder)}
-#'  \donttest{urin = nhanesSearch("urin", exclude_terms="During", ystart=2009)}
-#'  \donttest{dim(urin)}
-#'  \donttest{urine = nhanesSearch(c("urine", "urinary"), ignore.case=TRUE, ystop=2006, namesonly=TRUE)}
-#'  \donttest{length(urine)}
+#' \donttest{
+#' bladder = nhanesSearch("bladder", ystart = 2001, ystop = 2008, nchar = 50)
+#' dim(bladder)
+#' urin = nhanesSearch("urin", exclude_terms = "During", ystart = 2009)
+#' dim(urin)
+#' urine = nhanesSearch(c("urine", "urinary"), ignore.case = TRUE, ystop = 2006, namesonly = TRUE)
+#' length(urine)
+#' }
 #' @export
 #' 
 nhanesSearch <- function(search_terms = NULL, exclude_terms = NULL,
@@ -182,12 +184,14 @@ nhanesSearch <- function(search_terms = NULL, exclude_terms = NULL,
 #' (see https://wwwn.cdc.gov/nchs/nhanes/search/DataPage.aspx) for tables
 #' that match a given name pattern. Only a single pattern may be entered.
 #' @examples
-#' \donttest{bmx = nhanesSearchTableNames('BMX')}
-#' \donttest{length(bmx)}
-#' \donttest{hepbd = nhanesSearchTableNames('HEPBD')}
-#' \donttest{length(hepbd)}
-#' \donttest{hpvs = nhanesSearchTableNames('HPVS', includerdc=TRUE, details=TRUE)}
-#' \donttest{dim(hpvs)}
+#' \donttest{
+#' bmx = nhanesSearchTableNames('BMX')
+#' length(bmx)
+#' hepbd = nhanesSearchTableNames('HEPBD')
+#' length(hepbd)
+#' hpvs = nhanesSearchTableNames('HPVS', includerdc=TRUE, details=TRUE)
+#' dim(hpvs)
+#' }
 #' @export
 #' 
 nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includerdc=FALSE, 
@@ -198,7 +202,6 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
     return(.nhanesSearchTableNamesDB(pattern, ystart, ystop, includerdc,
                                      includewithdrawn, nchar, details))
   }
-
 
   if(length(pattern)>1) {
     pattern <- pattern[1]
@@ -291,10 +294,12 @@ nhanesSearchTableNames <- function(pattern=NULL, ystart=NULL, ystop=NULL, includ
 #' contain the given variable name. Only a single variable name may be entered, and only
 #' exact matches will be found.
 #' @examples 
-#' \donttest{bmxleg = nhanesSearchVarName('BMXLEG')}
-#' \donttest{length(bmxleg)}
-#' \donttest{bmxhead = nhanesSearchVarName('BMXHEAD', ystart=2003)}
-#' \donttest{length(bmxhead)}
+#' \donttest{
+#' bmxleg = nhanesSearchVarName('BMXLEG')
+#' length(bmxleg)
+#' bmxhead = nhanesSearchVarName('BMXHEAD', ystart=2003)
+#' length(bmxhead)
+#' }
 #' @export
 #'  
 nhanesSearchVarName <- function(varname=NULL, ystart=NULL, ystop=NULL, includerdc=FALSE, nchar=128, namesonly=TRUE) {

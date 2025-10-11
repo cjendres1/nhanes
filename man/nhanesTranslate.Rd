@@ -63,9 +63,11 @@ Most NHANES data tables have encoded values. E.g. 1 =
   alternative mirror of the CDC documentation).
 }
 \examples{
-\donttest{nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN'))}
-\donttest{nhanesTranslate('BPX_F', 'BPACSZ', details=TRUE)}
-\donttest{nhanesTranslate('BPX_F', 'BPACSZ', data=nhanes('BPX_F'))}
-\donttest{trans_demo = nhanesTranslate('DEMO_B')}
-\donttest{length(trans_demo)}
+\donttest{
+nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN'))
+nhanesTranslate('BPX_F', 'BPACSZ', details=TRUE)
+nhanesTranslate('BPX_F', 'BPACSZ', data=nhanes('BPX_F'))
+trans_demo = nhanesTranslate('DEMO_B')
+length(trans_demo)
+}
 }
