@@ -154,7 +154,7 @@ parseRedirect <- function(s, prefix = "../vitamind/analyticalnote.aspx?")
 ##'   first occurrence.
 ##' @examples
 ##' \donttest{
-##' ## May fail if CDC website is unavailable or malformatted
+##' ## May fail if CDC website is (available but) malformatted
 ##' try({
 ##'     manifest <- nhanesManifest(sizes = FALSE)
 ##'     dim(manifest)

@@ -56,8 +56,11 @@ alternative mirror of the CDC data).
 }
 \examples{
 \donttest{
-vix_e = nhanesFromURL("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2007/DataFiles/VIX_E.xpt")
-bpx_e = nhanesFromURL("/Nchs/Data/Nhanes/Public/2007/DataFiles/BPX_E.xpt", translated = FALSE)
-dim(bpx_e)
+## May fail if CDC website is unavailable
+try({
+    vix_e = nhanesFromURL("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2007/DataFiles/VIX_E.xpt")
+    bpx_e = nhanesFromURL("/Nchs/Data/Nhanes/Public/2007/DataFiles/BPX_E.xpt", translated = FALSE)
+    dim(bpx_e)
+})
 }
 }

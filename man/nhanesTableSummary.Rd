@@ -41,7 +41,10 @@ skipping other variables, etc. The precise details depend on the
 }
 \examples{
 \donttest{
-nhanesTableSummary('DEMO_D', use = "data")
-nhanesTableSummary('DEMO_D', use = "codebook")
+## May fail if CDC website is unavailable
+try({
+    nhanesTableSummary('DEMO_D', use = "data")
+    nhanesTableSummary('DEMO_D', use = "codebook")
+})
 }
 }

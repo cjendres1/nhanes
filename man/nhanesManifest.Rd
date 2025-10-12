@@ -99,7 +99,7 @@ Duplicate rows are removed from the result. Most of these
 }
 \examples{
 \donttest{
-## May fail if CDC website is unavailable or malformatted
+## May fail if CDC website is (available but) malformatted
 try({
     manifest <- nhanesManifest(sizes = FALSE)
     dim(manifest)

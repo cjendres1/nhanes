@@ -42,11 +42,14 @@
 #'   alternative mirror of the CDC documentation).
 #' @examples
 #' \donttest{
-#' nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN'))
-#' nhanesTranslate('BPX_F', 'BPACSZ', details=TRUE)
-#' nhanesTranslate('BPX_F', 'BPACSZ', data=nhanes('BPX_F'))
-#' trans_demo = nhanesTranslate('DEMO_B')
-#' length(trans_demo)
+#' ## May fail if CDC website is unavailable
+#' try({
+#'     nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN'))
+#'     nhanesTranslate('BPX_F', 'BPACSZ', details=TRUE)
+#'     nhanesTranslate('BPX_F', 'BPACSZ', data=nhanes('BPX_F'))
+#'     trans_demo = nhanesTranslate('DEMO_B')
+#'     length(trans_demo)
+#' })
 #' }
 #' @export
 #' 
