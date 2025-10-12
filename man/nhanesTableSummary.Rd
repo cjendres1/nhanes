@@ -42,9 +42,7 @@ skipping other variables, etc. The precise details depend on the
 \examples{
 \donttest{
 ## May fail if CDC website is unavailable
-try({
-    nhanesTableSummary('DEMO_D', use = "data")
-    nhanesTableSummary('DEMO_D', use = "codebook")
-})
+try(nhanesTableSummary('DEMO_D', use = "data"))
+try(nhanesTableSummary('DEMO_D', use = "codebook"))
 }
 }

@@ -44,9 +44,9 @@
 #' \donttest{
 #' ## May fail if CDC website is unavailable
 #' try({
-#'     nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN'))
-#'     nhanesTranslate('BPX_F', 'BPACSZ', details=TRUE)
-#'     nhanesTranslate('BPX_F', 'BPACSZ', data=nhanes('BPX_F'))
+#'     nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN')) |> print()
+#'     nhanesTranslate('BPX_F', 'BPACSZ', details = TRUE) |> print()
+#'     nhanesTranslate('BPX_F', 'BPACSZ', data = nhanes('BPX_F')) |> str()
 #'     trans_demo = nhanesTranslate('DEMO_B')
 #'     length(trans_demo)
 #' })

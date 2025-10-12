@@ -158,6 +158,8 @@ parseRedirect <- function(s, prefix = "../vitamind/analyticalnote.aspx?")
 ##' try({
 ##'     manifest <- nhanesManifest(sizes = FALSE)
 ##'     dim(manifest)
+##' })
+##' try({
 ##'     varmf <- nhanesManifest("variables", component = "lab")
 ##'     head(varmf)
 ##' })

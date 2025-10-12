@@ -575,10 +575,8 @@ nhanesSummary_codebook <- function(nh_table, src = nhanesCodebook(nh_table, ...)
 ##' @examples
 ##' \donttest{
 ##' ## May fail if CDC website is unavailable
-##' try({
-##'     nhanesTableSummary('DEMO_D', use = "data")
-##'     nhanesTableSummary('DEMO_D', use = "codebook")
-##' })
+##' try(nhanesTableSummary('DEMO_D', use = "data"))
+##' try(nhanesTableSummary('DEMO_D', use = "codebook"))
 ##' }
 ##' @export
 nhanesTableSummary <- function(nh_table, use = c("data", "codebook", "both"), ...)

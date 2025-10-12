@@ -1,6 +1,6 @@
 Package: nhanesA
 Version: 1.4.1
-Date: 2025-10-11
+Date: 2025-10-12
 Title: NHANES Data Retrieval
 Authors@R:
     c(person(given = "Christopher",

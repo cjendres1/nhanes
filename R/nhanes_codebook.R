@@ -26,8 +26,8 @@
 #' \donttest{
 #' ## May fail if CDC website is unavailable
 #' try({
-#'     nhanesCodebook('AUX_D', 'AUQ020D')
-#'     nhanesCodebook('BPX_J', 'BPACSZ')
+#'     nhanesCodebook('AUX_D', 'AUQ020D') |> print()
+#'     nhanesCodebook('BPX_J', 'BPACSZ') |> print()
 #'     bpx_code = nhanesCodebook('BPX_J')
 #'     length(bpx_code)
 #' })
