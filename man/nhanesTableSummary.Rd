@@ -40,6 +40,9 @@ skipping other variables, etc. The precise details depend on the
 \code{use} argument and are subject to change.
 }
 \examples{
-\donttest{nhanesTableSummary('DEMO_D', use = "data")}
-\donttest{nhanesTableSummary('DEMO_D', use = "codebook")}
+\donttest{
+## May fail if CDC website is unavailable
+try(nhanesTableSummary('DEMO_D', use = "data"))
+try(nhanesTableSummary('DEMO_D', use = "codebook"))
+}
 }

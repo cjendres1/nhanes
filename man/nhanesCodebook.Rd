@@ -30,8 +30,13 @@ Each NHANES variable has a codebook that provides a basic
   use of a local or alternative mirror of the CDC documentation).
 }
 \examples{
-\donttest{nhanesCodebook('AUX_D', 'AUQ020D')}
-\donttest{nhanesCodebook('BPX_J', 'BPACSZ')}
-\donttest{bpx_code = nhanesCodebook('BPX_J')}
-\donttest{length(bpx_code)}
+\donttest{
+## May fail if CDC website is unavailable
+try({
+    nhanesCodebook('AUX_D', 'AUQ020D') |> print()
+    nhanesCodebook('BPX_J', 'BPACSZ') |> print()
+    bpx_code = nhanesCodebook('BPX_J')
+    length(bpx_code)
+})
+}
 }

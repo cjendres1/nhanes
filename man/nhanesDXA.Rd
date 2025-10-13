@@ -33,7 +33,13 @@ Provide destfile in order to write the data to file. If destfile is not provided
 the data will be imported into the R environment.
 }
 \examples{
-\donttest{dxa_b <- nhanesDXA(2001)}
-\donttest{dxa_c_s <- nhanesDXA(2003, suppl=TRUE)}
-\dontrun{dxa = nhanesDXA(1999, destfile="dxx.xpt")}
+\donttest{
+## May fail if CDC website is unavailable
+try({
+    dxa_b <- nhanesDXA(2001)
+    dxa_c_s <- nhanesDXA(2003, suppl = TRUE)
+})
+## To save to a local file
+## dxa <- nhanesDXA(1999, destfile = "dxx.xpt")
+}
 }

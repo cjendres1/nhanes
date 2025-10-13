@@ -41,11 +41,16 @@
 #'   \url{https://wwwn.cdc.gov} (this allows the use of a local or
 #'   alternative mirror of the CDC documentation).
 #' @examples
-#' \donttest{nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN'))}
-#' \donttest{nhanesTranslate('BPX_F', 'BPACSZ', details=TRUE)}
-#' \donttest{nhanesTranslate('BPX_F', 'BPACSZ', data=nhanes('BPX_F'))}
-#' \donttest{trans_demo = nhanesTranslate('DEMO_B')}
-#' \donttest{length(trans_demo)}
+#' \donttest{
+#' ## May fail if CDC website is unavailable
+#' try({
+#'     nhanesTranslate('DEMO_B', c('DMDBORN','DMDCITZN')) |> print()
+#'     nhanesTranslate('BPX_F', 'BPACSZ', details = TRUE) |> print()
+#'     nhanesTranslate('BPX_F', 'BPACSZ', data = nhanes('BPX_F')) |> str()
+#'     trans_demo = nhanesTranslate('DEMO_B')
+#'     length(trans_demo)
+#' })
+#' }
 #' @export
 #' 
 nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128, 

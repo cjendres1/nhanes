@@ -98,9 +98,16 @@ Duplicate rows are removed from the result. Most of these
   first occurrence.
 }
 \examples{
-\donttest{manifest <- nhanesManifest(sizes = FALSE)}
-\donttest{dim(manifest)}
-\donttest{varmf <- nhanesManifest("variables", component = "lab")}
-\donttest{head(varmf)}
+\donttest{
+## May fail if CDC website is (available but) malformatted
+try({
+    manifest <- nhanesManifest(sizes = FALSE)
+    dim(manifest)
+})
+try({
+    varmf <- nhanesManifest("variables", component = "lab")
+    head(varmf)
+})
+}
 
 }

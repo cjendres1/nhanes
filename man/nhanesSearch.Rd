@@ -53,10 +53,12 @@ The search may be restricted to specific surveys using ystart and ystop.
 If no arguments are given, then nhanesSearch returns the complete variable list.
 }
 \examples{
- \donttest{bladder = nhanesSearch("bladder", ystart=2001, ystop=2008, nchar=50)}
- \donttest{dim(bladder)}
- \donttest{urin = nhanesSearch("urin", exclude_terms="During", ystart=2009)}
- \donttest{dim(urin)}
- \donttest{urine = nhanesSearch(c("urine", "urinary"), ignore.case=TRUE, ystop=2006, namesonly=TRUE)}
- \donttest{length(urine)}
+\donttest{
+bladder = nhanesSearch("bladder", ystart = 2001, ystop = 2008, nchar = 50)
+dim(bladder)
+urin = nhanesSearch("urin", exclude_terms = "During", ystart = 2009)
+dim(urin)
+urine = nhanesSearch(c("urine", "urinary"), ignore.case = TRUE, ystop = 2006, namesonly = TRUE)
+length(urine)
+}
 }

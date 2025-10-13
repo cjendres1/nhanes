@@ -153,10 +153,17 @@ parseRedirect <- function(s, prefix = "../vitamind/analyticalnote.aspx?")
 ##'   descriptions. These are removed explicitly, keeping only the
 ##'   first occurrence.
 ##' @examples
-##' \donttest{manifest <- nhanesManifest(sizes = FALSE)}
-##' \donttest{dim(manifest)}
-##' \donttest{varmf <- nhanesManifest("variables", component = "lab")}
-##' \donttest{head(varmf)}
+##' \donttest{
+##' ## May fail if CDC website is (available but) malformatted
+##' try({
+##'     manifest <- nhanesManifest(sizes = FALSE)
+##'     dim(manifest)
+##' })
+##' try({
+##'     varmf <- nhanesManifest("variables", component = "lab")
+##'     head(varmf)
+##' })
+##' }
 ##' 
 ##' @export
 nhanesManifest <- function(which = c("public", "limitedaccess", "variables"),
@@ -198,6 +205,7 @@ nhanesManifest <- function(which = c("public", "limitedaccess", "variables"),
   .nhanesCacheEnv[[ cache_key ]] <- list(manifest = ans, timestamp = Sys.time())
   ans
 }
+
 
 
 ## download and parse public manifest

@@ -44,10 +44,12 @@ Searches the Doc File field in the NHANES Comprehensive Data List
 that match a given name pattern. Only a single pattern may be entered.
 }
 \examples{
-\donttest{bmx = nhanesSearchTableNames('BMX')}
-\donttest{length(bmx)}
-\donttest{hepbd = nhanesSearchTableNames('HEPBD')}
-\donttest{length(hepbd)}
-\donttest{hpvs = nhanesSearchTableNames('HPVS', includerdc=TRUE, details=TRUE)}
-\donttest{dim(hpvs)}
+\donttest{
+bmx = nhanesSearchTableNames('BMX')
+length(bmx)
+hepbd = nhanesSearchTableNames('HEPBD')
+length(hepbd)
+hpvs = nhanesSearchTableNames('HPVS', includerdc=TRUE, details=TRUE)
+dim(hpvs)
+}
 }

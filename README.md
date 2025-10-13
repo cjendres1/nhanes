@@ -99,4 +99,4 @@ is already installed, and configured to use the database.
   nhanesA](https://cran.r-project.org/package=nhanesA/vignettes/Introducing_nhanesA.html)
 
 <br />
-<img src="man/figures/nhanesAsticker.png" alt="drawing" width="400"/>
+<img src="man/figures/logo.png" alt="logo" width="400"/>
