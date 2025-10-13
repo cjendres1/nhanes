@@ -1,5 +1,5 @@
 #nhanesA - retrieve data from the CDC NHANES repository
-# Christopher J. Endres 09/14/2023
+# 
 # FUNCTIONS:
 #   nhanes
 #   nhanesFromURL
@@ -236,10 +236,10 @@ nhanesDXA <- function(year, suppl=FALSE, destfile=NULL, adjust_timeout = TRUE) {
 
   dxa_fname <- function(year, suppl) {
     fname <- 
-      if(year == 1999 || year == 2000) { 'dxx'}
-      else if(year == 2001 || year == 2002) { 'dxx_b'}
-      else if(year == 2003 || year == 2004) { 'dxx_c'}
-      else if(year == 2005 || year == 2006) { 'DXX_D'}
+      if(year == 1999 || year == 2000) { '1999/datafiles/dxx'}
+      else if(year == 2001 || year == 2002) { '2001/datafiles/dxx_b'}
+      else if(year == 2003 || year == 2004) { '2003/datafiles/dxx_c'}
+      else if(year == 2005 || year == 2006) { '2005/datafiles/DXX_D'}
     if(isTRUE(suppl)) {
       fname <- paste0(fname, 
                       if(year == 2005 || year == 2006) '_S' else '_s')

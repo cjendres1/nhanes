@@ -40,7 +40,7 @@ ab_nhanesManifestPrefix <- function(x) {
 nhanesURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/'
 dataURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx'
 ladDataURL <- 'https://wwwn.cdc.gov/Nchs/Nhanes/search/DataPage.aspx?Component=LimitedAccess'
-dxaURL  <- "https://wwwn.cdc.gov/nchs/data/nhanes/dxa/"
+dxaURL  <- 'https://wwwn.cdc.gov/nchs/data/nhanes/public/'
 dxaTablesURL  <- "https://wwwn.cdc.gov/Nchs/Nhanes/Dxa/Dxa.aspx"
 
 demoURL <- "https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Component=Demographics"
