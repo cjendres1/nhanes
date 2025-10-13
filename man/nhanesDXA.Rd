@@ -38,7 +38,8 @@ the data will be imported into the R environment.
 try({
     dxa_b <- nhanesDXA(2001)
     dxa_c_s <- nhanesDXA(2003, suppl = TRUE)
-    dxa <- nhanesDXA(1999, destfile = "dxx.xpt")
 })
+## To save to a local file
+## dxa <- nhanesDXA(1999, destfile = "dxx.xpt")
 }
 }
