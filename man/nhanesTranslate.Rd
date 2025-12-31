@@ -12,7 +12,8 @@ nhanesTranslate(
   mincategories = 1,
   details = FALSE,
   dxa = FALSE,
-  cleanse_numeric = FALSE
+  cleanse_numeric = FALSE,
+  file = NULL
 )
 }
 \arguments{
@@ -41,6 +42,10 @@ used (default=FALSE).}
 \item{cleanse_numeric}{Logical flag. If \code{TRUE}, some special
 codes in numeric variables, such as \sQuote{Refused} and
 \sQuote{Don't know} will be converted to \code{NA}.}
+
+\item{file}{Optional local file path to save or read the HTML content.
+If specified and file exists, the local file will be used instead of 
+downloading.}
 }
 \value{
 The code translation table (or translated data frame when
