@@ -1,0 +1,4 @@
+#!/usr/bin/env Rscript
+
+roxygen2::roxygenize(".")
+

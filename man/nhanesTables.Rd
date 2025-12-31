@@ -41,9 +41,16 @@ a convenient way to browse the available tables. NULL is returned when an
 HTML read error is encountered.
 }
 \examples{
-nhanesTables('EXAM', 2007)
-\donttest{nhanesTables('LAB', 2009, details=TRUE, includerdc=TRUE)}
-\donttest{nhanesTables('Q', 2005, namesonly=TRUE)}
-\donttest{nhanesTables('DIET', 'P')}
-\donttest{nhanesTables('EXAM', 'Y')}
+exam = nhanesTables('EXAM', 2007)
+dim(exam)
+\donttest{
+lab = nhanesTables('LAB', 2009, details=TRUE, includerdc=TRUE)
+dim(lab)
+q = nhanesTables('Q', 2005, namesonly=TRUE)
+length(q)
+diet = nhanesTables('DIET', 'P')
+dim(diet)
+exam = nhanesTables('EXAM', 'Y')
+dim(exam)
+}
 }

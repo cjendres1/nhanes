@@ -4,7 +4,7 @@
 \alias{nhanesCodebook}
 \title{Display codebook for selected variable.}
 \usage{
-nhanesCodebook(nh_table, colname, dxa = FALSE)
+nhanesCodebook(nh_table, colname = NULL, dxa = FALSE)
 }
 \arguments{
 \item{nh_table}{The name of the NHANES table that contains the desired variable.}
@@ -21,11 +21,22 @@ Returns full NHANES codebook including Variable Name, SAS Label, English Text, T
 and Value distribution.
 }
 \details{
-Each NHANES variable has a codebook that provides a basic description
-as well as the distribution or range of values. This function returns the full
-codebook information for the selected variable.
+Each NHANES variable has a codebook that provides a basic
+  description as well as the distribution or range of values. This
+  function returns the full codebook information for the selected
+  variable. If the environment variable \code{NHANES_TABLE_BASE}
+  was set during startup, the value of this variable is used as the
+  base URL instead of \url{https://wwwn.cdc.gov} (this allows the
+  use of a local or alternative mirror of the CDC documentation).
 }
 \examples{
-\donttest{nhanesCodebook('AUX_D', 'AUQ020D')}
-\donttest{nhanesCodebook('BPX_J', 'BPACSZ')}
+\donttest{
+## May fail if CDC website is unavailable
+try({
+    nhanesCodebook('AUX_D', 'AUQ020D') |> print()
+    nhanesCodebook('BPX_J', 'BPACSZ') |> print()
+    bpx_code = nhanesCodebook('BPX_J')
+    length(bpx_code)
+})
+}
 }

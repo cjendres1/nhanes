@@ -38,7 +38,12 @@ of variables for a specified table, which helps to ascertain quickly if the tabl
 NULL is returned when an HTML read error is encountered.
 }
 \examples{
-\donttest{nhanesTableVars('LAB', 'CBC_E')}
-\donttest{nhanesTableVars('EXAM', 'OHX_E', details=TRUE, nchar=50)}
-\donttest{nhanesTableVars('DEMO', 'DEMO_F', namesonly = TRUE)}
+\donttest{
+lab_cbc = nhanesTableVars('LAB', 'CBC_E')
+dim(lab_cbc)
+exam_ohx = nhanesTableVars('EXAM', 'OHX_E', details=TRUE, nchar=50)
+dim(exam_ohx)
+demo = nhanesTableVars('DEMO', 'DEMO_F', namesonly = TRUE)
+length(demo)
+}
 }
