@@ -28,6 +28,9 @@
 #' @param cleanse_numeric Logical flag. If \code{TRUE}, some special
 #'   codes in numeric variables, such as \sQuote{Refused} and
 #'   \sQuote{Don't know} will be converted to \code{NA}.
+#' @param file Optional local file path to save or read the HTML content.
+#'   If specified and file exists, the local file will be used instead of 
+#'   downloading.
 #' @return The code translation table (or translated data frame when
 #'   data is defined). Returns NULL upon error.
 #' @details Most NHANES data tables have encoded values. E.g. 1 =
@@ -55,7 +58,8 @@
 #' 
 nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128, 
                             mincategories = 1, details=FALSE, dxa=FALSE,
-                            cleanse_numeric = FALSE)
+                            cleanse_numeric = FALSE,
+                            file = NULL)
 {
   if(isFALSE(dxa) && !grepl("^(Y_)\\w+", nh_table) && .useDB()) {
     return(.nhanesTranslateDB(nh_table, colnames,data,nchar,mincategories,details))
@@ -136,7 +140,15 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128,
         paste0(nhanesTableURL, nh_year, '/DataFiles/', nh_table, '.htm')
       }
   }
+  # use local file if specified and already exists
+  if (!is.null(file) && file.exists(file)) {
+    code_translation_url = file
+  }
   hurl <- .checkHtml(code_translation_url)
+  if (!is.null(file) && !file.exists(file) && !is.null(hurl)) {
+    dir.create(dirname(file), showWarnings = FALSE, recursive = TRUE)
+    xml2::write_html(hurl, file)
+  }
   if(is.null(colnames) )
     colnames = .getVarNames(hurl)$VarNames
   translations <- lapply(colnames, get_translation_table, hurl, details)
