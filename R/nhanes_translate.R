@@ -16,6 +16,9 @@
 #' @param data If a data frame is passed, then code translation will
 #'   be applied directly to the data frame. \cr In that case the
 #'   return argument is the code-translated data frame.
+#' @param codebook If specified, this will be used as the codebook
+#'   instead of downloading it from the internet. Should be of the
+#'   form returned by \code{\link{nhanesCodebook}}.
 #' @param nchar Applies only when data is defined. Code translations
 #'   can be very long. \cr Truncate the length by setting nchar
 #'   (default = 128).
@@ -53,12 +56,14 @@
 #' }
 #' @export
 #' 
-nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128, 
-                            mincategories = 1, details=FALSE, dxa=FALSE,
-                            cleanse_numeric = FALSE)
+nhanesTranslate <- function(nh_table, colnames = NULL,
+                            data = NULL, codebook = NULL,
+                            nchar = 128, mincategories = 1, details = FALSE,
+                            dxa = FALSE, cleanse_numeric = FALSE)
 {
   if(isFALSE(dxa) && !grepl("^(Y_)\\w+", nh_table) && .useDB()) {
-    return(.nhanesTranslateDB(nh_table, colnames,data,nchar,mincategories,details))
+    if (!is.null(codebook)) warning("Non-NULL 'codebook' ignored as DB available")
+    return(.nhanesTranslateDB(nh_table, colnames, data, nchar, mincategories, details))
   }
 
   # if(is.null(colnames)) {
@@ -71,76 +76,29 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128,
     warning("When a data table is passed to nhanesTranslate, the details variable is ignored")
   }
   
-  get_translation_table <- function(colname, hurl, details) {
-    xpt <- paste0('//*[h3[a[@name="', colname, '"]]]')
-    
-    tabletree <- hurl |> html_elements(xpath=xpt)
-    if(length(tabletree)==0) { # If not found then try 'id' instead of 'name'
-      xpt <- paste0('//*[h3[@id="', colname, '"]]')
-      
-      tabletree <- hurl |> html_elements(xpath=xpt)
-    }
-    if(length(tabletree)>0) {
-      tabletrans <- html_elements(tabletree, 'table') |> html_table() |> as.data.frame()
-    } else { # Code table not found so let's see if last letter should be lowercase
-      nc <- nchar(colname)
-      if(length(grep("[[:upper:]]", stringr::str_sub(colname, start=nc, end=nc)))>0){
-        lcnm <- colname
-        stringr::str_sub(lcnm, start=nc, end=nc) <-
-            tolower(stringr::str_sub(lcnm, start=nc, end=nc))
-        xpt <- paste0('//*[h3[a[@name="', lcnm, '"]]]')
-        
-        tabletree <- hurl |> html_elements(xpath=xpt)
+  ## NOTE: We could have used
+  ##
+  ## nhanesCodebook(nh_table, colname = colnames, dxa = dxa)
+  ##
+  ## but that behaves badly if length(colname) == 1 (see PR#114)
+  if (is.null(codebook)) codebook <- nhanesCodebook(nh_table, dxa = dxa)
+  if(!is.null(colnames)) codebook <- codebook[colnames]
 
-        if(length(tabletree)==0) { # If not found then try 'id' instead of 'name'
-          xpt <- paste0('//*[h3[@id="', lcnm, '"]]')
-          tabletree <- hurl |> html_elements(xpath=xpt)
-        }
-        
-        if(length(tabletree)>0) {
-          tabletrans <- html_elements(tabletree, 'table') |> html_table() |> as.data.frame()
-        } else { # Still not found even after converting to lowercase
-          warning(c('Column "', colname, '" not found'), collapse='')
-          return(NULL)
-        }
-      } else { #Last character is not an uppercase letter, thus can't convert to lowercase
-        warning(c('Column "', colname, '" not found'), collapse='')
-        return(NULL)
-      }
-    }
-    
-    if(length(tabletrans) > 0) {
-      if(details == FALSE) {
-        tabletrans <- tabletrans[,c('Code.or.Value', 'Value.Description')]
-      }
-      return(tabletrans)
-    } else { 
-      if(!(colname=='SEQN')) {
-        message(paste(c('No translation table is available for ', colname), collapse=''))
-      }
-      return(NULL)
-    }
-  }
   
-  if(dxa) {
-    code_translation_url <- "https://wwwn.cdc.gov/nchs/data/nhanes/dxa/dxx_d.htm"
-  } else {
-    nh_year <- .get_year_from_nh_table(nh_table)
-    if(anyNA(nh_year)) {
-      return(NULL)
-    }
-    code_translation_url <- 
-      if(nh_year == "Nnyfs"){
-        paste0("https://wwwn.cdc.gov/Nchs/Data/", nh_year, '/Public/2012/DataFiles/', nh_table, '.htm')
-      } else {
-        paste0(nhanesTableURL, nh_year, '/DataFiles/', nh_table, '.htm')
-      }
+  keep <- if (details) TRUE else c("Code.or.Value", "Value.Description")
+  get_translation_table <- function(varcb) {
+    ## Assume first component is variable name
+    i <- varcb[[1]]
+    if (!is.list(varcb)) return(NULL)
+    if (is.null(cb <- varcb[[i]])) return(NULL)
+    names(cb) <- make.names(names(cb))
+    as.data.frame(cb[keep])
   }
-  hurl <- .checkHtml(code_translation_url)
-  if(is.null(colnames) )
-    colnames = .getVarNames(hurl)$VarNames
-  translations <- lapply(colnames, get_translation_table, hurl, details)
-  names(translations) <- colnames
+  translations <- lapply(codebook, get_translation_table)
+  translations <- translations[!sapply(translations, is.null)]
+
+  ## translations <- lapply(colnames, get_translation_table, hurl, details)
+  ## names(translations) <- colnames
   
   #nchar_max <- 128
   if(nchar > nchar_max) {
@@ -148,10 +106,11 @@ nhanesTranslate <- function(nh_table, colnames=NULL, data = NULL, nchar = 128,
   }
   
   if(is.null(data)) { ## If no data to translate then just return the translation table
-    return(Filter(Negate(function(x) is.null(unlist(x))), translations))
+    ## return(Filter(Negate(function(x) is.null(unlist(x))), translations))
+    return(translations)
   } else {
     #    message("Need to decide what to do when data are passed in")
-    translations <- Filter(Negate(function(x) is.null(unlist(x))), translations)
+    ## translations <- Filter(Negate(function(x) is.null(unlist(x))), translations)
     colnames     <- as.list(names(translations))
     
     translated <- c() ## Let's keep track of columns that were translated

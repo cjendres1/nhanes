@@ -230,8 +230,9 @@
 }
 
 
-.nhanesTranslateDB <- function(nh_table, colnames = NULL, data = FALSE, nchar = 32,
-                               mincategories = 1, details = FALSE, dxa = FALSE)
+.nhanesTranslateDB <-
+    function(nh_table, colnames = NULL, data = NULL, nchar = 32,
+             mincategories = 1, details = FALSE, dxa = FALSE)
 {
   .checkTableNames(nh_table)
   if (!is.null(data)){
