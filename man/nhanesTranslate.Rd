@@ -8,6 +8,7 @@ nhanesTranslate(
   nh_table,
   colnames = NULL,
   data = NULL,
+  codebook = NULL,
   nchar = 128,
   mincategories = 1,
   details = FALSE,
@@ -24,6 +25,10 @@ translate all the columns by default.}
 \item{data}{If a data frame is passed, then code translation will
 be applied directly to the data frame. \cr In that case the
 return argument is the code-translated data frame.}
+
+\item{codebook}{If specified, this will be used as the codebook
+instead of downloading it from the internet. Should be of the
+form returned by \code{\link{nhanesCodebook}}.}
 
 \item{nchar}{Applies only when data is defined. Code translations
 can be very long. \cr Truncate the length by setting nchar
