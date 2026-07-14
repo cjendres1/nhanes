@@ -66,13 +66,19 @@ nhanesTables <- function(data_group, year, nchar = 128,
     turl <- paste0(nhanesURL, 'search/NnyfsData.aspx?Component=',
                    component,
                    '&CycleBeginYear=', '2012')
-  } else {
+  } else if (year %in% 2021:2023){
+    nh_year <- .get_nh_survey_years(year)
+    turl <- paste0(nhanesURL, 'search/variablelist.aspx?Component=',
+                   component,
+                   '&Cycle=', nh_year)
+  }
+  else {
     nh_year <- .get_nh_survey_years(year)
     turl <- paste0(nhanesURL, 'search/variablelist.aspx?Component=',
                    component,
                    '&CycleBeginYear=', unlist(str_split(nh_year, '-'))[[1]])
   }
-  
+
   # At this point df contains every table for the specified survey & year
   hurl <- .checkHtml(turl)
   if(is.null(hurl)) {
@@ -196,9 +202,15 @@ nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=128, na
     
   } else {
     nh_year <- .get_year_from_nh_table(nh_table)
+    if (nh_year == '2021'){
+      turl <- paste0(nhanesURL, 'search/variablelist.aspx?Component=', 
+                    component, 
+                    '&Cycle=', '2021-2023') 
+    } else{
     turl <- paste0(nhanesURL, 'search/variablelist.aspx?Component=', 
                    component, 
                    '&CycleBeginYear=', unlist(str_split(nh_year, '-'))[[1]]) 
+    }
   }
   
   hurl <- .checkHtml(turl) 
