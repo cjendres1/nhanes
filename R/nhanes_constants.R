@@ -70,8 +70,9 @@ nhanes_group <-
 
 ## nhanes_survey_groups <- unique(nhanes_group) # not used anywhere
 
-# Although continuous NHANES is grouped in 2-year intervals,
-# for convenience we want to specify using a single year
+# Continuous NHANES is generally grouped in 2-year intervals,
+# with the 2021-2023 post-pandemic cycle as an exception.
+# For convenience, allow a cycle to be specified using a single year.
 nh_years <-
   c(`1999` = "1999-2000", `2000` = "1999-2000", `2001` = "2001-2002", 
     `2002` = "2001-2002", `2003` = "2003-2004", `2004` = "2003-2004", 
@@ -80,8 +81,8 @@ nh_years <-
     `2011` = "2011-2012", `2012` = "2011-2012", `2013` = "2013-2014", 
     `2014` = "2013-2014", `2015` = "2015-2016", `2016` = "2015-2016", 
     `2017` = "2017-2018", `2018` = "2017-2018", `2019` = "2019-2020", 
-    `2020` = "2019-2020", `2021` = "2021-2022", `2022` = "2021-2022", 
-    `2023` = "2023-2024", `2024` = "2023-2024")
+    `2020` = "2019-2020", `2021` = "2021-2023", `2022` = "2021-2023", 
+    `2023` = "2021-2023", `2024` = "2023-2024")
 
 
 # Continuous NHANES table names have a letter suffix that indicates the collection interval
