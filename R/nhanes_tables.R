@@ -66,26 +66,26 @@ nhanesTables <- function(data_group, year, nchar = 128,
     turl <- paste0(nhanesURL, 'search/NnyfsData.aspx?Component=',
                    component,
                    '&CycleBeginYear=', '2012')
-  } else {
+   } else {
     nh_year <- .get_nh_survey_years(year)
 
-if (identical(nh_year, "2021-2023")) {
-  turl <- paste0(
-    nhanesURL,
-    'search/variablelist.aspx?Component=',
-    component,
-    '&Cycle=',
-    nh_year
-  )
-} else {
-  turl <- paste0(
-    nhanesURL,
-    'search/variablelist.aspx?Component=',
-    component,
-    '&CycleBeginYear=',
-    unlist(str_split(nh_year, '-'))[[1]]
-  )
-}
+    if (identical(nh_year, "2021-2023")) {
+      turl <- paste0(
+        nhanesURL,
+        'search/variablelist.aspx?Component=',
+        component,
+        '&Cycle=',
+        nh_year
+      )
+    } else {
+      turl <- paste0(
+        nhanesURL,
+        'search/variablelist.aspx?Component=',
+        component,
+        '&CycleBeginYear=',
+        unlist(str_split(nh_year, '-'))[[1]]
+      )
+    }
   }
   
   # At this point df contains every table for the specified survey & year
@@ -209,27 +209,27 @@ nhanesTableVars <- function(data_group, nh_table, details = FALSE, nchar=128, na
                    component, 
                    '&Cycle=', nh_year)
     
-  } else {
-nh_year <- .get_year_from_nh_table(nh_table)
-nh_cycle <- .get_nh_survey_years(nh_year)
+    } else {
+    nh_year <- .get_year_from_nh_table(nh_table)
+    nh_cycle <- .get_nh_survey_years(nh_year)
 
-if (identical(nh_cycle, "2021-2023")) {
-  turl <- paste0(
-    nhanesURL,
-    'search/variablelist.aspx?Component=',
-    component,
-    '&Cycle=',
-    nh_cycle
-  )
-} else {
-  turl <- paste0(
-    nhanesURL,
-    'search/variablelist.aspx?Component=',
-    component,
-    '&CycleBeginYear=',
-    unlist(str_split(nh_cycle, '-'))[[1]]
-  )
-}
+    if (identical(nh_cycle, "2021-2023")) {
+      turl <- paste0(
+        nhanesURL,
+        'search/variablelist.aspx?Component=',
+        component,
+        '&Cycle=',
+        nh_cycle
+      )
+    } else {
+      turl <- paste0(
+        nhanesURL,
+        'search/variablelist.aspx?Component=',
+        component,
+        '&CycleBeginYear=',
+        unlist(str_split(nh_cycle, '-'))[[1]]
+      )
+    }
   }
   
   hurl <- .checkHtml(turl) 
